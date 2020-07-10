@@ -1,0 +1,33 @@
+@import './reset.css';
+
+html,
+body,
+#app {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    text-align: left;
+    color: #606266;
+}
+
+.anchorBL {
+    display: none;
+}
+
+* {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+.router-link-active {
+    text-decoration: none;
+}
