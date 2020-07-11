@@ -1,13 +1,12 @@
 <template>
   <div id="taskArrangementWrapper">
     <div class="rightNav">
-      <span :class="{c409eff:cindex==item.id}" @click="clickRightNav(item.id)" v-for="item in rightNav" :key="item.id" v-show="item.roleShow4">{{item.text}}</span>
+      <span :class="{c409eff:cindex==item.id}" @click="clickRightNav(item.id,item.text)" v-for="item in rightNav" :key="item.id" v-show="item.roleShow4">{{item.text}}</span>
+     
     </div>
     <div class="taskArrangementContent">
-      <div class="acceptance" v-loading="loading"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 0.8)">
+      
+      <div class="acceptance" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
         <p class="acceptanceText lh48">验收内容</p>
         <el-divider></el-divider>
         <div class="acceptanceContainer">
@@ -69,6 +68,23 @@
         <el-button>取消</el-button>
       </div>
     </div>
+     <div class="usedRecodeBtn">
+        <!-- <el-button type="primary" plain size="small" @click="usedRecode()">使用</el-button> -->
+        <el-dialog title="评定方式" :visible.sync="dialogFormVisible">
+          <div class="dialogFormVisibleContent">
+            <el-radio-group v-model="radio">
+              <div v-for="item in useRecodeRadioList" :key="item.copyType"> <el-radio :label="item.copyType" >{{item.text}}</el-radio></div>
+             
+              <!-- <el-radio :label="6">备选项</el-radio><br/>
+              <el-radio :label="9">备选项</el-radio> -->
+            </el-radio-group>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="sureUsedRecode()">确 定</el-button>
+          </div>
+        </el-dialog>
+      </div>
 
   </div>
 </template>
@@ -78,7 +94,8 @@ import {
   getStandards,
   getCurrStandardDocument,
   // getAcceptanceFactoryPartsMenuDto,
-  submitData
+  submitData,
+  getCurrCopyStatus
 } from "@/apis/acceptMethods.js";
 import { getFactoryMenus } from "@/apis/userUnit.js";
 import { getChecklistStandards } from "@/apis/standard";
@@ -94,7 +111,8 @@ export default {
         // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:true }
       ],
       cindex: 1,
-      loading:false, //加载
+      cText: '资料审查',
+      loading: false, //加载
       acceptanceData1: [],
       defaultProps: {
         children: "children",
@@ -128,7 +146,10 @@ export default {
       StandardNames: [],
       checkList: [], //筛选标准
       projectInfor: {}, //项目信息
-      factoryType:1, //单位类型
+      factoryType: 1, //单位类型
+      dialogFormVisible: false,
+      radio: "", //使用记录
+      useRecodeRadioList:[], //使用记录数据
     };
   },
   created() {
@@ -137,8 +158,8 @@ export default {
     // this.getTree2Data();
     this.getPersonData();
     this.getStandardNames();
-    this.factoryType = this.$store.state.userInfor.factoryType
-    // console.log(this.$store.state.userInfor.factoryType)
+    this.factoryType = this.$store.state.userInfor.factoryType;
+    console.log(this.$store.state)
   },
   mounted() {
     this.init();
@@ -146,26 +167,48 @@ export default {
   methods: {
     //初始化页面
     init() {
-      this.projectInfor = this.$store.state.projectInfor
-      this.cindex = this.projectInfor.reviewStandardId
+      this.projectInfor = this.$store.state.projectInfor;
+      this.cindex = this.projectInfor.reviewStandardId;
       this.rightNav = [
-        { id: this.projectInfor.reviewStandardId, text: "资料审查", roleShow4: true },
-        { id: this.projectInfor.completStandardId, text: "竣工查验", roleShow4: true },
-        { id: this.projectInfor.inspectStandardId, text: "消防检测", roleShow4: true },
+        {
+          id: this.projectInfor.reviewStandardId,
+          text: "资料审查",
+          roleShow4: true
+        },
+        {
+          id: this.projectInfor.completStandardId,
+          text: "竣工查验",
+          roleShow4: true
+        },
+        {
+          id: this.projectInfor.inspectStandardId,
+          text: "消防检测",
+          roleShow4: true
+        },
         { id: this.projectInfor.standardId, text: "现场评定", roleShow4: true }
-      ]
-      this.getTree1Data()
+      ];
+      this.getTree1Data();
       // console.log(this.projectInfor)
     },
     //点击筛选验收内容
-    clickRightNav(id) {
+    clickRightNav(id,text) {
       this.cindex = id;
-      this.loading = true
-      this.getTree1Data()
+      this.cText = text
+      this.loading = true;
+      this.getTree1Data();
     },
     //提交
     onSubmit() {
+      if(this.$store.state.userRole.roleCode==300||this.$store.state.userRole.roleCode==400||this.$store.state.userRole.roleCode==450){
+          this.usedRecode()
+      }else{
+        this.SubmitTask()
+      }
+      
+    },
+     SubmitTask(copyType=null) {
       let obj = {
+        copyType,
         primaryChecklistIds: [],
         secondaryChecklistIds: [],
         acceptancePartIds: [],
@@ -370,7 +413,7 @@ export default {
         .then(res => {
           // console.log(res);
           if (res.httpStatus == 200) {
-            this.loading = false
+            this.loading = false;
             this.acceptanceTree1Name = res.result.name;
             this.acceptanceData1 = res.result.primaryTitles.map(item => {
               if (item.selected) {
@@ -558,16 +601,51 @@ export default {
             message: "请求数据失败"
           });
         });
+    },
+    // 使用记录
+    usedRecode() {
+      getCurrCopyStatus({
+        projectId:this.$store.state.projectInfor.projectId
+      }).then(res=>{
+        console.log(res)
+        if(res.httpStatus == 200){
+          if(this.cText == '资料审查'){
+            this.useRecodeRadioList = [
+              {text:'使用建设单位已有的资料审查记录',copyType:15,disabled:res.result.reviewComplete},
+              {text:'使用服务机构已有的资料审查记录',copyType:20,disabled:res.result.reviewInspect},
+              {text:'全部重新评定',copyType:1,disabled:false}
+            ]
+          }else{
+             this.useRecodeRadioList = [
+              {text:'使用建设单位已有的竣工查验记录',copyType:5,disabled:res.result.complete},
+              {text:'使用服务机构已有的消防检测记录',copyType:10,disabled:res.result.inspect},
+              {text:'全部重新评定',copyType:1,disabled:false}
+            ]
+          }
+
+        }
+      }).catch(err=>{
+        this.$message({
+          type:'info',
+          message:'网络请求失败'
+        })
+      })
+      this.dialogFormVisible = true;
+    },
+    // 确定使用
+    sureUsedRecode() {
+      // console.log()
+      this.SubmitTask(this.radio)
     }
   },
   computed: {
-    changeProject(){
-      return this.$store.state.projectInfor
+    changeProject() {
+      return this.$store.state.projectInfor;
     }
   },
   watch: {
-    changeProject:function(){
-      this.init() 
+    changeProject: function() {
+      this.init();
     }
   }
 };
@@ -600,6 +678,7 @@ export default {
       background-color: #409eff;
       color: #fff;
     }
+   
   }
   .taskArrangementContent {
     flex: 1;
@@ -618,8 +697,8 @@ export default {
       }
       .acceptanceContainer {
         padding: 10px 0 0 25px;
-         height: 637px;
-      overflow-y: auto;
+        height: 637px;
+        overflow-y: auto;
       }
     }
     .apply {
@@ -632,9 +711,9 @@ export default {
       }
       .applyContainer {
         padding: 10px 10px 10px 25px;
-         height: 637px;
-      overflow-y: auto;
-      // border:1px solid red; 
+        height: 637px;
+        overflow-y: auto;
+        // border:1px solid red;
         .choseStandard {
           text-align: center;
         }
@@ -660,8 +739,8 @@ export default {
         text-indent: 20px;
       }
       .staffingConiner {
-       height: 637px;
-      overflow-y: auto;
+        height: 637px;
+        overflow-y: auto;
         padding: 10px 0 0 25px;
       }
     }
@@ -671,16 +750,28 @@ export default {
       bottom: 20px;
       text-align: center;
     }
-    .el-divider{
+    .el-divider {
       margin: 0;
     }
   }
-
+  .usedRecodeBtn{
+    padding-left:100px; 
+    .dialogFormVisibleContent{
+      
+       .el-radio{
+         .el-radio__label{
+            line-height: 30px;
+       font-size: 16px;
+         }
+       }
+    }
+  }
   .l30 {
     line-height: 30px;
   }
-  .lh48{
+  .lh48 {
     line-height: 48px;
   }
+  
 }
 </style>

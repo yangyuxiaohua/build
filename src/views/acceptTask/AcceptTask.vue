@@ -6,7 +6,6 @@
           <img src="../../assets/imgs/index/xiangmu.png" alt="">
           <span>任务安排</span>
         </div>
-        <!-- <el-button type="primary" plain size="small" @click="addProject()">新增</el-button> -->
       </div>
       <el-divider></el-divider>
       <el-input placeholder="请输入" v-model="projectSearch">
@@ -15,14 +14,14 @@
       <div class="projectList">
         <p v-for="item in projectList" :key="item.projectId" @click="clickProject(item)" :class="{chosedProjectClass:chosedProjectIdNum==item.projectId}">{{item.projectName}}</p>
       </div>
-      
+
     </div>
     <div class="right">
       <!-- <div class="rightNav">
         <span :class="{c409eff:cindex==item.id}" @click="clickRightNav(item.id,item.path)" v-for="item in rightNav" :key="item.id" v-show="item.roleShow4">{{item.text}}</span>
       </div> -->
       <!-- <div class="rightContainer"> -->
-        <router-view></router-view>
+      <router-view></router-view>
       <!-- </div> -->
     </div>
   </div>
@@ -33,7 +32,6 @@ import { inDexOfStr } from "../../utils/publictool.js";
 import {
   getProjectsByAcceptanceFactoryId,
   getProjectsByConstructionFactoryId
-  // addProject
 } from "@/apis/project.js";
 
 export default {
@@ -52,11 +50,12 @@ export default {
       // dialogProjectFormVisible: false,
       // addProjectForm: {}, //新增项目
       formLabelWidth: "100px",
-      chosedProjectIdNum: "" //选中的项目
+      chosedProjectIdNum: "", //选中的项目
+     
     };
   },
   created() {
-    this.roleShow()
+    this.roleShow();
     // if (inDexOfStr(this.$route.path, "basicInfor")) {
     //   this.cindex = 1;
     // } else if (inDexOfStr(this.$route.path, "acceptanceContent")) {
@@ -65,33 +64,37 @@ export default {
     //   this.cindex = 3;
     // }
     this.getProjectList();
-    if(this.$store.state.projectInfor.projectId){
+    if (this.$store.state.projectInfor.projectId) {
       this.chosedProjectIdNum = this.$store.state.projectInfor.projectId;
     }
   },
   methods: {
-     //角色控制
+    //角色控制
     roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 600 || roleCode == 650 || roleCode == 700 ||roleCode==500) {
-      
+      if (
+        roleCode == 600 ||
+        roleCode == 650 ||
+        roleCode == 700 ||
+        roleCode == 500
+      ) {
       }
     },
     handleIconClick() {
       // console.log(this.projectSearch)
-      this.getProjectList(this.projectSearch)
+      this.getProjectList(this.projectSearch);
     },
     // clickRightNav(index, path) {
     //   this.cindex = index;
     //   // this.$router.history.push(path);
     // },
     // 查询项目列表
-    getProjectList(name='') {
+    getProjectList(name = "") {
       if (
         this.$store.state.userRole.roleCode == 300 ||
         this.$store.state.userRole.roleCode == 600
       ) {
-        getProjectsByConstructionFactoryId({name})
+        getProjectsByConstructionFactoryId({ name })
           .then(res => {
             if (res.httpStatus == 200) {
               this.projectList = res.result;
@@ -104,7 +107,7 @@ export default {
             });
           });
       } else {
-        getProjectsByAcceptanceFactoryId({name})
+        getProjectsByAcceptanceFactoryId({ name })
           .then(res => {
             if (res.httpStatus == 200) {
               this.projectList = res.result;
@@ -118,19 +121,12 @@ export default {
           });
       }
     },
-    // 新增项目
-    // addProject() {
-    //   // this.dialogProjectFormVisible = true;
-    //   this.$store.commit("chosedProjectId", {});
-    //   this.cindex = 1;
-    //   this.chosedProjectIdNum = "";
-    //   this.$router.history.push("/index/project/basicInfor");
-    // },
+    
     //点击某一个项目
     clickProject(i) {
       this.chosedProjectIdNum = i.projectId;
       this.$store.commit("chosedProjectId", i);
-      this.cindex = 1
+      this.cindex = 1;
       // this.$router.history.push("/index/project/basicInfor");
     }
   },
@@ -182,6 +178,7 @@ export default {
           margin-left: 5px;
         }
       }
+     
       .el-button {
         // height: 30px;
         // line-height: 30px;
@@ -216,7 +213,7 @@ export default {
     // flex-direction: column;
     // padding: 0 10px 0 15px;
     // margin-left: 10px;
-    
+
     // .rightContainer {
     //   flex: 1;
     //   padding: 20px 10px 0 15px;

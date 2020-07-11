@@ -17,6 +17,12 @@ export const getAcceptanceFactoryPartsMenuDto = params => rq.post('/project/fact
 // 统一提交验收项和人员指派
 export const submitData = params => rq.post('/record/personnel/submit', params,'json')
 
+// projectId
+
+// 验收单位 -> 现场评定 获取复制状态
+export const getCurrCopyStatus = params => rq.post('/record/personnel/getCurrCopyStatus', params,'json')
+
+
 // // 根据项目获取现场评定内容
 // export const getDocumentByProjectId1 = params => rq.post('/record/curr/getDocumentByProjectId', params)
 

@@ -25,3 +25,12 @@ export const getRecordsByProjectIdGroup2 = params => rq.post('/record/curr/getRe
 
 // 3.根据项目主键获取所有验收记录(竣工查验和消防检测)
 export const getRecordsByProjectId3 = params => rq.post('/record/curr/getRecordsByProjectId3', params)
+
+// 1.根据项目主键获取所有一级菜单(现场评定)
+export const getEvaluationData12 = params => rq.post('/record/curr/get2RecordsByProjectIdGroup1', params)
+
+// 1.根据项目主键获取所有一级菜单(竣工查验、消防检测)
+export const getFiData12 = params => rq.post('/record/curr/getRecordsByProjectIdGroup1', params)
+
+// 1.根据项目主键获取所有一级菜单(资料评审)
+export const getDataReviewData12 = params => rq.post('/record/getRecordsByProjectIdGroup1', params)

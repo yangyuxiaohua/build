@@ -1,10 +1,10 @@
 <template>
   <div id="basicInforWrapper">
-    <el-form ref="form" :model="form" label-width="80px" size="small">
+    <el-form ref="form" :model="form" label-width="100px" size="small">
       <el-row>
-        <el-col :span="9">
-          <el-form-item label="工程名称" class="projectName">
-            <el-input v-model="form.name"></el-input>
+        <el-col :span="8">
+          <el-form-item label="工程名称">
+            <el-input v-model="form.projectName" class="w80P"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -17,14 +17,14 @@
               <el-option v-for="(item,index) in cityOptions" :key="index" :label="item.name" :value="item.id">
               </el-option>
             </el-select>
-            <el-select v-model="form.countyRegion" :placeholder="coPh" :disabled='countyDisabled' @change="chosedCounty()">
+            <el-select v-model="form.regionId" :placeholder="coPh" :disabled='countyDisabled' @change="chosedCounty()">
               <el-option v-for="(item,index) in countyOptions" :key="index" :label="item.name" :value="item.id">
               </el-option>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="5">
-          <el-form-item label="详细地址" class="peojectName">
+        <el-col :span="6">
+          <el-form-item label="详细地址">
             <el-input v-model="form.detailedAddress"></el-input>
           </el-form-item>
         </el-col>
@@ -34,9 +34,119 @@
           </span>
         </el-col>
       </el-row>
+      <el-divider></el-divider>
+
+      <el-row class="construction">
+        <el-col :span="8">
+          <el-form-item label="工程投资额">
+            <!-- <el-input v-model="form.name" class="w80P"></el-input> -->
+            <el-input v-model="form.money" class="w80P">
+              <template slot="append">万元</template>
+            </el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <!-- <el-form-item label="总建筑物面积">
+            <el-input v-model="form.name" class="w80P"></el-input>
+          </el-form-item> -->
+          <el-form-item label="总建筑面积">
+            <el-input v-model="form.constructionArea" class="w80P">
+              <template slot="append">m²</template>
+            </el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <!-- <el-form-item label="申请验收日期">
+            <el-input v-model="form.detailedAddress"></el-input>
+          </el-form-item> -->
+          <el-form-item label="申请验收日期">
+            <el-date-picker v-model="form.time" type="date" placeholder="选择日期" value-format="timestamp" class="w80P">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-divider></el-divider>
+
+      <el-row class="construction">
+        <el-col :span="8">
+          <el-form-item label="建设单位">
+            <!-- <el-select v-model="form.constructionPartId" class="w80P">
+              <el-option v-for="j in constructionOptions" :key="j.factoryId" :label="j.factoryName" :value="j.factoryId">
+              </el-option>
+            </el-select> -->
+
+            <el-cascader :options="constructionOptions" :props="props" clearable v-model="form.constructionPartId" @change="changeUnit('construction')" class="w80P"></el-cascader>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="联系人">
+            <el-input v-model="person1" class="w80P" disabled></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="联系电话">
+            <el-input v-model="phone1" class="w80P" disabled></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
 
       <el-divider></el-divider>
       <el-row class="construction">
+        <el-col :span="8">
+          <el-form-item label="技术服务机构">
+            <!-- <el-select v-model="form.servicePartId" class="w80P">
+              <el-option v-for="j in serviceOptions" :key="j.factoryId" :label="j.factoryName" :value="j.factoryId">
+              </el-option>
+            </el-select> -->
+            <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" @change="changeUnit('service')" class="w80P"></el-cascader>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="联系人">
+            <el-input v-model="person2" class="w80P" disabled></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="联系电话">
+            <el-input v-model="form.phone2" class="w80P" disabled></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-divider></el-divider>
+
+      <el-row class="construction">
+        <el-col :span="8">
+          <!-- <el-form-item label="验收单位">
+            <el-select v-model="form.constructionUnitValue" class="w80P">
+              <el-option v-for="j in constructionUnitOptions" :key="j.factoryId" :label="j.factoryName" :value="j.factoryId">
+              </el-option>
+            </el-select>
+          </el-form-item> -->
+
+          <el-form-item label="验收单位">
+            <el-cascader :options="AcceptanceFactorysOptions" :props="props" clearable v-model="form.acceptancePartId"  class="w80P"></el-cascader>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="消防验收申请受理凭证文号" label-width="180px">
+            <el-input v-model="form.certificateNumber" class="w75P"></el-input>
+          </el-form-item>
+          <!-- <el-form-item label="联系人">
+            <el-input v-model="form.person" class="w80P"></el-input>
+          </el-form-item> -->
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="消防设计审查意见书文号" label-width="180px">
+            <el-input v-model="form.reviewCertificateNumber" class="w75P"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-divider></el-divider>
+
+      <!-- <el-row class="construction">
         <el-col :span="6">
           <el-form-item label="建设单位">
             <el-select v-model="form.constructionUnitValue">
@@ -60,134 +170,166 @@
             <el-input v-model="form.phone"></el-input>
           </el-form-item>
         </el-col>
-      </el-row>
+      </el-row> -->
 
-      <el-divider></el-divider>
-      <el-row class="construction">
+      <!-- <el-divider></el-divider> -->
+
+      <!-- <el-row class="construction">
         <el-col :span="12">
           <el-form-item label="验收凭证文号" label-width="100px">
             <el-input v-model="form.ProofDocument"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="总建筑面积" label-width="100px">
-            <el-input v-model="form.coveredArea">
-              <template slot="append">m²</template>
-
-            </el-input>
-          </el-form-item>
+          
         </el-col>
         <el-col :span="6">
-          <el-form-item label="申请日期">
-            <el-date-picker v-model="form.dataValue" type="date" placeholder="选择日期" value-format="timestamp">
-            </el-date-picker>
-          </el-form-item>
+          
         </el-col>
       </el-row>
-      <el-divider></el-divider>
+      <el-divider></el-divider> -->
       <el-row class="construction">
         <el-col :span="12">
-          <el-form-item label="工程类别：" label-width="100px" class="Engineering">
-            <el-radio-group v-model="form.Engineering">
+          <el-form-item label="工程类别：" class="Engineering">
+            <el-radio-group v-model="form.typeId">
               <el-radio :label="item.dictionaryId" v-for="item in EngineeringList" :key="item.dictionaryId">{{item.name}}</el-radio>
-              <!-- <el-radio label="扩建"></el-radio>
-                            <el-radio label="改建"></el-radio>
-                        </el-radio-group>
-                        （
-                        <el-radio-group v-model="form.resource">
-                            <el-radio label="装修"></el-radio>
-                            <el-radio label="建筑保温"></el-radio>
-                            <el-radio label="用途变更"></el-radio> -->
             </el-radio-group>
-            <!-- ） -->
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <!-- <el-col :span="12">
           <el-form-item label="火宅危险性：" label-width="100px">
             <el-radio-group v-model="form.fire">
-              <!-- <el-radio label="甲类"></el-radio>
-                            <el-radio label="乙类"></el-radio>
-                            <el-radio label="丙类"></el-radio>
-                            <el-radio label="丁类"></el-radio>
-                            <el-radio label="戊类"></el-radio> -->
               <el-radio :label="item.dictionaryId" v-for="item in fireList" :key="item.dictionaryId">{{item.name}}</el-radio>
             </el-radio-group>
           </el-form-item>
-        </el-col>
-
+        </el-col> -->
       </el-row>
       <el-divider></el-divider>
-      <div class="userd mT15">
-        <el-form-item label="使用性质：" class="construction" label-width="82px">
-          <span>总建筑物面积大于二万平方米的 ：</span>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_2w" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
 
-        </el-form-item>
-        <el-form-item>
-          <span>总建筑物面积大于一万五千平方米的 ：</span>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_15w" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <span>总建筑物面积大于一万平方米的 ：</span>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_1w" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <span>总建筑物面积大于二千五百平方米的 ：</span>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Water" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <span>总建筑物面积大于一千平方米的 ：</span>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_01" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <span>总建筑物面积大于五百平方米的 ：</span>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_05" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Standard" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Car" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <span>生产、储存、装卸易燃易爆危险物品的 ：</span>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Produce" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_project" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-radio-group v-model="form.userd">
-            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Public" :key="item.dictionaryId">{{item.name}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </div>
+      <el-row class="construction">
+        <el-col :span="18">
+          <el-form-item label="特殊建设工程情形：" label-width="140px">
+            <el-input v-model="userdListStr" class="w75P" disabled></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="4" class="clickZoom">
+          <span @click="clickZoom()">{{zoomText}}</span>
+          <span @click="clickZoom()">
+            <i class="el-icon-arrow-down" v-show="zoomDown"></i>
+            <i class="el-icon-arrow-up" v-show="zoomUp"></i>
+          </span>
+
+        </el-col>
+      </el-row>
       <el-divider></el-divider>
+
+      <transition name="el-zoom-in-top">
+        <div v-show="show2" class="transition-box userd">
+          <el-form-item>
+            <span>总建筑物面积大于二万平方米的 ：</span>
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_2w" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <span>总建筑物面积大于一万五千平方米的 ：</span>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_15w" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_15w" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <span>总建筑物面积大于一万平方米的 ：</span>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_1w" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_1w" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <span>总建筑物面积大于二千五百平方米的 ：</span>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Water" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Water" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <span>总建筑物面积大于一千平方米的 ：</span>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_01" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_01" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <span>总建筑物面积大于五百平方米的 ：</span>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_05" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_05" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Standard" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Standard" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Car" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Car" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <span>生产、储存、装卸易燃易爆危险物品的 ：</span>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Produce" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Produce" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_project" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_project" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <!-- <el-radio-group v-model="form.userd">
+            <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Public" :key="item.dictionaryId">{{item.name}}</el-radio>
+          </el-radio-group> -->
+            <el-checkbox-group v-model="userdList">
+              <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Public" :key="item.dictionaryId">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </div>
+      </transition>
+
+      <!-- <el-divider></el-divider> -->
 
       <el-form-item class="btn construction">
         <div class="btnWrapper">
@@ -224,7 +366,7 @@ import {
   getProjectInfor,
   pageFactory,
   updateProject,
-  getConstructionFactorys,
+  getConstructionFactorys
   // getAcceptanceFactorys
 } from "@/apis/project.js";
 import { getFactoryMenus } from "@/apis/userUnit.js";
@@ -236,19 +378,22 @@ export default {
   data() {
     return {
       form: {
-        name: "",
-        projectAddress: "",
-        constructionUnit: "",
-        person: "",
-        phone: "",
-        ProofDocument: "",
-        coveredArea: "",
-        dataValue: "",
+        projectName: "", //工程名称
+        regionId: "", //工程地址
+        detailedAddress: "", //详细地址
+        money: "", // 投资额
+        constructionArea: "", //总建筑面积
+        time: "", //申请验收日期
+        constructionPartId: "", //建设单位
+        servicePartId: "", //技术服务机构
+        acceptancePartId: "", //验收单位
+        certificateNumber: "", //消防验收申请受理凭证文号
+        reviewCertificateNumber: "", //消防设计审查意见书文号
+        typeId: "", //工程类别：
         provinceRegion: "云南省",
         cityRegion: "昆明市",
-        countyRegion: "",
-        detailedAddress: "",
-        acceptanceFactoryId: ""
+        lat: "",
+        lon: ""
       },
       provinceOptions: [], // 省
       cityOptions: [], //市
@@ -264,8 +409,9 @@ export default {
       cPh: "市",
       coPh: "县",
       modifyShow: false,
-      constructionUnitOptions: [], //建设单位
       AcceptanceFactorysOptions: [], //验收单位
+      serviceOptions: [],
+      constructionOptions: [],
       props: {
         // multiple: true,
         checkStrictly: true,
@@ -274,8 +420,17 @@ export default {
         value: "id",
         emitPath: false
       },
-      lat: "",
-      lon: ""
+      allUserdList:[], // 保存特殊建设工程情形的数据
+      userdList: [], //特殊建设工程情形
+      userdListStr: "", //特殊建设工程情形
+      person1: "", //建设单位联系人
+      person2: "", //技术服务机构联系人
+      phone1: "", //建设单位电话
+      phone2: "", //技术服务机构电话
+      zoomText: "展开",
+      zoomDown: true,
+      zoomUp: false,
+      show2: false
     };
   },
   mounted() {
@@ -284,29 +439,28 @@ export default {
     this.getFireInfor();
     this.getUsedInfor();
     this.getAcceptanceFactorysOptions();
-    this.getConstructionFactoryOptions();
+    // this.getConstructionFactoryOptions();
     this.getProjectInformation();
-    this.chosedcity()
+    this.chosedcity();
   },
   methods: {
     onSubmit() {
       if (!this.$store.state.projectInfor.projectId) {
         addProject2({
-          certificateNumber: this.form.ProofDocument,
-          constructionArea: this.form.coveredArea,
-          contactPhone: this.form.phone,
-          contactUser: this.form.person,
-          dangerousLevelId: this.form.fire,
-          regionId: this.form.countyRegion,
-          typeId: this.form.Engineering,
-          usageId: this.form.userd,
-          time: this.form.dataValue,
-          constructionFactoryId: this.form.constructionUnitValue,
-          projectName: this.form.name,
+          projectName: this.form.projectName,
+          regionId: this.form.regionId,
+          detailedAddress: this.form.detailedAddress,
+          money: this.form.money,
+          time: this.form.time,
+          constructionPartId: this.form.constructionPartId,
+          servicePartId: this.form.servicePartId,
+          acceptancePartId: this.form.acceptancePartId,
+          certificateNumber: this.form.certificateNumber,
+          reviewCertificateNumber: this.form.reviewCertificateNumber,
+          typeId: this.form.typeId,
           lat: this.form.lat,
           lon: this.form.lon,
-          detailedAddress: this.form.detailedAddress,
-          acceptancePartId: this.form.acceptancePartId
+          usageId:this.userdList.join(',')
         })
           .then(res => {
             if (res.httpStatus == 200) {
@@ -314,16 +468,16 @@ export default {
                 type: "success",
                 message: "提交成功"
               });
-              // console.log(res)
               this.$store.commit("saveContentId", res.result.contentId);
               this.$store.commit("chosedProjectId", {
-                projectId:res.result.result.projectId,
-                acContentId:res.result.result.contentId
+                projectId: res.result.result.projectId,
+                acContentId: res.result.result.contentId
               });
               let bool =
                 this.$store.state.addProjectSuccessed == "1" ? "2" : "1";
               this.$store.commit("addProjectSuccess", bool);
-            } else {
+              this.getProjectInformation()
+              } else {
               this.$message({
                 type: "warning",
                 message: "提交失败"
@@ -339,20 +493,20 @@ export default {
       } else {
         updateProject({
           projectId: this.$store.state.projectInfor.projectId,
-          certificateNumber: this.form.ProofDocument,
-          constructionArea: this.form.coveredArea,
-          contactPhone: this.form.phone,
-          contactUser: this.form.person,
-          dangerousLevelId: this.form.fire,
-          regionId: this.form.countyRegion,
-          typeId: this.form.Engineering,
-          usageId: this.form.userd,
-          time: this.form.dataValue,
-          constructionFactoryId: this.form.constructionUnitValue,
+           projectName: this.form.projectName,
+          regionId: this.form.regionId,
+          detailedAddress: this.form.detailedAddress,
+          money: this.form.money,
+          time: this.form.time,
+          constructionPartId: this.form.constructionPartId,
+          servicePartId: this.form.servicePartId,
+          acceptancePartId: this.form.acceptancePartId,
+          certificateNumber: this.form.certificateNumber,
+          reviewCertificateNumber: this.form.reviewCertificateNumber,
+          typeId: this.form.typeId,
           lat: this.form.lat,
           lon: this.form.lon,
-          detailedAddress: this.form.detailedAddress,
-          acceptancePartId: this.form.acceptancePartId
+          usageId:this.userdList.join(',')
         })
           .then(res => {
             if (res.httpStatus == 200) {
@@ -363,6 +517,7 @@ export default {
               let bool =
                 this.$store.state.addProjectSuccessed == "1" ? "2" : "1";
               this.$store.commit("addProjectSuccess", bool);
+              this.getProjectInformation()
             } else {
               this.$message({
                 type: "info",
@@ -384,8 +539,6 @@ export default {
         .then(res => {
           if (res.httpStatus == 200) {
             this.provinceOptions = res.result;
-            // this.provinceRegion= "530000000000"
-            // this.cityRegion="530100000000"
           }
         })
         .catch(err => {
@@ -424,7 +577,7 @@ export default {
       getRegions({
         level: 3,
         // pid: this.form.cityRegion
-        pid:'530100000000'
+        pid: "530100000000"
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -441,7 +594,7 @@ export default {
     //选中县级获取坐标
     chosedCounty() {
       getRegions({
-        id: this.form.countyRegion
+        id: this.form.regionId
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -537,8 +690,9 @@ export default {
     getUsedInfor() {
       getUsed()
         .then(res => {
-          console.log(res)
+          // console.log(res);
           if (res.httpStatus == 200) {
+            this.allUserdList = res.result
             this.getUsedList = res.result.reduce((res1, item) => {
               res1[item.code]
                 ? res1[item.code].push(item)
@@ -546,7 +700,7 @@ export default {
               return res1;
             }, {});
           }
-          console.log(this.getUsedList)
+          // console.log(this.getUsedList);
         })
         .catch(err => {
           this.$message({
@@ -561,6 +715,7 @@ export default {
         projectId: this.$store.state.projectInfor.projectId
       })
         .then(res => {
+          console.log(res)
           if (res.httpStatus == 200) {
             //h获取三级联动
             if (res.result.project.regionId) {
@@ -570,80 +725,106 @@ export default {
               this.pPh = "省";
               this.coPh = "区/县";
             }
-            if( res.result.project.lat&& res.result.project.lat!=''){
-              this.$store.commit('savePoint',{
-                lat:res.result.project.lat,
+            if (res.result.project.lat && res.result.project.lat != "") {
+              this.$store.commit("savePoint", {
+                lat: res.result.project.lat,
                 lng: res.result.project.lon
-              })
+              });
             }
             this.form = {
-              person: res.result.projectInfo.contactUser,
-              phone: res.result.projectInfo.contactPhone,
-              ProofDocument: res.result.projectInfo.certificateNumber,
-              coveredArea: res.result.projectInfo.constructionArea,
-              dataValue: res.result.projectInfo.time,
-              Engineering: res.result.project.typeId,
-              fire: res.result.project.dangerousLevelId,
-              userd: res.result.projectInfoUsages[0].dictionaryId,
-              constructionUnitValue: res.result.project.constructionFactoryId,
-              name: res.result.project.projectName,
-              lat: res.result.project.lat,
-              lon: res.result.project.lon,
-              detailedAddress: res.result.project.detailedAddress,
-              acceptancePartId: res.result.project.authAcceptanceIds[0]
+                projectName: res.result.project.projectName, //工程名称
+                regionId: res.result.project.regionId, //工程地址
+                detailedAddress: res.result.project.detailedAddress, //详细地址
+                money: res.result.project.money, // 投资额
+                constructionArea: res.result.project.constructionArea, //总建筑面积
+                time: res.result.project.time, //申请验收日期
+                constructionPartId: res.result.project.authConstructionIds[0], //建设单位
+                servicePartId: res.result.project.authServiceIds[0], //技术服务机构
+                acceptancePartId: res.result.project.authAcceptanceIds[0], //验收单位
+                certificateNumber: res.result.project.certificateNumber, //消防验收申请受理凭证文号
+                reviewCertificateNumber: res.result.project.reviewCertificateNumber, //消防设计审查意见书文号
+                typeId: res.result.project.typeId, //工程类别：
+                provinceRegion: "云南省",
+                cityRegion: "昆明市",
+                lat: res.result.project.lat,
+                lon: res.result.project.lon
             };
+            // console.log(this.form)
+            this.userdList = res.result.projectInfoUsages.map(item=>{
+              return item.dictionaryId
+            })
+            let arr = res.result.projectInfoUsages.map(item=>{
+              return item.usageName
+            })
+            this.userdListStr = arr.join(',')
+
           }
         })
         .catch(err => {
-          console.log(err)
-          this.$message({
-              type: "warning",
-              message: err
-            });
-        });
-    },
-    // 查询建设单位
-    getConstructionFactoryOptions() {
-      getConstructionFactorys()
-        .then(res => {
-      console.log(res)
-          this.constructionUnitOptions = res.result.map(item => {
-            return {
-              factoryId: item.factoryId,
-              factoryName: item.factoryName
-            };
-          });
-        })
-        .catch(err => {
-          console.log(err)
+          console.log(err);
           this.$message({
             type: "warning",
-            message: err.msg
+            message: err
           });
         });
     },
-    //查询验收单位
+    //查询（验收单位，建设单位，技术服务机构）
     getAcceptanceFactorysOptions() {
-      getFactoryMenus(
-        {
-           factoryType:5,
-        onlyFactory:true,
-         queryUser:false
-        }
-      )
+      //验收
+      getFactoryMenus({
+        factoryType: 5,
+        onlyFactory: true,
+        queryUser: false
+      })
         .then(res => {
           if (res.httpStatus == 200) {
-            this.AcceptanceFactorysOptions = res.result.map(
-              item => {
-                // item.id = item.factoryId;
-                // item.partsName = item.factoryName;
-                return item;
-              }
-            );
+            this.AcceptanceFactorysOptions = res.result.map(item => {
+              return item;
+            });
           }
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
+          this.$message({
+            type: "warning",
+            message: err
+          });
+        });
+      // 建设
+      getFactoryMenus({
+        factoryType: 1,
+        onlyFactory: true,
+        queryUser: false
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            this.constructionOptions = res.result.map(item => {
+              return item;
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.$message({
+            type: "warning",
+            message: err
+          });
+        });
+      //服务机构
+      getFactoryMenus({
+        factoryType: 10,
+        onlyFactory: true,
+        queryUser: false
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            this.serviceOptions = res.result.map(item => {
+              return item;
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
           this.$message({
             type: "warning",
             message: err
@@ -673,7 +854,21 @@ export default {
         });
       }
     },
-    change1() {
+    //点击缩放
+    clickZoom() {
+      this.zoomText = this.zoomText == "展开" ? "收缩" : "展开";
+      this.zoomDown = this.zoomDown == true ? false : true;
+      this.zoomUp = this.zoomUp == false ? true : false;
+      this.show2 = this.show2 == false ? true : false;
+    },
+    //改变建设单位和服务机构获取人员和电话
+    changeUnit(unit) {
+      console.log(unit)
+      if(unit =='construction'){
+
+      }else{
+
+      }
     }
   },
   watch: {
@@ -701,7 +896,7 @@ export default {
   width: 100%;
   height: 100%;
   color: #606266;
-  padding-bottom: 30px; 
+  padding-bottom: 30px;
   background-color: #fff;
   position: relative;
   .el-divider {
@@ -748,19 +943,19 @@ export default {
     .el-form-item__label {
       // text-align: left;
     }
+
     .userd {
       line-height: 20px;
       .el-form-item {
         margin: 0;
-        border-bottom :1px solid #f4f4f4;
+        border-bottom: 1px solid #f4f4f4;
         .el-form-item__label {
           line-height: 38px;
         }
         .el-form-item__content {
-          }
-        .el-radio__label{
+        }
+        .el-radio__label {
           line-height: 40px;
-          
         }
       }
     }
@@ -797,8 +992,23 @@ export default {
       line-height: 60px;
     }
   }
-  .mT15{
-      margin-top: 15px;
+  .mT15 {
+    margin-top: 15px;
+  }
+  .w80P {
+    width: 80%;
+  }
+  .w75P {
+    width: 75%;
+  }
+  .clickZoom {
+    color: dodgerblue;
+    font-size: 16px;
+    line-height: 30px;
+    margin-left: 10px;
+  }
+  .clickZoom:hover {
+    cursor: pointer;
   }
 }
 </style>

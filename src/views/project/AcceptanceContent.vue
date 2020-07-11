@@ -4,15 +4,16 @@
 
       <div class="individualBuild">
         <div class="individualBuildTit">
-          <!-- <el-button type="primary" plain size="small"  @click="addIndividualBuildInfor('individualBuildList')">新增+</el-button> -->
+          <!-- <el-button type="primary" plain size=""  @click="addIndividualBuildInfor('individualBuildList')">新增+</el-button> -->
           <span class="arrowIcons" @click="changeArrow('individualBuildList')">
             <i :class="arrowIconClass1"></i>
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">单体建筑 <br>
-            <el-button type="primary" plain size="mini" @click="addIndividualBuildInfor('individualBuildList')" v-show="individualBuildShow">新增+</el-button>
+            <el-button type="primary" plain @click="addIndividualBuildInfor('individualBuildList')" v-show="individualBuildShow">新增+</el-button>
           </span>
           <span class="individualName">建筑名称</span>
+          <span class="individuaUsed">使用性质</span>
           <span class="individuaType">结构类型</span>
           <span class="individualRefractory">耐火等级</span>
           <span class="individualOnFloorNum">地上层数</span>
@@ -30,7 +31,10 @@
 
             </span>
             <span class="individualName">
-              <el-input v-model="item.individualName" size='small' :title="item.individualName"></el-input>
+              <el-input v-model="item.individualName" :title="item.individualName"></el-input>
+            </span>
+            <span class="individuaUsed">
+              <el-input v-model="item.usages" size=''></el-input>
             </span>
             <span class="individuaType">
               <el-select v-model="item.individuaType">
@@ -45,43 +49,43 @@
               </el-select>
             </span>
             <span class="individualOnFloorNum">
-              <el-input v-model="item.individualOnFloorNum" size='small'>
+              <el-input v-model="item.individualOnFloorNum" size=''>
                 <template slot="append">层</template>
 
               </el-input>
             </span>
             <span class="individualUnderFloorNum">
-              <el-input v-model="item.individualUnderFloorNum" size='small'>
+              <el-input v-model="item.individualUnderFloorNum" size=''>
                 <template slot="append">层</template>
 
               </el-input>
             </span>
             <span class="individualHeight">
-              <el-input v-model="item.individualHeight" size='small'>
+              <el-input v-model="item.individualHeight" size=''>
                 <template slot="append">m</template>
 
               </el-input>
             </span>
             <span class="individualLength">
-              <el-input v-model="item.individualLength" size='small'>
+              <el-input v-model="item.individualLength" size=''>
                 <template slot="append">m</template>
 
               </el-input>
             </span>
             <span class="individualArea">
-              <el-input v-model="item.individualArea" size='small'>
+              <el-input v-model="item.individualArea" size=''>
                 <template slot="append">m²</template>
 
               </el-input>
             </span>
             <span class="individualOnArea">
-              <el-input v-model="item.individualOnArea" size='small'>
+              <el-input v-model="item.individualOnArea" size=''>
                 <template slot="append">m²</template>
 
               </el-input>
             </span>
             <span class="individualUnderArea">
-              <el-input v-model="item.individualUnderArea" size='small'>
+              <el-input v-model="item.individualUnderArea" size=''>
                 <template slot="append">m²</template>
               </el-input>
             </span>
@@ -100,13 +104,13 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">储罐<br>
-            <el-button type="primary" plain size="small" @click="addIndividualBuildInfor('tankList')" v-show="tankShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('tankList')" v-show="tankShow">新增+</el-button>
           </span>
           <span class="individualName">设备位置</span>
           <span class="individuaType">总容量</span>
           <span class="individualRefractory">设置形式</span>
-          <span class="individualOnFloorNum">储存形式</span>
-          <span class="individualUnderFloorNum">储存物质名称</span>
+          <span class="individualOnFloorNum w100px">储存形式</span>
+          <span class="individualUnderFloorNum w100px">储存物质名称</span>
           <span class="handle">操作</span>
 
         </div>
@@ -116,10 +120,10 @@
 
             </span>
             <span class="individualName">
-              <el-input v-model="item.individualName" size='small'></el-input>
+              <el-input v-model="item.individualName" size=''></el-input>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size='small'>
+              <el-input v-model="item.individuaType" size=''>
                 <template slot="append">m³</template>
 
               </el-input>
@@ -130,15 +134,15 @@
                 </el-option>
               </el-select>
             </span>
-            <span class="individualOnFloorNum">
+            <span class="individualOnFloorNum w100px">
 
               <el-select v-model="item.individualOnFloorNum">
                 <el-option v-for="i in saveTypesOptions" :key="i.dictionaryId" :label="i.name" :value="i.dictionaryId">
                 </el-option>
               </el-select>
             </span>
-            <span class="individualUnderFloorNum">
-              <el-input v-model="item.individualUnderFloorNum" size='small'></el-input>
+            <span class="individualUnderFloorNum w100px">
+              <el-input v-model="item.individualUnderFloorNum" size=''></el-input>
             </span>
             <span class="handle">
               <el-button type="primary" size="mini" @click="save('tankList',item)">保存</el-button>
@@ -154,7 +158,7 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">堆场<br>
-            <el-button type="primary" plain size="small" @click="addIndividualBuildInfor('yardList')" v-show="yardShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('yardList')" v-show="yardShow">新增+</el-button>
           </span>
           <span class="individualName">储存物质名称</span>
           <span class="individuaType">储量</span>
@@ -167,11 +171,11 @@
 
             </span>
             <span class="individualName">
-              <el-input v-model="item.individualName" size='small'></el-input>
+              <el-input v-model="item.individualName" size=''></el-input>
             </span>
             <span class="individuaType">
 
-              <el-input v-model="item.individuaType" size='small'>
+              <el-input v-model="item.individuaType" size=''>
                 <template slot="append">m³</template>
 
               </el-input>
@@ -190,7 +194,7 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">建筑保温 <br>
-            <el-button type="primary" plain size="small" @click="addIndividualBuildInfor('keepWarmList')" v-show="keepWarmShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('keepWarmList')" v-show="keepWarmShow">新增+</el-button>
           </span>
           <span class="individualName">材料类别</span>
           <span class="individuaType">保温所在层数</span>
@@ -211,16 +215,16 @@
               </el-select>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size='small'>
+              <el-input v-model="item.individuaType" size=''>
                 <template slot="append">层</template>
 
               </el-input>
             </span>
             <span class="individualRefractory">
-              <el-input v-model="item.individualRefractory" size='small'></el-input>
+              <el-input v-model="item.individualRefractory" size=''></el-input>
             </span>
             <span class="individualOnFloorNum">
-              <el-input v-model="item.individualOnFloorNum" size='small'></el-input>
+              <el-input v-model="item.individualOnFloorNum" size=''></el-input>
             </span>
             <span class="handle">
               <el-button type="primary" size="mini" @click="save('keepWarmList',item)">保存</el-button>
@@ -237,7 +241,7 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">装饰装修 <br>
-            <el-button type="primary" plain size="small" @click="addIndividualBuildInfor('decorateList')" v-show="decorateShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('decorateList')" v-show="decorateShow">新增+</el-button>
           </span>
           <span class="individualName">装修部位</span>
           <span class="individuaType">装修面积</span>
@@ -258,13 +262,13 @@
               </el-select>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size='small'>
+              <el-input v-model="item.individuaType" size=''>
                 <template slot="append">m²</template>
 
               </el-input>
             </span>
             <span class="individualRefractory">
-              <el-input v-model="item.individualRefractory" size='small'>
+              <el-input v-model="item.individualRefractory" size=''>
                 <template slot="append">层</template>
 
               </el-input>
@@ -285,7 +289,7 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">用途改变<br>
-            <el-button type="primary" plain size="small" @click="addIndividualBuildInfor('changeUseList')" v-show="changeUseShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('changeUseList')" v-show="changeUseShow">新增+</el-button>
           </span>
           <span class="individualName">使用性质</span>
           <span class="individuaType">原有用途</span>
@@ -304,10 +308,10 @@
               </el-select>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size='small'></el-input>
+              <el-input v-model="item.individuaType" size=''></el-input>
             </span>
             <!-- <span class="individualRefractory">
-                            <el-input v-model="item.individualRefractory" size='small'></el-input>
+                            <el-input v-model="item.individualRefractory" size=''></el-input>
                         </span> -->
             <span class="handle">
               <el-button type="primary" size="mini" @click="save('changeUseList',item)">保存</el-button>
@@ -362,6 +366,12 @@ import {
   deletedAc4,
   deletedAc5,
   deletedAc6,
+  updateAc1,
+  updateAc2,
+  updateAc3,
+  updateAc4,
+  updateAc5,
+  updateAc6,
   getMenus,
   replaceMenus
 } from "@/apis/acceptanceContent";
@@ -409,6 +419,7 @@ export default {
     this.getCheckMenus();
   },
   methods: {
+    //保存消防设施
     onSubmit() {
       let fireNoCkecked = [];
       for (let i = 0; i < this.fireFightingDeviceList.length; i++) {
@@ -481,7 +492,7 @@ export default {
         contentId: this.$store.state.projectInfor.acContentId
       })
         .then(res => {
-          console.log(res.result.ac1Builds)
+          console.log(res.result.ac1Builds);
           if (res.httpStatus == 200) {
             if (res.result.ac1Builds <= 0) {
               this.individualBuildList = [{}];
@@ -497,7 +508,8 @@ export default {
                 item.individualUnderFloorNum = item.numberOfUnderground;
                 item.individualRefractory = item.refractoryLevelId;
                 item.individualUnderArea = item.undergroundFloorSpace;
-                
+                // item.acContentBuildId
+
                 return item;
               });
             }
@@ -580,13 +592,15 @@ export default {
       }
     },
     save(index, i) {
-      if (!i.acContentBuildId) {
-        if (index == "individualBuildList") {
-          console.log(this.$store.state.projectInfor)
+      console.log(i);
+      // if (!i.acContentBuildId) {
+      if (index == "individualBuildList") {
+        if (!i.acContentBuildId) {
           addAc1({
             projectId: this.$store.state.projectInfor.projectId,
             acContentId: this.$store.state.projectInfor.acContentId,
             buildName: i.individualName,
+            usages: i.usages,
             aboveGroundFloorArea: i.individualOnArea,
             buildHeight: i.individualHeight,
             buildLen: i.individualLength,
@@ -603,6 +617,7 @@ export default {
                   type: "success",
                   message: "保存成功"
                 });
+                this.getFormInfor()
               }
             })
             .catch(err => {
@@ -611,8 +626,67 @@ export default {
                 message: err.msg
               });
             });
-        } else if (index == "tankList") {
+        } else {
+          updateAc1({
+            acContentBuildId: i.acContentBuildId,
+            projectId: this.$store.state.projectInfor.projectId,
+            // acContentId: this.$store.state.projectInfor.acContentId,
+            buildName: i.individualName,
+            usages: i.usages,
+            aboveGroundFloorArea: i.individualOnArea,
+            buildHeight: i.individualHeight,
+            buildLen: i.individualLength,
+            buildTypeId: i.individuaType,
+            coversArea: i.individualArea,
+            inTheUpperNumber: i.individualOnFloorNum,
+            numberOfUnderground: i.individualUnderFloorNum,
+            refractoryLevelId: i.individualRefractory,
+            undergroundFloorSpace: i.individualUnderArea
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
+                this.$message({
+                  type: "success",
+                  message: "修改成功"
+                });
+              }
+            })
+            .catch(err => {
+              this.$message({
+                type: "warning",
+                message: err.msg
+              });
+            });
+        }
+      } else if (index == "tankList") {
+        if (!i.acContentStorageTankId) {
           addAc2({
+            projectId: this.$store.state.projectInfor.projectId,
+            acContentId: this.$store.state.projectInfor.acContentId,
+            position: i.individualName,
+            settingTypeId: i.individualRefractory,
+            storageMaterialName: i.individualUnderFloorNum,
+            storageTypeId: i.individualOnFloorNum,
+            totalCapacity: i.individuaType
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
+                this.$message({
+                  type: "success",
+                  message: "保存成功"
+                });
+                this.getFormInfor()
+              }
+            })
+            .catch(err => {
+              this.$message({
+                type: "warning",
+                message: err.msg
+              });
+            });
+        } else {
+          updateAc2({
+            acContentStorageTankId: i.acContentStorageTankId,
             projectId: this.$store.state.projectInfor.projectId,
             acContentId: this.$store.state.projectInfor.acContentId,
             position: i.individualName,
@@ -635,8 +709,33 @@ export default {
                 message: err.msg
               });
             });
-        } else if (index == "yardList") {
+        }
+      } else if (index == "yardList") {
+        if (!i.acceptanceContentYardId) {
           addAc3({
+            projectId: this.$store.state.projectInfor.projectId,
+            acContentId: this.$store.state.projectInfor.acContentId,
+            storageCapacity: i.individuaType,
+            storageMaterialName: i.individualName
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
+                this.$message({
+                  type: "success",
+                  message: "保存成功"
+                });
+                this.getFormInfor()
+              }
+            })
+            .catch(err => {
+              this.$message({
+                type: "warning",
+                message: err.msg
+              });
+            });
+        } else {
+          updateAc3({
+            acceptanceContentYardId: i.acceptanceContentYardId,
             projectId: this.$store.state.projectInfor.projectId,
             acContentId: this.$store.state.projectInfor.acContentId,
             storageCapacity: i.individuaType,
@@ -656,8 +755,36 @@ export default {
                 message: err.msg
               });
             });
-        } else if (index == "keepWarmList") {
+        }
+      } else if (index == "keepWarmList") {
+        if (!i.acContentBuildingInsulationsId) {
           addAc4({
+            projectId: this.$store.state.projectInfor.projectId,
+            acContentId: this.$store.state.projectInfor.acContentId,
+            material: i.individualOnFloorNum,
+            materialClassesId: i.individualName,
+            numberOfInsulationLayers: i.individuaType,
+            parts: i.individualRefractory
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
+                this.$message({
+                  type: "success",
+                  message: "保存成功"
+                });
+                this.getFormInfor()
+                
+              }
+            })
+            .catch(err => {
+              this.$message({
+                type: "warning",
+                message: err.msg
+              });
+            });
+        } else {
+          updateAc4({
+            acContentBuildingInsulationsId: i.acContentBuildingInsulationsId,
             projectId: this.$store.state.projectInfor.projectId,
             acContentId: this.$store.state.projectInfor.acContentId,
             material: i.individualOnFloorNum,
@@ -679,7 +806,9 @@ export default {
                 message: err.msg
               });
             });
-        } else if (index == "decorateList") {
+        }
+      } else if (index == "decorateList") {
+        if (!i.acDecorationId) {
           addAc5({
             projectId: this.$store.state.projectInfor.projectId,
             acContentId: this.$store.state.projectInfor.acContentId,
@@ -700,8 +829,35 @@ export default {
                 type: "warning",
                 message: err.msg
               });
+                this.getFormInfor()
+              
             });
-        } else if (index == "changeUseList") {
+        } else {
+          updateAc5({
+            acDecorationId: i.acDecorationId,
+            projectId: this.$store.state.projectInfor.projectId,
+            acContentId: this.$store.state.projectInfor.acContentId,
+            area: i.individuaType,
+            layerNum: i.individualRefractory,
+            parts: i.individualName
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
+                this.$message({
+                  type: "success",
+                  message: "保存成功"
+                });
+              }
+            })
+            .catch(err => {
+              this.$message({
+                type: "warning",
+                message: err.msg
+              });
+            });
+        }
+      } else if (index == "changeUseList") {
+        if (!i.acContentUsagesId) {
           addAc6({
             projectId: this.$store.state.projectInfor.projectId,
             acContentId: this.$store.state.projectInfor.acContentId,
@@ -722,13 +878,38 @@ export default {
                 message: err.msg
               });
             });
+        } else {
+          updateAc6({
+            acContentUsagesId: i.acContentUsagesId,
+            projectId: this.$store.state.projectInfor.projectId,
+            acContentId: this.$store.state.projectInfor.acContentId,
+            originalUsage: i.individuaType,
+            usingNatureId: i.individualName
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
+                this.$message({
+                  type: "success",
+                  message: "保存成功"
+                });
+                this.getFormInfor()
+                
+              }
+            })
+            .catch(err => {
+              this.$message({
+                type: "warning",
+                message: err.msg
+              });
+            });
         }
-      } else {
-        this.$message({
-          type: "info",
-          message: "不能在原项中修改，请删除后重新添加"
-        });
       }
+      // } else {
+      //   this.$message({
+      //     type: "info",
+      //     message: "不能在原项中修改，请删除后重新添加"
+      //   });
+      // }
     },
     deleteI(index, id) {
       this.$confirm("确定删除, 是否继续?", "提示", {
@@ -1039,7 +1220,7 @@ export default {
 };
 </script>
 
-<style lang="less" >
+<style lang="less">
 #acceptanceContentWrapper {
   width: 100%;
   height: 100%;
@@ -1079,7 +1260,7 @@ export default {
     .individualText {
       width: 80px;
       .el-button {
-        height: 30px;
+        // height: 30px;
         // line-height: 5px;
         span {
           padding: 0;
@@ -1088,7 +1269,10 @@ export default {
       }
     }
     .individualName {
-      width: 250px;
+      width: 200px;
+    }
+    .individuaUsed {
+      width: 120px;
     }
     .individuaType {
       width: 120px;
@@ -1097,25 +1281,25 @@ export default {
       width: 100px;
     }
     .individualOnFloorNum {
-      width: 100px;
+      width: 80px;
     }
     .individualUnderFloorNum {
-      width: 100px;
+      width: 80px;
     }
     .individualHeight {
-      width: 100px;
+      width: 80px;
     }
     .individualLength {
-      width: 100px;
+      width: 80px;
     }
     .individualArea {
-      width: 100px;
+      width: 80px;
     }
     .individualOnArea {
-      width: 100px;
+      width: 80px;
     }
     .individualUnderArea {
-      width: 100px;
+      width: 80px;
     }
     .fireFightingDevice {
       line-height: 30px;
@@ -1131,25 +1315,8 @@ export default {
         margin: 0 5px;
       }
     }
-    .el-select {
-      .el-input {
-        color: red;
-        .el-input__inner {
-          height: 30px;
-        }
-        .el-input__suffix {
-          right: -10px;
-          top: -8px;
-        }
-
-        .el-select__caret {
-          .el-input__icon {
-            .el-icon-arrow-up {
-              line-height: 30px !important;
-            }
-          }
-        }
-      }
+    .w100px {
+      width: 100px;
     }
     .el-input-group__append {
       padding: 0 5px;
@@ -1161,6 +1328,12 @@ export default {
       margin-bottom: 40px;
       text-align: center;
     }
+  }
+  .el-input__icon {
+    line-height: 0;
+  }
+  .el-input {
+    // line-height: 40px;
   }
 }
 </style>

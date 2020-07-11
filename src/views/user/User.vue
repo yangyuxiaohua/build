@@ -14,30 +14,33 @@
       </el-menu>
     </div>
     <div class="middle">
+      <div class="unitNav">
+        <span v-for="item in unitNavList" :key="item.type" @click="choseUnitType(item)" :class="{chosedNav:item.type==factoryType}">{{item.name}}</span>
+      </div>
       <div class="search">
         <el-row>
-          <el-col :span="16">
-            <el-input v-model="projectName" placeholder="请输入内容"></el-input>
+          <el-col :span="18">
+            <el-input v-model="projectName" placeholder="请输入内容" suffix-icon="el-icon-search"></el-input>
           </el-col>
           <el-col :span="4">
-            <el-button type="primary" plain @click="addUnit()">增加</el-button>
+            <el-button type="primary" plain @click="addUnit()" class="addBtn">增加</el-button>
           </el-col>
         </el-row>
       </div>
       <el-divider></el-divider>
       <div class="treeWrapper">
-        <p>验收单位</p>
+        <p>{{factoryTypeName}}</p>
         <el-tree :data="treeData1" :props="defaultProps" @node-click="handleNodeClick" highlight-current :expand-on-click-node='expandOnClickNode' accordion :default-expand-all='expandAll' :indent='treeIndex'>
           <span class="custom-tree-node" slot-scope="{node,data}">
             <span class="nodeText">{{node.label }}</span>
           </span>
         </el-tree>
-        <p class="btLine">建设单位</p>
+        <!-- <p class="btLine">建设单位</p>
          <el-tree :data="treeData2" :props="defaultProps" @node-click="handleNodeClick" highlight-current :expand-on-click-node='expandOnClickNode' accordion :default-expand-all='expandAll' :indent='treeIndex'>
           <span class="custom-tree-node" slot-scope="{node,data}">
             <span class="nodeText">{{node.label }}</span>
           </span>
-        </el-tree> 
+        </el-tree>  -->
       </div>
     </div>
     <div class="right">
@@ -66,7 +69,7 @@ export default {
       ],
       projectName: "", //项目搜索
       treeData1: [],
-      treeData2: [],
+      // treeData2: [],
       defaultProps: {
         children: "departments",
         label: "partsName"
@@ -74,69 +77,40 @@ export default {
       expandOnClickNode: false,
       expandAll: true,
       treeIndex: 10, //tree相邻节点之间的缩进
-      addFlag: 1
+      addFlag: 1,
+      unitNavList: [
+        { type: 5, name: "验收单位" },
+        { type: 1, name: "建设单位" },
+        { type: 10, name: "服务机构" }
+      ],
+      factoryType: 5, //单位类型
+      factoryTypeName: "验收单位"
     };
   },
   created() {
     this.defaultActive = this.$route.path;
-    this.getUnit();
+    // console.log(this.$store.state.userInfor.factoryType)
+    this.getUnit(this.factoryType);
   },
   methods: {
-    getUnit() {
-      getFactoryMenus( {
-        factoryType:5,
-        onlyFactory:false,
-// projectId
-         queryUser:false
-      })
-        .then(res => {
-          if (res.httpStatus == 200) {
-            console.log(res)
-            this.treeData1 = res.result.map(item => {
-              // console.log(item)
-              // item.id = item.factoryId;
-              // item.partsName = item.factoryName;
-              // item.departments.map(i => {
-              //   this.treeData1.push(i);
-              // });
-              return item;
-            });
-            // this.getUnittreeData(res.result.rootFactorys)
-          }
-        })
-        .catch(err => {
-          this.$message({
-            type: "warning",
-            message: err
-          });
-        });
+    //单位类型切换
+    choseUnitType(i) {
+      this.factoryType = i.type;
+      this.factoryTypeName = i.name;
+      this.getUnit(i.type);
+    },
+    getUnit(type) {
       getFactoryMenus({
-        factoryType:1,
-        onlyFactory:false,
-// projectId
-         queryUser:false
+        factoryType: type,
+        onlyFactory: false,
+        queryUser: false
       })
         .then(res => {
-          console.log(res )
           if (res.httpStatus == 200) {
-            // this.treeData2 = res.result.rootFactorys.map(item => {
-            //   item.id = item.factoryId;
-            //   item.partsName = item.factoryName;
-            //   // item.departments.map(i => {
-            //   //   this.treeData1.push(i);
-            //   // });
-            //   return item;
-            // });
-            this.treeData2 = res.result.map(item => {
-              // console.log(item)
-              // item.id = item.factoryId;
-              // item.partsName = item.factoryName;
-              // item.departments.map(i => {
-              //   this.treeData1.push(i);
-              // });
+            console.log(res);
+            this.treeData1 = res.result.map(item => {
               return item;
             });
-            // this.getUnittreeData(res.result.rootFactorys)
           }
         })
         .catch(err => {
@@ -192,11 +166,37 @@ export default {
     box-shadow: 10px 0px 0px #f2f2f2;
     box-sizing: border-box;
     padding: 10px;
-    height: 840px;
-    overflow-y: auto;
-    .el-row {
-      display: flex;
-      justify-content: space-between;
+    // height: 840px;
+    overflow-x: hidden;
+    // .el-row {
+    //   display: flex;
+    //   justify-content: space-between;
+    // }
+    .search {
+      margin-top: 10px;
+    }
+    .unitNav {
+      width: 100%;
+      height: 40px;
+      line-height: 40px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+
+      span {
+        display: inline-block;
+        width: 33%;
+        text-align: center;
+        color: #409eff;
+      }
+      span:hover {
+        cursor: pointer;
+      }
+      .chosedNav {
+        background-color: #409eff;
+        color: #fff;
+      }
+    }
+    .addBtn {
+      margin-left: 20px;
     }
     .el-divider {
       margin: 10px 0;

@@ -3,7 +3,7 @@
     <div class="headerWrapper">
       <div class="headerNav">
         <span class="navList" v-for="(item,index) in navList" :key='index' :class="{chosedNav:cindex==item.standardId}" @click="changeNav(item)">{{item.name}}</span>
-       
+
       </div>
       <div class="container">
         <router-view></router-view>
@@ -20,21 +20,27 @@
       <el-switch v-model="status" active-color="#13ce66" inactive-color="#777A82" active-value="100" inactive-value="1" @change='changeStatus()'>
       </el-switch>
     </div>
-     <div class="searchContent">
-          <el-select v-model="primaryTitleId" clearable placeholder="分部" class="w100px">
-            <el-option v-for="item in primaryTitleIdOptopns" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select v-model="secondaryTitleId" clearable placeholder="分项" class="w100px">
-            <el-option v-for="item in secondaryTitleIdOptopns" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select v-model="result" clearable placeholder="结论" class="w100px">
-            <el-option v-for="item in resultOptions" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-button type="primary" plain @click="unitCurrentChange(1)">查询</el-button>
-        </div>
+    <div class="searchContent">
+      <el-cascader :options="primaryTitleIdOptopns" :props="props" clearable placeholder='分部/分项' @focus='getPrimaryTitleIdOptopns()' ref="ascaderPrimaryTitleId"></el-cascader>
+
+      <el-select v-model="result" clearable placeholder="重要程度" class="w120px">
+        <el-option v-for="item in importantOption" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-select v-model="result" clearable placeholder="查验结论" class="w120px">
+        <el-option v-for="item in resultOptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-select v-model="result" clearable placeholder="检测结论" class="w120px">
+        <el-option v-for="item in resultOptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-select v-model="result" clearable placeholder="评定结论" class="w120px">
+        <el-option v-for="item in resultOptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button type="primary" plain @click="RecodeCurrentChange()">查询</el-button>
+    </div>
   </div>
 </template>
 
@@ -42,6 +48,11 @@
 import { getCategorys } from "@/apis/standard";
 import { inDexOfStr } from "../../utils/publictool.js";
 import { updateProject } from "../../apis/project.js";
+import {
+  getEvaluationData12,
+  getFiData12,
+  getDataReviewData12
+} from "../../apis/evaluation.js";
 import {
   getProjectsByAcceptanceFactoryId,
   getProjectsByConstructionFactoryId
@@ -61,10 +72,24 @@ export default {
         { label: "合格", value: "1" },
         { label: "不合格", value: "5" }
       ],
+      importantOption: [
+        { label: "A", value: "A" },
+        { label: "B", value: "B" },
+        { label: "C", value: "C" }
+      ],
+      primaryTitleIdOptopns: [], // 分部分项
       primaryTitleId: "",
-      primaryTitleIdOptopns: [],
-      secondaryTitleId: "",
-      secondaryTitleIdOptopns: []
+      standardName: "",
+      props:{ //级联选择器配置
+         children: "secondaryCategory",
+        label: "name",
+        value: "secondaryId",
+        checkStrictly: true
+      }
+      // primaryTitleId: "",
+      // primaryTitleIdOptopns: [],
+      // secondaryTitleId: "",
+      // secondaryTitleIdOptopns: []
     };
   },
   created() {
@@ -72,12 +97,10 @@ export default {
     this.getProjectList();
     this.projectValue = this.$store.state.projectInfor;
     this.pProjectName = this.$store.state.projectInfor.projectName;
+    // console.log(this.$store.state.projectInfor.projectId)
   },
   methods: {
-    changeNav(index, path) {
-      this.cindex = index;
-      this.$router.history.push(path);
-    },
+    // 获取项目列表
     getProjectList() {
       if (
         this.$store.state.userRole.roleCode == 300 ||
@@ -124,6 +147,7 @@ export default {
           });
       }
     },
+    //选中项目
     chosedProject() {
       this.status = this.projectValue.status;
       this.$store.commit("chosedProjectId", this.projectValue);
@@ -162,18 +186,18 @@ export default {
           if (res.httpStatus == 200) {
             this.navList = res.result.map((item, index) => {
               let path;
-              switch(item.categoryName){
-               case '现场评定' :
-               path = '/index/recode/evaluation';
-               break;
-               case '资料审查' :
-               path = '/index/recode/dataReview';
-               break;
-               case '竣工查验' :
-               path = '/index/recode/completionInspection';
-               break;
-               default :
-               path = '/index/recode/fireDetection';//消防检测
+              switch (item.categoryName) {
+                case "现场评定":
+                  path = "/index/recode/evaluation";
+                  break;
+                case "资料审查":
+                  path = "/index/recode/dataReview";
+                  break;
+                case "竣工查验":
+                  path = "/index/recode/completionInspection";
+                  break;
+                default:
+                  path = "/index/recode/fireDetection"; //消防检测
               }
               return {
                 id: index,
@@ -183,7 +207,8 @@ export default {
               };
             });
             this.cindex = this.navList[0].standardId;
-            this.$router.history.push(this.navList[0].path)
+            this.standardName = this.navList[0].name;
+            this.$router.history.push(this.navList[0].path);
           }
         })
         .catch(err => {
@@ -193,50 +218,97 @@ export default {
           });
         });
     },
-    //获取一二级菜单的数据
-    getRecode12() {
-      getRecordsByProjectIdGroup1({
+    //获取一二级菜单的数据(现场评定)
+    getEvaluationRecode12() {
+      getEvaluationData12({
         projectId: this.$store.state.projectInfor.projectId
       })
         .then(res => {
-          if (res.httpStatus == 200) {
-            // console.log(res)
-            this.primaryTitleIdOptopns = res.result.map(item => {
-              return {
-                label: item.primaryTitle,
-                value: item.primaryTitleId
-              };
-            });
+          // console.log(res);
+          if(res.httpStatus==200){
+            this.primaryTitleIdOptopns = res.result.map(item=>{
+              // console.log(item.primaryId)
+              item.secondaryId = "menuLevel1_" + item.primaryId
+              return item
+            })
+
           }
         })
         .catch(err => {
-          console.log(err);
+          this.$message({
+            type: "info",
+            message: "获取数据失败"
+          });
         });
-      getRecordsByProjectIdGroup2({
+    },
+    //获取一二级菜单的数据(资料评审)
+    getDataReviewRecode12() {
+      getDataReviewData12({
         projectId: this.$store.state.projectInfor.projectId
       })
         .then(res => {
-          if (res.httpStatus == 200) {
-            console.log(res);
-            this.secondaryTitleIdOptopns = res.result.map(item => {
-              return {
-                label: item.secondaryTitle,
-                value: item.secondaryTitleId
-              };
-            });
+          // console.log(res);
+           if(res.httpStatus==200){
+            this.primaryTitleIdOptopns = res.result.map(item=>{
+              // console.log(item.primaryId)
+              item.secondaryId = "menuLevel1_" + item.primaryId
+              return item
+            })
+
           }
         })
         .catch(err => {
-          console.log(err);
+          this.$message({
+            type: "info",
+            message: "获取数据失败"
+          });
+        });
+    },
+    //获取一二级菜单的数据(消防检测和竣工查验)
+    getFireRecode12() {
+      getFiData12({
+        projectId: this.$store.state.projectInfor.projectId
+      })
+        .then(res => {
+          // console.log(res);
+           if(res.httpStatus==200){
+            this.primaryTitleIdOptopns = res.result.map(item=>{
+              // console.log(item.primaryId)
+              item.secondaryId = "menuLevel1_" + item.primaryId
+              return item
+            })
+
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: "获取数据失败"
+          });
         });
     },
     // 点击菜单
     changeNav(i) {
       this.cindex = i.standardId;
-      this.$router.history.push(i.path)
+      this.standardName = i.name;
+      this.$router.history.push(i.path);
       // this.$store.commit("saveStandardId", i.standardId);
-      this.$store.commit('saveRecodeStandard',i)
+      this.$store.commit("saveRecodeStandard", i);
     },
+    //获取分部/分项选项
+    getPrimaryTitleIdOptopns() {
+      if (this.standardName == "现场评定") {
+        this.getEvaluationRecode12();
+      } else if (this.standardName == "资料审查") {
+        this.getDataReviewRecode12();
+      } else {
+        this.getFireRecode12();
+      }
+    },
+    RecodeCurrentChange(){
+      console.log(this.$refs.ascaderPrimaryTitleId.getCheckedNodes())
+    }
+    // ascaderPrimaryTitleId
   }
 };
 </script>
@@ -308,7 +380,7 @@ export default {
     }
   }
   .searchContent {
-    width: 600px;
+    width: 720px;
     height: 40px;
     position: absolute;
     left: 540px;
@@ -316,9 +388,13 @@ export default {
     display: flex;
     .el-select {
       margin-left: 10px;
+      // width: 100px;
     }
     .el-button {
       margin-left: 20px;
+    }
+    .w120px {
+      width: 120px;
     }
   }
   // .w100px{
