@@ -34,3 +34,6 @@ export const getFiData12 = params => rq.post('/record/curr/getRecordsByProjectId
 
 // 1.根据项目主键获取所有一级菜单(资料评审)
 export const getDataReviewData12 = params => rq.post('/record/getRecordsByProjectIdGroup1', params)
+
+// 项目归档
+export const toArchive = params => rq.post('/project/toArchive', params)

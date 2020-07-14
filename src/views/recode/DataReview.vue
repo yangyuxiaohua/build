@@ -181,7 +181,7 @@ import {
   // getRecordsByProjectIdGroup1,
   // getRecordsByProjectIdGroup2
 } from "@/apis/dataReview";
-import { getTime ,changeEdit} from "@/utils/publictool";
+import { getTime ,changeEdit,splitStr} from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -321,9 +321,9 @@ export default {
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
-        result: this.result,
-        secondaryTitleId: this.secondaryTitleId,
-        primaryTitleId: this.primaryTitleId
+        primaryTitleId:this.primaryTitleId,
+        secondaryTitleId:this.secondaryTitleId,
+        result:this.result,
       })
         .then(res => {
           console.log(res);
@@ -472,13 +472,42 @@ export default {
   computed: {
     getProjectId() {
       return this.$store.state.projectInfor;
+    },
+     getSearchValue(){
+      return this.$store.state.ScreeningRecordObj
     }
   },
   watch: {
     getProjectId: function() {
       this.unitCurrentChange(this.unitCurrentPage);
-    // this.getRecode12();
+    },
+     getSearchValue: function(val1) {
+      // console.log(val1)
+      let obj; 
+      if(val1.ascaderValue){
+        if(splitStr(val1.ascaderValue)[0]=='menuLevel1'){
+          obj = {
+            primaryTitleId:splitStr(val1.ascaderValue)[1],
+            secondaryTitleId:'',
+          }
+        }else{
+           obj = {
+            primaryTitleId:'',
+            secondaryTitleId:val1.ascaderValue,
+          }
+        }
+      }else{
+        obj = {
+          primaryTitleId:'',
+          secondaryTitleId:'',
+        }
+      }
       
+       this.primaryTitleId = obj.primaryTitleId
+       this.secondaryTitleId = obj.secondaryTitleId
+       this.result = val1.evaluationValue
+         this.unitCurrentPage = 1
+         this.unitCurrentChange(this.unitCurrentPage)
     }
   }
 };

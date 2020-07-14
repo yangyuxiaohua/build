@@ -90,7 +90,9 @@ export default {
   created() {
     this.defaultActive = this.$route.path;
     // console.log(this.$store.state.userInfor.factoryType)
-    this.getUnit(this.factoryType);
+    this.getUnit(this.unitNavList[0].type);
+      this.$store.commit('saveFactoryType',this.unitNavList[0].type) //默认储存单位类型 
+    
   },
   methods: {
     //单位类型切换
@@ -98,6 +100,7 @@ export default {
       this.factoryType = i.type;
       this.factoryTypeName = i.name;
       this.getUnit(i.type);
+      this.$store.commit('saveFactoryType',i.type)
     },
     getUnit(type) {
       getFactoryMenus({
@@ -128,12 +131,14 @@ export default {
     },
     addUnit() {
       this.addFlag = this.$store.state.unitStatus == 1 ? 2 : 1;
+      this.$store.commit("saveUnitInfo", {});
       this.$store.commit("changeUnitStatus", this.addFlag);
+
     }
   },
   watch: {
     getConfiFlag: function() {
-      this.getUnit();
+      this.getUnit(this.$store.state.factoryType);
     }
   },
   computed: {
@@ -147,9 +152,10 @@ export default {
 
 <style lang="less">
 #userWrapper {
-  width: 100%;
+  // width: 100%;
   height: 100%;
   display: flex;
+  box-sizing: border-box;
   .left {
     height: 100%;
     // width: 300px;
@@ -163,8 +169,8 @@ export default {
   .middle {
     flex: 0 0 400px;
     // border-right:1px solid rgb(170, 162, 162);
-    box-shadow: 10px 0px 0px #f2f2f2;
     box-sizing: border-box;
+    box-shadow: 10px 0px 0px #f2f2f2;
     padding: 10px;
     // height: 840px;
     overflow-x: hidden;
@@ -202,7 +208,7 @@ export default {
       margin: 10px 0;
     }
     .treeWrapper {
-      height: 750px;
+      height: 720px;
       overflow-y: auto;
       // overflow: hidden;
       padding: 0 0 0 10px;

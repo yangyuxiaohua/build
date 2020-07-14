@@ -96,7 +96,7 @@
                 <span>检查数量：</span>
               </el-col>
               <el-col :span="18">
-               <el-input v-model="form.completChecklistDtos.checkNum" placeholder="" readonly></el-input>
+                <el-input v-model="form.completChecklistDtos.checkNum" placeholder="" readonly></el-input>
               </el-col>
             </el-row>
             <el-row class="nopadding">
@@ -147,7 +147,7 @@
                 <span>检查数量：</span>
               </el-col>
               <el-col :span="18">
-               <el-input v-model="form.inspectChecklistDtos.checkNum" placeholder="" readonly></el-input>
+                <el-input v-model="form.inspectChecklistDtos.checkNum" placeholder="" readonly></el-input>
               </el-col>
             </el-row>
             <el-row class="nopadding">
@@ -198,7 +198,7 @@
                 <span>检查数量：</span>
               </el-col>
               <el-col :span="18">
-               <el-input v-model="form.curr2ChecklistDtos.checkNum" placeholder="" :readonly='readonly'></el-input>
+                <el-input v-model="form.curr2ChecklistDtos.checkNum" placeholder="" :readonly='readonly'></el-input>
               </el-col>
             </el-row>
             <el-row class="nopadding">
@@ -243,7 +243,6 @@
             </el-row>
           </el-col>
 
-         
         </el-row>
 
         <el-row>
@@ -295,7 +294,7 @@ import {
   getRecordsByProjectIdGroup1,
   getRecordsByProjectIdGroup2
 } from "@/apis/evaluation";
-import { getTime, changeEdit } from "@/utils/publictool";
+import { getTime, changeEdit,splitStr} from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -344,77 +343,12 @@ export default {
       videoSrc: "",
       fileList: [], //文件数组
       roleShow4: true, //权限
-      // editorOption: {
-      //   modules: {
-      //     ImageExtend: {
-      //       loading: true,
-      //       // 如果不作设置，即{}  则依然开启复制粘贴功能且以base64插入
-      //       name: "file", // 图片参数名
-      //       size: 3, // 可选参数 图片大小，单位为M，1M = 1024kb
-      //       // action: "http://192.168.0.200:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       action: "http://39.104.90.111:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       // response 为一个函数用来获取服务器返回的具体图片地址
-      //       // 例如服务器返回{code: 200; data:{ url: 'baidu.com'}}
-      //       // 则 return res.data.url
-      //       response: res => {
-      //         //  console.log(res)
-      //         const imgUrl = Ip + res.result;
-      //         // console.log(imgUrl)
-      //         return imgUrl;
-      //         // return Ip + res.result;
-      //       },
-      //       // headers: xhr => {
-      //       //   // xhr.setRequestHeader('myHeader','myValue')
-      //       // }, // 可选参数 设置请求头部
-      //       sizeError: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "图片太大"
-      //         });
-      //       }, // 图片超过大小的回调
-      //       start: () => {}, // 可选参数 自定义开始上传触发事件
-      //       end: () => {}, // 可选参数 自定义上传结束触发的事件，无论成功或者失败
-      //       error: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "上传失败"
-      //         });
-      //       }, // 可选参数 上传失败触发的事件
-      //       success: () => {
-      //         //  console.log(res)
-      //       }, // 可选参数  上传成功触发的事件
-      //       change: (xhr, formData) => {
-      //         console.log(xhr);
-      //         console.log(formData);
-      //         return false;
-      //         // xhr.setRequestHeader('myHeader','myValue')
-      //         // formData.append('token', 'myToken')
-      //       } // 可选参数 每次选择图片触发，也可用来设置头部，但比headers多了一个参数，可设置formData
-      //     },
-      //     ImageResize: {
-      //       // ...
-      //       // handleStyles: {
-      //       //   backgroundColor: "black",
-      //       //   border: "none",
-      //       //   color: white
-      //       //   // other camelCase styles for size display
-      //       // }
-      //       displaySize: true
-      //     },
-      //     imageDrop: true, //图片拖拽
-      //     toolbar: {
-      //       // 如果不上传图片到服务器，此处不必配置
-      //       container: container, // container为工具栏，此次引入了全部工具栏，也可自行配置
-      //       handlers: {
-      //         image: function() {
-      //           // 劫持原来的图片点击按钮事件
-      //           QuillWatch.emit(this.quill.id);
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
-      result: "", //下拉框的筛选
+      primaryTitleId:'',//下拉框的筛选
+      secondaryTitleId:'',
+      checkTypeName:'',
+      copyCompleteRecordResult:'',
+      copyInspectRecordResult:'',
+      result: "", 
       resultOptions: [
         { label: "合格", value: "1" },
         { label: "不合格", value: "5" }
@@ -441,9 +375,13 @@ export default {
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
-        result: this.result,
-        secondaryTitleId: this.secondaryTitleId,
-        primaryTitleId: this.primaryTitleId
+        //筛选
+        primaryTitleId:this.primaryTitleId,
+        secondaryTitleId:this.secondaryTitleId,
+        checkTypeName:this.checkTypeName,
+        copyCompleteRecordResult:this.copyCompleteRecordResult,
+        copyInspectRecordResult:this.copyInspectRecordResult,
+        result:this.result
       })
         .then(res => {
           // console.log(res);
@@ -509,7 +447,7 @@ export default {
         });
     },
     handleModify(flag, item) {
-      console.log(item);
+      // console.log(item);
       if (flag == 1) {
         this.readonly = true;
         this.form = item;
@@ -645,13 +583,49 @@ export default {
   computed: {
     getProjectId() {
       return this.$store.state.projectInfor;
+    },
+    getSearchValue(){
+      return this.$store.state.ScreeningRecordObj
     }
   },
   watch: {
     getProjectId: function() {
       this.unitCurrentChange(this.unitCurrentPage);
       // this.getRecode12();
+    },
+    getSearchValue: function(val1) {
+      // console.log(val1)
+      // splitStr
+      let obj; 
+      if(val1.ascaderValue){
+        if(splitStr(val1.ascaderValue)[0]=='menuLevel1'){
+          obj = {
+            primaryTitleId:splitStr(val1.ascaderValue)[1],
+            secondaryTitleId:'',
+          }
+        }else{
+           obj = {
+            primaryTitleId:'',
+            secondaryTitleId:val1.ascaderValue,
+          }
+        }
+      }else{
+        obj = {
+          primaryTitleId:'',
+          secondaryTitleId:'',
+        }
+      }
+      
+       this.primaryTitleId = obj.primaryTitleId
+       this.secondaryTitleId = obj.secondaryTitleId
+       this.checkTypeName = val1.importantValue
+       this.copyCompleteRecordResult = val1.inspectionValue
+       this.copyInspectRecordResult = val1.detectionValue
+       this.result = val1.evaluationValue
+         this.unitCurrentPage = 1
+         this.unitCurrentChange(this.unitCurrentPage)
     }
+    
   }
 };
 </script>

@@ -187,7 +187,7 @@ import {
   deletedSecondaryMenu,
   deletedChecklist
 } from "@/apis/standard";
-import { uploadIp, Ip } from "@/apis/upload";
+import { uploadIp, ImgIp } from "@/apis/upload";
 import { splitStr } from "@/utils/publictool";
 //富文本
 import { quillEditor, Quill } from "vue-quill-editor";
@@ -252,10 +252,10 @@ export default {
             // 则 return res.data.url
             response: res => {
               //  console.log(res)
-              const imgUrl = Ip + res.result;
+              const imgUrl = ImgIp + res.result;
               // console.log(imgUrl)
               return imgUrl;
-              // return Ip + res.result;
+              // return ImgIp + res.result;
             },
             // headers: xhr => {
             //   // xhr.setRequestHeader('myHeader','myValue')

@@ -2,10 +2,10 @@
   <div id="taskArrangementWrapper">
     <div class="rightNav">
       <span :class="{c409eff:cindex==item.id}" @click="clickRightNav(item.id,item.text)" v-for="item in rightNav" :key="item.id" v-show="item.roleShow4">{{item.text}}</span>
-     
+
     </div>
     <div class="taskArrangementContent">
-      
+
       <div class="acceptance" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
         <p class="acceptanceText lh48">验收内容</p>
         <el-divider></el-divider>
@@ -59,7 +59,12 @@
         <p class="staffingText lh48">人员安排</p>
         <el-divider></el-divider>
         <div class="staffingConiner">
-          <el-tree :data="acceptancePersonData" show-checkbox default-expand-all ref="personTree" highlight-current :props="partDefaultProps" :default-checked-keys='checkedPersonList' :expand-on-click-node='expandOnClickNode' :check-on-click-node="checkOnClickNode" :check-strictly='checkStrictly' node-key="id">
+          <p class="personTit"> 项目负责人</p>
+            <el-tree :data="acceptancePersonData2" show-checkbox ref="personTree2" highlight-current :props="partDefaultProps" :default-checked-keys='checkedPersonList2' :expand-on-click-node='expandOnClickNode' :check-on-click-node="checkOnClickNode" :check-strictly='checkStrictly' node-key="id" :default-expanded-keys="defaultOnNode">
+          </el-tree>
+          <el-divider></el-divider>
+          <p class="personTit"> 所有人</p>
+          <el-tree :data="acceptancePersonData" show-checkbox ref="personTree" highlight-current :props="partDefaultProps" :default-checked-keys='checkedPersonList' :expand-on-click-node='expandOnClickNode' :check-on-click-node="checkOnClickNode" :check-strictly='checkStrictly' node-key="id" :default-expanded-keys="defaultOnNode">
           </el-tree>
         </div>
       </div>
@@ -68,23 +73,25 @@
         <el-button>取消</el-button>
       </div>
     </div>
-     <div class="usedRecodeBtn">
-        <!-- <el-button type="primary" plain size="small" @click="usedRecode()">使用</el-button> -->
-        <el-dialog title="评定方式" :visible.sync="dialogFormVisible">
-          <div class="dialogFormVisibleContent">
-            <el-radio-group v-model="radio">
-              <div v-for="item in useRecodeRadioList" :key="item.copyType"> <el-radio :label="item.copyType" >{{item.text}}</el-radio></div>
-             
-              <!-- <el-radio :label="6">备选项</el-radio><br/>
+    <div class="usedRecodeBtn">
+      <!-- <el-button type="primary" plain size="small" @click="usedRecode()">使用</el-button> -->
+      <el-dialog title="评定方式" :visible.sync="dialogFormVisible">
+        <div class="dialogFormVisibleContent">
+          <el-radio-group v-model="radio">
+            <div v-for="item in useRecodeRadioList" :key="item.copyType">
+              <el-radio :label="item.copyType">{{item.text}}</el-radio>
+            </div>
+
+            <!-- <el-radio :label="6">备选项</el-radio><br/>
               <el-radio :label="9">备选项</el-radio> -->
-            </el-radio-group>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="sureUsedRecode()">确 定</el-button>
-          </div>
-        </el-dialog>
-      </div>
+          </el-radio-group>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="sureUsedRecode()">确 定</el-button>
+        </div>
+      </el-dialog>
+    </div>
 
   </div>
 </template>
@@ -111,7 +118,7 @@ export default {
         // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:true }
       ],
       cindex: 1,
-      cText: '资料审查',
+      cText: "资料审查",
       loading: false, //加载
       acceptanceData1: [],
       defaultProps: {
@@ -141,7 +148,9 @@ export default {
       ],
       checkedList: [], //默认选中
       acceptancePersonData: [], // 人员列表
+      acceptancePersonData2:[], //项目负责人列表
       checkedPersonList: [], // 默认选中人员
+      checkedPersonList2:[], //默认选中项目负责人
       departments: [],
       StandardNames: [],
       checkList: [], //筛选标准
@@ -149,7 +158,8 @@ export default {
       factoryType: 1, //单位类型
       dialogFormVisible: false,
       radio: "", //使用记录
-      useRecodeRadioList:[], //使用记录数据
+      useRecodeRadioList: [], //使用记录数据
+      defaultOnNode: [] //人员默认展开
     };
   },
   created() {
@@ -157,9 +167,10 @@ export default {
     // this.getTree1Data();
     // this.getTree2Data();
     this.getPersonData();
+    this.getPersonData2()
     this.getStandardNames();
     this.factoryType = this.$store.state.userInfor.factoryType;
-    console.log(this.$store.state)
+    console.log(this.$store.state);
   },
   mounted() {
     this.init();
@@ -191,36 +202,54 @@ export default {
       // console.log(this.projectInfor)
     },
     //点击筛选验收内容
-    clickRightNav(id,text) {
+    clickRightNav(id, text) {
       this.cindex = id;
-      this.cText = text
+      this.cText = text;
       this.loading = true;
       this.getTree1Data();
     },
     //提交
     onSubmit() {
-      if(this.$store.state.userRole.roleCode==300||this.$store.state.userRole.roleCode==400||this.$store.state.userRole.roleCode==450){
-          this.usedRecode()
-      }else{
-        this.SubmitTask()
+      if (
+        this.$store.state.userRole.roleCode == 300 ||
+        this.$store.state.userRole.roleCode == 400 ||
+        this.$store.state.userRole.roleCode == 450
+      ) {
+        this.usedRecode();
+      } else {
+        this.SubmitTask();
       }
-      
     },
-     SubmitTask(copyType=null) {
+    SubmitTask(copyType = null) {
       let obj = {
         copyType,
         primaryChecklistIds: [],
         secondaryChecklistIds: [],
         acceptancePartIds: [],
-        standardId: this.$store.state.projectInfor.standardId,
+        standardId: this.cindex,
         placements: [],
         projectId: this.$store.state.projectInfor.projectId,
-        standardNames: []
+        standardNames: [],
+        projectLeaders: [
+    // {
+    //   "factoryId": "string",
+    //   "factoryType": "string",
+    //   "id": "string",
+    //   "projectId": "string",
+    //   "projectLeader": "string"
+    // }
+  ],
       };
       let arr1 = this.$refs.acceptanceTree1.getCheckedKeys();
       // let arr2 = this.$refs.acceptanceTree2.getCheckedKeys();
       let arr3 = this.$refs.personTree.getCheckedKeys();
-
+      let arr4 = this.$refs.personTree2.getCheckedKeys()
+      obj.projectLeaders = arr4.map(item=>{
+         if (item.indexOf("_") !== -1) {
+          // obj.acceptancePartIds.push(item);
+          return {projectLeader:splitStr(item)[0]}
+        } 
+      })
       //================================================
       // let level1NoChecked = [];
       // let level2NoChecked = [];
@@ -312,7 +341,8 @@ export default {
       //     level2NoChecked.push(totalF2[i]);
       //   }
       // }
-
+   
+    console.log(arr4)
       arr3.forEach(item => {
         if (item.indexOf("_") == -1) {
           obj.acceptancePartIds.push(item);
@@ -323,7 +353,7 @@ export default {
           obj.placements.push(item);
         }
       });
-
+ 
       // level1NoChecked = level1NoChecked.map(item => {
       //   return {
       //     menuLevel: 1,
@@ -570,6 +600,88 @@ export default {
       }
       judgeChildren(data);
     },
+    //获取项目负责人人员列表
+    getPersonData2() {
+      getFactoryMenus({
+        projectId: this.$store.state.projectInfor.projectId,
+        factoryType: this.factoryType,
+        onlyFactory: false,
+        queryUser: true,
+        leader:1,
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            console.log(res);
+            this.acceptancePersonData2 = res.result.map(item => {
+              // return {
+              //   id: item.factoryId,
+              //   partsName: item.factoryName,
+              //   departments: item.departments,
+              //   disabled: false,
+              //   selected: false
+              // };
+              return item;
+            });
+            this.ruleValidate2(this.acceptancePersonData2);
+          } else {
+            this.$message({
+              type: "info",
+              message: "获取人员失败"
+            });
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "warning",
+            message: err
+          });
+        });
+    },
+    // 递归人员进选中的数组checkedPersonList
+    ruleValidate2(data) {
+      let _this = this;
+      function judgeChildren(data) {
+        data.forEach(e => {
+          if (!e.departments) {
+            if (e.selected) {
+              _this.checkedPersonList2.push(e.id);
+            }
+            if (e.userPartsDtos) {
+              let arr = e.userPartsDtos.map(item => {
+                if (item.selected) {
+                  _this.checkedPersonList2.push(item.id);
+                }
+                item.partsName = item.username;
+                return item;
+              });
+              e.departments = e.departments.concat(arr);
+            }
+            return;
+          } else {
+            if (e.selected) {
+              _this.checkedPersonList2.push(e.id);
+            }
+            if (e.userPartsDtos) {
+              let arr = e.userPartsDtos.map(item => {
+                item.partsName = item.username;
+                if (item.selected) {
+                  _this.checkedPersonList2.push(item.id);
+                }
+                return item;
+
+                // return {
+                //   id: item.id,
+                //   partsName: item.username
+                // };
+              });
+              e.departments = e.departments.concat(arr);
+            }
+            judgeChildren(e.departments);
+          }
+        });
+      }
+      judgeChildren(data);
+    },
 
     //切换标准
     changeStandard() {},
@@ -605,37 +717,54 @@ export default {
     // 使用记录
     usedRecode() {
       getCurrCopyStatus({
-        projectId:this.$store.state.projectInfor.projectId
-      }).then(res=>{
-        console.log(res)
-        if(res.httpStatus == 200){
-          if(this.cText == '资料审查'){
-            this.useRecodeRadioList = [
-              {text:'使用建设单位已有的资料审查记录',copyType:15,disabled:res.result.reviewComplete},
-              {text:'使用服务机构已有的资料审查记录',copyType:20,disabled:res.result.reviewInspect},
-              {text:'全部重新评定',copyType:1,disabled:false}
-            ]
-          }else{
-             this.useRecodeRadioList = [
-              {text:'使用建设单位已有的竣工查验记录',copyType:5,disabled:res.result.complete},
-              {text:'使用服务机构已有的消防检测记录',copyType:10,disabled:res.result.inspect},
-              {text:'全部重新评定',copyType:1,disabled:false}
-            ]
-          }
-
-        }
-      }).catch(err=>{
-        this.$message({
-          type:'info',
-          message:'网络请求失败'
-        })
+        projectId: this.$store.state.projectInfor.projectId
       })
+        .then(res => {
+          console.log(res);
+          if (res.httpStatus == 200) {
+            if (this.cText == "资料审查") {
+              this.useRecodeRadioList = [
+                {
+                  text: "使用建设单位已有的资料审查记录",
+                  copyType: 15,
+                  disabled: res.result.reviewComplete
+                },
+                {
+                  text: "使用服务机构已有的资料审查记录",
+                  copyType: 20,
+                  disabled: res.result.reviewInspect
+                },
+                { text: "全部重新评定", copyType: 1, disabled: false }
+              ];
+            } else {
+              this.useRecodeRadioList = [
+                {
+                  text: "使用建设单位已有的竣工查验记录",
+                  copyType: 5,
+                  disabled: res.result.complete
+                },
+                {
+                  text: "使用服务机构已有的消防检测记录",
+                  copyType: 10,
+                  disabled: res.result.inspect
+                },
+                { text: "全部重新评定", copyType: 1, disabled: false }
+              ];
+            }
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: "网络请求失败"
+          });
+        });
       this.dialogFormVisible = true;
     },
     // 确定使用
     sureUsedRecode() {
       // console.log()
-      this.SubmitTask(this.radio)
+      this.SubmitTask(this.radio);
     }
   },
   computed: {
@@ -678,7 +807,6 @@ export default {
       background-color: #409eff;
       color: #fff;
     }
-   
   }
   .taskArrangementContent {
     flex: 1;
@@ -742,6 +870,12 @@ export default {
         height: 637px;
         overflow-y: auto;
         padding: 10px 0 0 25px;
+        .personTit {
+          line-height: 30px;
+        }
+        .el-divider {
+          margin: 12px 0;
+        }
       }
     }
     .btns {
@@ -754,16 +888,15 @@ export default {
       margin: 0;
     }
   }
-  .usedRecodeBtn{
-    padding-left:100px; 
-    .dialogFormVisibleContent{
-      
-       .el-radio{
-         .el-radio__label{
-            line-height: 30px;
-       font-size: 16px;
-         }
-       }
+  .usedRecodeBtn {
+    padding-left: 100px;
+    .dialogFormVisibleContent {
+      .el-radio {
+        .el-radio__label {
+          line-height: 30px;
+          font-size: 16px;
+        }
+      }
     }
   }
   .l30 {
@@ -772,6 +905,5 @@ export default {
   .lh48 {
     line-height: 48px;
   }
-  
 }
 </style>

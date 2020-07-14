@@ -9,22 +9,52 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="12" v-show="organizationTypeShow">
-          <el-form-item label="机构类型">
-            <el-select v-model="form.organizationType" placeholder="请选择活动区域" class="w400px" @change='changeOrganizationType()'>
-              <el-option label="单位" value="5"></el-option>
-              <el-option label="部门" value="1"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
         <el-col :span="12">
           <el-form-item label="机构名称">
             <el-input v-model="form.partsName"></el-input>
           </el-form-item>
         </el-col>
+        <el-col :span="12">
+
+          <el-form-item label="机构地址">
+            <el-input v-model="form.departmentPosition"></el-input>
+          </el-form-item>
+        </el-col>
+
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="机构类别">
+            <el-select v-model="form.type" placeholder="请选择机构类型" class="w100" @change='changeOrganizationType()'>
+              <el-option label="单位" value="5"></el-option>
+              <el-option label="部门" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <!-- 建设单位 -->
+        <el-col :span="12">
+          <el-form-item label="资质等级">
+            <el-input v-model="form.qualificationLevel"></el-input>
+          </el-form-item>
+        </el-col>
+
+      </el-row>
+      <!-- 建设单位 -->
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="法定代表人">
+            <el-input v-model="form.legalPerson"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="身份证号">
+            <el-input v-model="form.idcard"></el-input>
+          </el-form-item>
+        </el-col>
+
       </el-row>
 
-      <el-row v-show='unitTypeShow'>
+      <!-- <el-row v-show='unitTypeShow'>
         <el-col>
           <el-form-item label="单位类别">
             <el-select v-model="form.type" placeholder="请选择单位类别" class="w100">
@@ -33,17 +63,11 @@
             </el-select>
           </el-form-item>
         </el-col>
-      </el-row>
-      <el-row>
-        <el-col>
-          <el-form-item label="机构地址">
-            <el-input v-model="form.departmentPosition"></el-input>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      </el-row> -->
+
       <el-row>
         <el-col :span='12'>
-          <el-form-item label="联系人1">
+          <el-form-item label="联系人员">
             <el-input v-model="form.contactMasterUser"></el-input>
           </el-form-item>
         </el-col>
@@ -55,13 +79,26 @@
       </el-row>
       <el-row>
         <el-col :span='12'>
-          <el-form-item label="联系人2">
-            <el-input v-model="form.contactSecondaryUser"></el-input>
+          <el-form-item label="使用状态">
+            <el-radio-group v-model="form.enable">
+              <el-radio :label="1">启用</el-radio>
+              <el-radio :label="-1">禁用</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-col>
+        <!-- 建设单位 -->
         <el-col :span="12">
-          <el-form-item label="联系电话">
-            <el-input v-model="form.contactSecondaryPhone"></el-input>
+          <el-form-item label="营业执照">
+            <div class="uploadBox" v-loading="loading">
+              <el-upload class="avatar-uploader" :action="uploadIp" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                <img v-if="imageUrl" :src="imageUrl" class="avatar wh80px">
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload>
+            </div>
+            <el-button size='mini' plain class="lookImg" @click="dialogVisible = true" v-show="imageUrl">查看大图</el-button>
+            <el-dialog :visible.sync="dialogVisible">
+              <img width="100%" :src="imageUrl" alt="">
+            </el-dialog>
           </el-form-item>
         </el-col>
       </el-row>
@@ -78,18 +115,19 @@
 import {
   getFactoryMenus,
   addPart,
-  addFactory,
-  deletedFactory,
+  // addFactory,
+  // deletedFactory,
   deletedPart,
-  updateFactory,
+  // updateFactory,
   updatedPart
 } from "@/apis/userUnit.js";
+import { uploadIp, ImgIp } from "@/apis/upload.js";
 import { splitStr2 } from "@/utils/publictool";
 
 export default {
   data() {
     return {
-      organizationType: "", //组织机构类型
+      // organizationType: "", //组织机构类型
       form: {},
       props: {
         // multiple: true,
@@ -101,161 +139,174 @@ export default {
       },
       options: [],
       unitTypeShow: true, //显示单位类别
-      organizationTypeShow: false, //选择单位
+      organizationTypeShow: true, //选择单位
       factoryId: "",
       deleteBtnShow: false,
       updata: false, //判断新增还是修改
       confiStatus: 1,
-      disabledAuthPart:false,// 禁用上级部门
+      disabledAuthPart: false, // 禁用上级部门
+      imageUrl: "",
+      uploadIp: "", //上传地址
+      // businessLicense:'',//营业执照
+      loading: false,
+      dialogVisible:false, //查看大图
     };
   },
   created() {
     // authPartsIds
     this.getLastFactoryMenus();
+    this.uploadIp = uploadIp;
   },
 
   methods: {
     onSubmit() {
       if (!this.updata) {
-        if (this.form.authPartsIds && this.form.authPartsIds != "") {
-          addPart({
-            authPartsIds: this.form.authPartsIds,
-            contactMasterPhone: this.form.contactMasterPhone,
-            contactMasterUser: this.form.contactMasterUser,
-            contactSecondaryPhone: this.form.contactSecondaryPhone,
-            contactSecondaryUser: this.form.contactSecondaryUser,
-            departmentPosition: this.form.departmentPosition,
-            factoryId: this.factoryId,
-            partsName: this.form.partsName,
-            type: this.form.organizationType
-          })
-            .then(res => {
-              if (res.httpStatus == 200) {
-                this.$message({
-                  type: "success",
-                  message: "添加成功"
-                });
-                this.changeConfiStatus();
-                this.getLastFactoryMenus();
-                
-              } else {
-                this.$message({
-                  type: "info",
-                  message: "网络请求失败"
-                });
-              }
-            })
-            .catch(err => {
+        // if (this.form.authPartsIds && this.form.authPartsIds != "") {
+        addPart({
+          authPartsIds: this.form.authPartsIds,
+          partsName: this.form.partsName,
+          departmentPosition: this.form.departmentPosition,
+          // factoryId: this.factoryId,
+          type: this.form.type,
+          qualificationLevel: this.form.qualificationLevel,
+          legalPerson: this.form.legalPerson,
+          idcard: this.form.idcard,
+          contactMasterUser: this.form.contactMasterUser,
+          contactMasterPhone: this.form.contactMasterPhone,
+          enable: this.form.enable,
+          businessLicense: this.form.businessLicense,
+          isRoot: this.form.isRoot,
+          factoryType: this.$store.state.factoryType
+        })
+          .then(res => {
+            if (res.httpStatus == 200) {
               this.$message({
-                type: "warning",
-                message: err
+                type: "success",
+                message: "添加成功"
               });
-            });
-        } else {
-          addFactory({
-            contactMasterPhone: this.form.contactMasterPhone,
-            contactMasterUser: this.form.contactMasterUser,
-            contactSecondaryPhone: this.form.contactSecondaryPhone,
-            contactSecondaryUser: this.form.contactSecondaryUser,
-            unitLocation: this.form.departmentPosition,
-            // factoryId: this.$store.state.userInfor.factoryId,
-            factoryName: this.form.partsName,
-            type: this.form.type
-          })
-            .then(res => {
-              if (res.httpStatus == 200) {
-                this.$message({
-                  type: "success",
-                  message: "添加成功"
-                });
-                this.changeConfiStatus();
-                this.getLastFactoryMenus();
-                
-              } else {
-                this.$message({
-                  type: "info",
-                  message: "网络请求失败"
-                });
-              }
-            })
-            .catch(err => {
+              this.changeConfiStatus();
+              this.getLastFactoryMenus();
+            } else {
               this.$message({
-                type: "warning",
-                message: err
+                type: "info",
+                message: "网络请求失败"
               });
+            }
+          })
+          .catch(err => {
+            this.$message({
+              type: "warning",
+              message: err
             });
-        }
+          });
+        // } else {
+        //   addFactory({
+        //     contactMasterPhone: this.form.contactMasterPhone,
+        //     contactMasterUser: this.form.contactMasterUser,
+        //     // contactSecondaryPhone: this.form.contactSecondaryPhone,
+        //     // contactSecondaryUser: this.form.contactSecondaryUser,
+        //     unitLocation: this.form.departmentPosition,
+        //     // factoryId: this.$store.state.userInfor.factoryId,
+        //     factoryName: this.form.partsName,
+        //     type: this.form.type
+        //   })
+        //     .then(res => {
+        //       if (res.httpStatus == 200) {
+        //         this.$message({
+        //           type: "success",
+        //           message: "添加成功"
+        //         });
+        //         this.changeConfiStatus();
+        //         this.getLastFactoryMenus();
+        //       } else {
+        //         this.$message({
+        //           type: "info",
+        //           message: "网络请求失败"
+        //         });
+        //       }
+        //     })
+        //     .catch(err => {
+        //       this.$message({
+        //         type: "warning",
+        //         message: err
+        //       });
+        //     });
+        // }
       } else {
-        if (
-          this.$store.state.unitInfo.factoryId &&
-          this.$store.state.unitInfo.factoryId != ""
-        ) {
-          updateFactory({
-            authPartsIds: this.form.authPartsIds,
-            contactMasterPhone: this.form.contactMasterPhone,
-            contactMasterUser: this.form.contactMasterUser,
-            contactSecondaryPhone: this.form.contactSecondaryPhone,
-            contactSecondaryUser: this.form.contactSecondaryUser,
-            unitLocation: this.form.departmentPosition,
-            factoryId: this.$store.state.unitInfo.factoryId,
-            factoryName: this.form.partsName,
-            type: this.form.organizationType
-          })
-            .then(res => {
-              if (res.httpStatus == 200) {
-                this.$message({
-                  type: "success",
-                  message: "修改成功"
-                });
-                this.changeConfiStatus();
-                this.getLastFactoryMenus();
-              } else {
-                this.$message({
-                  type: "info",
-                  message: "网络请求失败"
-                });
-              }
-            })
-            .catch(err => {
+        // if (
+        //   this.$store.state.unitInfo.factoryId &&
+        //   this.$store.state.unitInfo.factoryId != ""
+        // ) {
+        //   updateFactory({
+        //     authPartsIds: this.form.authPartsIds,
+        //     contactMasterPhone: this.form.contactMasterPhone,
+        //     contactMasterUser: this.form.contactMasterUser,
+        //     // contactSecondaryPhone: this.form.contactSecondaryPhone,
+        //     // contactSecondaryUser: this.form.contactSecondaryUser,
+        //     unitLocation: this.form.departmentPosition,
+        //     factoryId: this.$store.state.unitInfo.factoryId,
+        //     factoryName: this.form.partsName,
+        //     type: this.form.organizationType
+        //   })
+        //     .then(res => {
+        //       if (res.httpStatus == 200) {
+        //         this.$message({
+        //           type: "success",
+        //           message: "修改成功"
+        //         });
+        //         this.changeConfiStatus();
+        //         this.getLastFactoryMenus();
+        //       } else {
+        //         this.$message({
+        //           type: "info",
+        //           message: "网络请求失败"
+        //         });
+        //       }
+        //     })
+        //     .catch(err => {
+        //       this.$message({
+        //         type: "warning",
+        //         message: err
+        //       });
+        //     });
+        // } else {
+        updatedPart({
+          authPartsIds: this.form.authPartsIds,
+          partsName: this.form.partsName,
+          departmentPosition: this.form.departmentPosition,
+          // factoryId: this.factoryId,
+          type: this.form.type,
+          qualificationLevel: this.form.qualificationLevel,
+          legalPerson: this.form.legalPerson,
+          idcard: this.form.idcard,
+          contactMasterUser: this.form.contactMasterUser,
+          contactMasterPhone: this.form.contactMasterPhone,
+          enable: this.form.enable,
+          businessLicense: this.form.businessLicense,
+          id: this.$store.state.unitInfo.id
+        })
+          .then(res => {
+            if (res.httpStatus == 200) {
               this.$message({
-                type: "warning",
-                message: err
+                type: "success",
+                message: "修改成功"
               });
-            });
-        } else {
-          updatedPart({
-            contactMasterPhone: this.form.contactMasterPhone,
-            contactMasterUser: this.form.contactMasterUser,
-            contactSecondaryPhone: this.form.contactSecondaryPhone,
-            contactSecondaryUser: this.form.contactSecondaryUser,
-            departmentPosition: this.form.departmentPosition,
-            partsName: this.form.partsName,
-            type: this.form.type,
-            id: this.$store.state.unitInfo.id
-          })
-            .then(res => {
-              if (res.httpStatus == 200) {
-                this.$message({
-                  type: "success",
-                  message: "修改成功"
-                });
-                this.changeConfiStatus();
-                this.getLastFactoryMenus();
-                
-              } else {
-                this.$message({
-                  type: "info",
-                  message: "网络请求失败"
-                });
-              }
-            })
-            .catch(err => {
+              this.changeConfiStatus();
+              this.getLastFactoryMenus();
+            } else {
               this.$message({
-                type: "warning",
-                message: err
+                type: "info",
+                message: "网络请求失败"
               });
+            }
+          })
+          .catch(err => {
+            this.$message({
+              type: "warning",
+              message: err
             });
-        }
+          });
+        // }
       }
     },
     //选择机构类型
@@ -265,14 +316,17 @@ export default {
       getFactoryMenus()
         .then(res => {
           if (res.httpStatus == 200) {
-            console.log(res)
+            console.log(res);
             this.options = res.result.map(item => {
+              // console.log(item)
               // this.factoryId = item.factoryId;
               // item.id = item.factoryId;
               // item.authPartsIds = item.factoryId;
               // item.partsName = item.factoryName;
               return item;
             });
+            console.log(this.options);
+            this.options.unshift({ partsName: "无", authPartsIds: "000" });
           }
         })
         .catch(err => {
@@ -284,17 +338,22 @@ export default {
     },
     // 选中上一级机构
     chosedauthPartsIds() {
-      if (this.form.authPartsIds) {
-        if(this.form.authPartsIds.indexOf(',')==-1){
-        this.factoryId = this.form.authPartsIds;
-        }else{
-          this.factoryId = splitStr2(this.form.authPartsIds)[0];
-        }
-        this.unitTypeShow = false;
-        this.organizationTypeShow = true;
+      // if (this.form.authPartsIds) {
+      //   if (this.form.authPartsIds.indexOf(",") == -1) {
+      //     this.factoryId = this.form.authPartsIds;
+      //   } else {
+      //     this.factoryId = splitStr2(this.form.authPartsIds)[0];
+      //   }
+      //   this.unitTypeShow = false;
+      //   this.organizationTypeShow = true;
+      // } else {
+      //   this.unitTypeShow = true;
+      //   this.organizationTypeShow = false;
+      // }
+      if (this.form.authPartsIds == "000") {
+        this.form.isRoot = 1;
       } else {
-        this.unitTypeShow = true;
-        this.organizationTypeShow = false;
+        this.form.isRoot = -1;
       }
     },
     //删除
@@ -305,59 +364,57 @@ export default {
         type: "info"
       })
         .then(() => {
-          if (this.$store.state.unitInfo.factoryId) {
-            deletedFactory({
-              factoryId: this.$store.state.unitInfo.factoryId
-            })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.changeConfiStatus();
-                this.getLastFactoryMenus();
-                  
-                } else {
-                  this.$message({
-                    type: "success",
-                    message: "删除失败"
-                  });
-                }
-              })
-              .catch(err => {
+          // if (this.$store.state.unitInfo.factoryId) {
+          //   deletedFactory({
+          //     factoryId: this.$store.state.unitInfo.factoryId
+          //   })
+          //     .then(res => {
+          //       if (res.httpStatus == 200) {
+          //         this.$message({
+          //           type: "success",
+          //           message: "删除成功"
+          //         });
+          //         this.changeConfiStatus();
+          //         this.getLastFactoryMenus();
+          //       } else {
+          //         this.$message({
+          //           type: "success",
+          //           message: "删除失败"
+          //         });
+          //       }
+          //     })
+          //     .catch(err => {
+          //       this.$message({
+          //         type: "warning",
+          //         message: err
+          //       });
+          //     });
+          // } else {
+          deletedPart({
+            id: this.$store.state.unitInfo.id
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
                 this.$message({
-                  type: "warning",
-                  message: err
+                  type: "success",
+                  message: "删除成功"
                 });
-              });
-          } else {
-            deletedPart({
-              id: this.$store.state.unitInfo.id
-            })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.changeConfiStatus();
+                this.changeConfiStatus();
                 this.getLastFactoryMenus();
-                  
-                } else {
-                  this.$message({
-                    type: "success",
-                    message: "删除失败"
-                  });
-                }
-              })
-              .catch(err => {
+              } else {
                 this.$message({
-                  type: "warning",
-                  message: err
+                  type: "success",
+                  message: "删除失败"
                 });
+              }
+            })
+            .catch(err => {
+              this.$message({
+                type: "warning",
+                message: err
               });
-          }
+            });
+          // }
         })
         .catch(() => {
           this.$message({
@@ -368,23 +425,58 @@ export default {
     },
     //数据回填
     getFormData(val) {
+      console.log(val);
       this.form = {
         authPartsIds: val.authPartsIds,
         partsName: val.partsName,
         contactMasterUser: val.contactMasterUser,
-        contactMasterPhone: val.contactMasterPhone,
-        contactSecondaryUser: val.contactSecondaryUser,
-        contactSecondaryPhone: val.contactSecondaryPhone,
-        departmentPosition: val.unitLocation ? val.unitLocation  :val.departmentPosition ,
+        departmentPosition: val.departmentPosition,
         type: val.type,
-        organizationType: val.type
+        qualificationLevel: val.qualificationLevel,
+        legalPerson: val.legalPerson,
+        idcard: val.idcard,
+        contactMasterUser: val.contactMasterUser,
+        contactMasterPhone: val.contactMasterPhone,
+        enable: val.enable,
+        businessLicense: val.businessLicense
+        // departmentPosition: val.unitLocation
+        //   ? val.unitLocation
+        //   : val.departmentPosition,
+        // type: val.type,
       };
       this.disabledAuthPart = true;
+      if (val.businessLicense) {
+        this.imageUrl = ImgIp + val.businessLicense;
+      } else {
+        this.imageUrl = "";
+      }
     },
     //修改,添加成功和删除成功修改操作的flag
     changeConfiStatus() {
       this.confiStatus = this.$store.state.confiflag == 1 ? 2 : 1;
       this.$store.commit("changeConfiFlag", this.confiStatus);
+    },
+    // 上传
+    handleAvatarSuccess(res, file) {
+      // this.imageUrl = URL.createObjectURL(file.raw);
+      console.log(res, file);
+      if (res.httpStatus == 200) {
+        this.form.businessLicense = res.result;
+        this.imageUrl = ImgIp + res.result;
+      }
+      this.loading = false;
+    },
+    beforeAvatarUpload(file) {
+      this.loading = true;
+      // const isJPG = file.type === "image/jpeg";
+      // const isLt2M = file.size / 1024 / 1024 < 2;
+      // if (!isJPG) {
+      //   this.$message.error("上传头像图片只能是 JPG 格式!");
+      // }
+      // if (!isLt2M) {
+      //   this.$message.error("上传头像图片大小不能超过 2MB!");
+      // }
+      // return isJPG && isLt2M;
     }
   },
   computed: {
@@ -393,6 +485,9 @@ export default {
     },
     getUnitStatus() {
       return this.$store.state.unitStatus;
+    },
+    getFactorytype() {
+      return this.$store.state.factoryType;
     }
   },
   watch: {
@@ -405,14 +500,16 @@ export default {
         this.updata = true;
         this.deleteBtnShow = true;
         //  this.disabledAuthPart = true
-        
       } else {
         this.form = {};
-         this.disabledAuthPart = false
+        this.disabledAuthPart = false;
         this.unitTypeShow = true;
         this.deleteBtnShow = false;
         this.updata = false;
       }
+    },
+    getFactorytype: function(val1, val2) {
+      this.form = {};
     }
   }
 };
@@ -438,6 +535,46 @@ export default {
   .tac {
     margin-top: 20px;
     text-align: center;
+  }
+  .w100 {
+    width: 100%;
+  }
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+  .avatar-uploader-icon,
+  .wh80px {
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+  }
+  .uploadBox {
+    width: 80px;
+    height: 80px;
+    position: relative;
+  }
+  .lookImg {
+    // margin-left: 15px;
   }
 }
 </style>

@@ -19,6 +19,8 @@ export default new Vuex.Store({
     filterMarkersData:"", //首页筛选的marker的条件
     cindex:null,//首页跳转记住跳转的菜单
     recodeStandard:{} , //记录的4个菜单数据
+    factoryType:'',// 单位类型
+    ScreeningRecordObj:{}, //记录筛选
   },
   mutations: {
     saveUserRole(state, role) {
@@ -63,6 +65,12 @@ export default new Vuex.Store({
     },
     saveRecodeStandard(state,obj){
           state.recodeStandard = obj
+    },
+    saveFactoryType(state,str){ //保存单位类型
+      state.factoryType = str
+    },
+    saveScreeningRecordObj(state,obj){ // 筛选记录
+      state.ScreeningRecordObj = obj
     }
   },
   actions: {},

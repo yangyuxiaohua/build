@@ -15,27 +15,27 @@
         </el-option>
       </el-select>
     </div>
-    <div class="switch">
+    <div class="switch" v-show="isDataReview">
       <span>记录归档</span>
-      <el-switch v-model="status" active-color="#13ce66" inactive-color="#777A82" active-value="100" inactive-value="1" @change='changeStatus()'>
+      <el-switch v-model="status" active-color="#13ce66" inactive-color="#777A82" :active-value="true" :inactive-value="false" @change='changeStatus()'>
       </el-switch>
     </div>
     <div class="searchContent">
-      <el-cascader :options="primaryTitleIdOptopns" :props="props" clearable placeholder='分部/分项' @focus='getPrimaryTitleIdOptopns()' ref="ascaderPrimaryTitleId"></el-cascader>
+      <el-cascader :options="primaryTitleIdOptopns" :props="props" clearable placeholder='分部/分项' @focus='getPrimaryTitleIdOptopns()' ref="ascaderPrimaryTitleId" v-model="primaryTitleIdValue"></el-cascader>
 
-      <el-select v-model="result" clearable placeholder="重要程度" class="w120px">
+      <el-select v-model="importantValue" clearable placeholder="重要程度" class="w120px" v-show="importantShow">
         <el-option v-for="item in importantOption" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-select v-model="result" clearable placeholder="查验结论" class="w120px">
+      <el-select v-model="inspectionValue" clearable placeholder="查验结论" class="w120px" v-show="completionInspectionShow">
         <el-option v-for="item in resultOptions" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-select v-model="result" clearable placeholder="检测结论" class="w120px">
+      <el-select v-model="detectionValue" clearable placeholder="检测结论" class="w120px" v-show="fireDetectionShow">
         <el-option v-for="item in resultOptions" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-select v-model="result" clearable placeholder="评定结论" class="w120px">
+      <el-select v-model="evaluationValue" clearable placeholder="评定结论" class="w120px" v-show="evaluationShow">
         <el-option v-for="item in resultOptions" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
@@ -47,16 +47,20 @@
 <script>
 import { getCategorys } from "@/apis/standard";
 import { inDexOfStr } from "../../utils/publictool.js";
-import { updateProject } from "../../apis/project.js";
+// import { updateProject } from "../../apis/project.js";
 import {
   getEvaluationData12,
   getFiData12,
-  getDataReviewData12
+  getDataReviewData12,
+  toArchive
 } from "../../apis/evaluation.js";
 import {
-  getProjectsByAcceptanceFactoryId,
-  getProjectsByConstructionFactoryId
+  // getProjectsByAcceptanceFactoryId,
+  // getProjectsByConstructionFactoryId,
+  getProjectInfor
 } from "@/apis/project.js";
+import { getProjects } from "@/apis/home.js";
+
 export default {
   data() {
     return {
@@ -65,7 +69,7 @@ export default {
       ProjectOptions: [],
       projectValue: {},
       pProjectName: "",
-      status: "1",
+      status: "true",
       chosedPro: {},
       result: "", //下拉框的筛选
       resultOptions: [
@@ -80,12 +84,24 @@ export default {
       primaryTitleIdOptopns: [], // 分部分项
       primaryTitleId: "",
       standardName: "",
-      props:{ //级联选择器配置
-         children: "secondaryCategory",
+      props: {
+        //级联选择器配置
+        children: "secondaryCategory",
         label: "name",
         value: "secondaryId",
         checkStrictly: true
-      }
+      },
+      isDataReview: false, //是否是资料评审，控制记录归档是否显示
+      //下拉框显示
+      importantShow:false,
+      completionInspectionShow: false,
+      fireDetectionShow: false,
+      evaluationShow: false,
+      primaryTitleIdValue:'', //分部/分项
+      importantValue:'',//重要程度
+      inspectionValue:'',//查验结论
+      detectionValue:'',//检测结论
+      evaluationValue:'',//评定结论
       // primaryTitleId: "",
       // primaryTitleIdOptopns: [],
       // secondaryTitleId: "",
@@ -96,67 +112,93 @@ export default {
     this.getCategorysMethods();
     this.getProjectList();
     this.projectValue = this.$store.state.projectInfor;
+    // console.log(this.$store.state.projectInfor)
+    // console.log(this.projectValue)
+    this.status = this.projectValue.status == 1 ? false : true;
     this.pProjectName = this.$store.state.projectInfor.projectName;
+    //清除筛选保存的条件
+    this.$store.commit("saveScreeningRecordObj", {});
+
     // console.log(this.$store.state.projectInfor.projectId)
   },
   methods: {
     // 获取项目列表
-    getProjectList() {
-      if (
-        this.$store.state.userRole.roleCode == 300 ||
-        this.$store.state.userRole.roleCode == 600
-      ) {
-        getProjectsByConstructionFactoryId()
-          .then(res => {
-            if (res.httpStatus == 200) {
-              this.ProjectOptions = res.result.map(item => {
-                item.label = item.projectName;
-                item.value = item.projectId;
-                return item;
-              });
-              if (!this.$store.state.projectInfor.standardId) {
-                this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
-              }
-            }
-          })
-          .catch(err => {
-            this.$message({
-              type: "warning",
-              message: err.msg
+    getProjectList(name = "") {
+      getProjects({ name })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            // this.projectList = res.result;
+            this.ProjectOptions = res.result.map(item => {
+              item.label = item.projectName;
+              item.value = item.projectId;
+              return item;
             });
-          });
-      } else {
-        getProjectsByAcceptanceFactoryId()
-          .then(res => {
-            if (res.httpStatus == 200) {
-              this.ProjectOptions = res.result.map(item => {
-                item.label = item.projectName;
-                item.value = item.projectId;
-                return item;
-              });
-              if (!this.$store.state.projectInfor.standardId) {
-                this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
-              }
+            if (!this.$store.state.projectInfor.standardId) {
+              this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
             }
-          })
-          .catch(err => {
-            this.$message({
-              type: "warning",
-              message: err.msg
-            });
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "warning",
+            message: err
           });
-      }
+        });
+      // if (
+      //   this.$store.state.userRole.roleCode == 300 ||
+      //   this.$store.state.userRole.roleCode == 600
+      // ) {
+      //   getProjectsByConstructionFactoryId()
+      //     .then(res => {
+      //       if (res.httpStatus == 200) {
+      //         this.ProjectOptions = res.result.map(item => {
+      //           item.label = item.projectName;
+      //           item.value = item.projectId;
+      //           return item;
+      //         });
+      //         if (!this.$store.state.projectInfor.standardId) {
+      //           this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
+      //         }
+      //       }
+      //     })
+      //     .catch(err => {
+      //       this.$message({
+      //         type: "warning",
+      //         message: err.msg
+      //       });
+      //     });
+      // } else {
+      //   getProjectsByAcceptanceFactoryId()
+      //     .then(res => {
+      //       if (res.httpStatus == 200) {
+      //         this.ProjectOptions = res.result.map(item => {
+      //           item.label = item.projectName;
+      //           item.value = item.projectId;
+      //           return item;
+      //         });
+      //         if (!this.$store.state.projectInfor.standardId) {
+      //           this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
+      //         }
+      //       }
+      //     })
+      //     .catch(err => {
+      //       this.$message({
+      //         type: "warning",
+      //         message: err.msg
+      //       });
+      //     });
+      // }
     },
     //选中项目
     chosedProject() {
-      this.status = this.projectValue.status;
       this.$store.commit("chosedProjectId", this.projectValue);
+      this.status = this.projectValue.status == 1 ? false : true;
     },
     //改变开关状态
     changeStatus() {
-      updateProject({
-        projectId: this.$store.state.projectInfor.projectId,
-        status: this.status
+      toArchive({
+        projectId: this.$store.state.projectInfor.projectId
+        // status: this.status
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -164,8 +206,19 @@ export default {
               type: "success",
               message: "档案归档成功"
             });
+            console.log(res);
+            // this.status = this.status == true ? false :true
+            getProjectInfor({
+              projectId: this.$store.state.projectInfor.projectId
+            }).then(res => {
+              if (res.httpStatus == 200) {
+                console.log(res.result.project);
+                this.$store.commit("chosedProjectId", res.result.project);
+              }
+            });
+            this.getProjectList();
           } else {
-            this.status = this.status == 1 ? 100 : 1;
+            this.status = this.projectValue.status == 1 ? false : true;
             this.$message({
               type: "warning",
               message: res.msg
@@ -173,6 +226,7 @@ export default {
           }
         })
         .catch(err => {
+          this.status = this.projectValue.status == 1 ? false : true;
           this.$message({
             type: "info",
             message: err
@@ -208,6 +262,12 @@ export default {
             });
             this.cindex = this.navList[0].standardId;
             this.standardName = this.navList[0].name;
+            if (this.standardName == "资料审查") {
+              this.isDataReview = false;
+            } else {
+              this.isDataReview = true;
+            }
+            this.constroShow(this.standardName)
             this.$router.history.push(this.navList[0].path);
           }
         })
@@ -225,13 +285,12 @@ export default {
       })
         .then(res => {
           // console.log(res);
-          if(res.httpStatus==200){
-            this.primaryTitleIdOptopns = res.result.map(item=>{
+          if (res.httpStatus == 200) {
+            this.primaryTitleIdOptopns = res.result.map(item => {
               // console.log(item.primaryId)
-              item.secondaryId = "menuLevel1_" + item.primaryId
-              return item
-            })
-
+              item.secondaryId = "menuLevel1_" + item.primaryId;
+              return item;
+            });
           }
         })
         .catch(err => {
@@ -248,13 +307,12 @@ export default {
       })
         .then(res => {
           // console.log(res);
-           if(res.httpStatus==200){
-            this.primaryTitleIdOptopns = res.result.map(item=>{
+          if (res.httpStatus == 200) {
+            this.primaryTitleIdOptopns = res.result.map(item => {
               // console.log(item.primaryId)
-              item.secondaryId = "menuLevel1_" + item.primaryId
-              return item
-            })
-
+              item.secondaryId = "menuLevel1_" + item.primaryId;
+              return item;
+            });
           }
         })
         .catch(err => {
@@ -271,13 +329,12 @@ export default {
       })
         .then(res => {
           // console.log(res);
-           if(res.httpStatus==200){
-            this.primaryTitleIdOptopns = res.result.map(item=>{
+          if (res.httpStatus == 200) {
+            this.primaryTitleIdOptopns = res.result.map(item => {
               // console.log(item.primaryId)
-              item.secondaryId = "menuLevel1_" + item.primaryId
-              return item
-            })
-
+              item.secondaryId = "menuLevel1_" + item.primaryId;
+              return item;
+            });
           }
         })
         .catch(err => {
@@ -291,9 +348,17 @@ export default {
     changeNav(i) {
       this.cindex = i.standardId;
       this.standardName = i.name;
-      this.$router.history.push(i.path);
+      if (this.standardName == "资料审查") {
+        this.isDataReview = false;
+      } else {
+        this.isDataReview = true;
+      }
       // this.$store.commit("saveStandardId", i.standardId);
       this.$store.commit("saveRecodeStandard", i);
+      this.$store.commit("saveScreeningRecordObj", {});
+      this.constroShow(this.standardName)
+      this.clearValue()
+      this.$router.history.push(i.path);
     },
     //获取分部/分项选项
     getPrimaryTitleIdOptopns() {
@@ -305,8 +370,62 @@ export default {
         this.getFireRecode12();
       }
     },
-    RecodeCurrentChange(){
-      console.log(this.$refs.ascaderPrimaryTitleId.getCheckedNodes())
+    //控制下拉框的隐藏显示
+    constroShow(name) {
+      switch (name) {
+        case "现场评定":
+          this.completionInspectionShow=true,
+          this.fireDetectionShow=true,
+          this.evaluationShow=true
+          this.importantShow=true
+          break;
+        case "资料审查":
+          this.importantShow=false,
+          this.completionInspectionShow=false,
+          this.fireDetectionShow=false,
+          this.evaluationShow=true
+          break;
+        case "竣工查验":
+          this.importantShow=true,
+          this.completionInspectionShow=true,
+          this.fireDetectionShow=false,
+          this.evaluationShow=false
+          break;
+        default:
+          this.completionInspectionShow=false,
+          this.importantShow=true,
+          this.fireDetectionShow=true,
+          this.evaluationShow=false
+      }
+    },
+    //点击查询
+    RecodeCurrentChange() {
+      // console.log(this.$refs.ascaderPrimaryTitleId.getCheckedNodes()[0].value);
+      // console.log(this.primaryTitleIdValue);
+      // let value = value
+      let ascaderValue;
+      if(this.$refs.ascaderPrimaryTitleId.getCheckedNodes().length>0){
+        ascaderValue = this.$refs.ascaderPrimaryTitleId.getCheckedNodes()[0].value
+      }else{
+        ascaderValue=''
+      }
+      let obj = {
+      ascaderValue:ascaderValue,//分部分项
+      importantValue:this.importantValue,//重要程度
+      inspectionValue:this.inspectionValue,//查验结论
+      detectionValue:this.detectionValue,//检测结论
+      evaluationValue:this.evaluationValue,//评定结论
+      };
+      console.log(obj)
+      this.$store.commit("saveScreeningRecordObj", obj);
+    },
+    //清空选项
+    clearValue(){
+      this.primaryTitleIdValue=''//分部分项
+     this.importantValue=''//重要程度
+      this.inspectionValue=''//查验结论
+      this.detectionValue=''//检测结论
+      this.evaluationValue=''//评定结论
     }
     // ascaderPrimaryTitleId
   }

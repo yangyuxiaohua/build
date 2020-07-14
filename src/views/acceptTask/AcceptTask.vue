@@ -1,5 +1,5 @@
 <template>
-  <div id="projectWrapper">
+  <div id="AcceptTaskWrapper">
     <div class="left">
       <div class="tit">
         <div class="titText">
@@ -12,7 +12,11 @@
         <i class="el-icon-search el-input__icon" slot="suffix" @click="handleIconClick"></i>
       </el-input>
       <div class="projectList">
-        <p v-for="item in projectList" :key="item.projectId" @click="clickProject(item)" :class="{chosedProjectClass:chosedProjectIdNum==item.projectId}">{{item.projectName}}</p>
+        <p>已分配：</p>
+        <p v-for="(item) in projectList" :key="item.projectId" @click="clickProject(item)" :class="{chosedProjectClass:chosedProjectIdNum==item.projectId}">{{item.projectName}}</p>
+        <el-divider></el-divider>
+        <p>未分配：</p>
+        <p v-for="(item,index) in projectList2" :key="index" @click="clickProject(item)" :class="{chosedProjectClass:chosedProjectIdNum==item.projectId}">{{item.projectName}}</p>
       </div>
 
     </div>
@@ -29,10 +33,11 @@
 
 <script>
 import { inDexOfStr } from "../../utils/publictool.js";
-import {
-  getProjectsByAcceptanceFactoryId,
-  getProjectsByConstructionFactoryId
-} from "@/apis/project.js";
+// import {
+//   getProjectsByAcceptanceFactoryId,
+//   getProjectsByConstructionFactoryId
+// } from "@/apis/project.js";
+import { getProjects } from "@/apis/home.js";
 
 export default {
   data() {
@@ -47,11 +52,11 @@ export default {
       //   // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:true }
       // ],
       projectList: [], // 项目列表
+      projectList2:[],//为分配任务项目
       // dialogProjectFormVisible: false,
       // addProjectForm: {}, //新增项目
       formLabelWidth: "100px",
       chosedProjectIdNum: "", //选中的项目
-     
     };
   },
   created() {
@@ -90,38 +95,33 @@ export default {
     // },
     // 查询项目列表
     getProjectList(name = "") {
-      if (
-        this.$store.state.userRole.roleCode == 300 ||
-        this.$store.state.userRole.roleCode == 600
-      ) {
-        getProjectsByConstructionFactoryId({ name })
-          .then(res => {
-            if (res.httpStatus == 200) {
-              this.projectList = res.result;
-            }
-          })
-          .catch(err => {
-            this.$message({
-              type: "warning",
-              message: err
-            });
+      getProjects({ name,distribution:1 })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            this.projectList = res.result;
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "warning",
+            message: err
           });
-      } else {
-        getProjectsByAcceptanceFactoryId({ name })
-          .then(res => {
-            if (res.httpStatus == 200) {
-              this.projectList = res.result;
-            }
-          })
-          .catch(err => {
-            this.$message({
-              type: "warning",
-              message: err
-            });
+        });
+      getProjects({ name,distribution:-1 })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            this.projectList2 = res.result;
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "warning",
+            message: err
           });
-      }
+        });
+      
     },
-    
+
     //点击某一个项目
     clickProject(i) {
       this.chosedProjectIdNum = i.projectId;
@@ -144,7 +144,7 @@ export default {
 </script>
 
 <style lang="less" >
-#projectWrapper {
+#AcceptTaskWrapper {
   width: 100%;
   height: 100%;
   display: flex;
@@ -178,7 +178,7 @@ export default {
           margin-left: 5px;
         }
       }
-     
+
       .el-button {
         // height: 30px;
         // line-height: 30px;

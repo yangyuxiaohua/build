@@ -177,7 +177,7 @@ import {
   getUploadsByChecklistId,
   IP
 } from "@/apis/evaluation";
-import { getTime,changeEdit } from "@/utils/publictool";
+import { getTime,changeEdit,splitStr } from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -290,6 +290,10 @@ export default {
       //     }
       //   }
       // },
+       primaryTitleId:'',//下拉框的筛选
+      secondaryTitleId:'',
+      checkTypeName:'',
+      copyInspectRecordResult:'',
       result: "", //下拉框的筛选
       resultOptions: [
         { label: "合格", value: "1" },
@@ -317,9 +321,10 @@ export default {
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
-        result: this.result,
+        primaryTitleId: this.primaryTitleId,
         secondaryTitleId: this.secondaryTitleId,
-        primaryTitleId: this.primaryTitleId
+         checkTypeName:this.checkTypeName,
+        copyInspectRecordResult:this.copyInspectRecordResult,
       })
         .then(res => {
           console.log(res);
@@ -493,6 +498,9 @@ export default {
   computed: {
     getProjectId() {
       return this.$store.state.projectInfor;
+    },
+    getSearchValue(){
+      return this.$store.state.ScreeningRecordObj
     }
   },
   watch: {
@@ -500,6 +508,36 @@ export default {
       this.unitCurrentChange(this.unitCurrentPage);
     // this.getRecode12();
       
+    },
+    getSearchValue: function(val1) {
+      // console.log(val1)
+      // splitStr
+      let obj; 
+      if(val1.ascaderValue){
+        if(splitStr(val1.ascaderValue)[0]=='menuLevel1'){
+          obj = {
+            primaryTitleId:splitStr(val1.ascaderValue)[1],
+            secondaryTitleId:'',
+          }
+        }else{
+           obj = {
+            primaryTitleId:'',
+            secondaryTitleId:val1.ascaderValue,
+          }
+        }
+      }else{
+        obj = {
+          primaryTitleId:'',
+          secondaryTitleId:'',
+        }
+      }
+      
+       this.primaryTitleId = obj.primaryTitleId
+       this.secondaryTitleId = obj.secondaryTitleId
+       this.checkTypeName = val1.importantValue
+       this.copyInspectRecordResult = val1.detectionValue
+         this.unitCurrentPage = 1
+         this.unitCurrentChange(this.unitCurrentPage)
     }
   }
 };

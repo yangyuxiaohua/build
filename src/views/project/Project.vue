@@ -15,7 +15,7 @@
       <div class="projectList">
         <p v-for="item in projectList" :key="item.projectId" @click="clickProject(item)" :class="{chosedProjectClass:chosedProjectIdNum==item.projectId}">{{item.projectName}}</p>
       </div>
-      
+
     </div>
     <div class="right">
       <div class="rightNav">
@@ -30,11 +30,12 @@
 
 <script>
 import { inDexOfStr } from "../../utils/publictool.js";
-import {
-  getProjectsByAcceptanceFactoryId,
-  getProjectsByConstructionFactoryId
-  // addProject
-} from "@/apis/project.js";
+// import {
+//   getProjectsByAcceptanceFactoryId,
+//   getProjectsByConstructionFactoryId
+//   // addProject
+// } from "@/apis/project.js";
+import { getProjects } from "@/apis/home.js";
 
 export default {
   data() {
@@ -42,8 +43,18 @@ export default {
       projectSearch: "",
       cindex: 1,
       rightNav: [
-        { id: 1, path: "/index/project/basicInfor", text: "基本信息",roleShow4:true },
-        { id: 2, path: "/index/project/acceptanceContent", text: "验收内容",roleShow4:true },
+        {
+          id: 1,
+          path: "/index/project/basicInfor",
+          text: "基本信息",
+          roleShow4: true
+        },
+        {
+          id: 2,
+          path: "/index/project/acceptanceContent",
+          text: "验收内容",
+          roleShow4: true
+        }
         // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:true }
       ],
       projectList: [], // 项目列表
@@ -54,7 +65,7 @@ export default {
     };
   },
   created() {
-    this.roleShow()
+    this.roleShow();
     if (inDexOfStr(this.$route.path, "basicInfor")) {
       this.cindex = 1;
     } else if (inDexOfStr(this.$route.path, "acceptanceContent")) {
@@ -63,62 +74,59 @@ export default {
       this.cindex = 3;
     }
     this.getProjectList();
-    if(this.$store.state.projectInfor.projectId){
+    if (this.$store.state.projectInfor.projectId) {
       this.chosedProjectIdNum = this.$store.state.projectInfor.projectId;
     }
   },
   methods: {
-     //角色控制
+    //角色控制
     roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 600 || roleCode == 650 || roleCode == 700 ||roleCode==500) {
+      if (
+        roleCode == 600 ||
+        roleCode == 650 ||
+        roleCode == 700 ||
+        roleCode == 500
+      ) {
         this.rightNav = [
-        { id: 1, path: "/index/project/basicInfor", text: "基本信息",roleShow4:true },
-        { id: 2, path: "/index/project/acceptanceContent", text: "验收内容",roleShow4:true },
-        // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:false }
+          {
+            id: 1,
+            path: "/index/project/basicInfor",
+            text: "基本信息",
+            roleShow4: true
+          },
+          {
+            id: 2,
+            path: "/index/project/acceptanceContent",
+            text: "验收内容",
+            roleShow4: true
+          }
+          // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:false }
         ];
       }
     },
     handleIconClick() {
       // console.log(this.projectSearch)
-      this.getProjectList(this.projectSearch)
+      this.getProjectList(this.projectSearch);
     },
     clickRightNav(index, path) {
       this.cindex = index;
       this.$router.history.push(path);
     },
     // 查询项目列表
-    getProjectList(name='') {
-      if (
-        this.$store.state.userRole.roleCode == 300 ||
-        this.$store.state.userRole.roleCode == 600
-      ) {
-        getProjectsByConstructionFactoryId({name})
-          .then(res => {
-            if (res.httpStatus == 200) {
-              this.projectList = res.result;
-            }
-          })
-          .catch(err => {
-            this.$message({
-              type: "warning",
-              message: err
-            });
+    getProjectList(name = "") {
+      getProjects({ name })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            this.projectList = res.result;
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "warning",
+            message: err
           });
-      } else {
-        getProjectsByAcceptanceFactoryId({name})
-          .then(res => {
-            if (res.httpStatus == 200) {
-              this.projectList = res.result;
-            }
-          })
-          .catch(err => {
-            this.$message({
-              type: "warning",
-              message: err
-            });
-          });
-      }
+        });
     },
     // 新增项目
     addProject() {
@@ -132,7 +140,7 @@ export default {
     clickProject(i) {
       this.chosedProjectIdNum = i.projectId;
       this.$store.commit("chosedProjectId", i);
-      this.cindex = 1
+      this.cindex = 1;
       this.$router.history.push("/index/project/basicInfor");
     }
   },
@@ -142,7 +150,7 @@ export default {
     }
   },
   watch: {
-    addProjectSuccess: function changeaddProjectStatus(val1,val2) {
+    addProjectSuccess: function changeaddProjectStatus(val1, val2) {
       this.getProjectList();
     }
   }

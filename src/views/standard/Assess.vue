@@ -169,7 +169,7 @@ import {
   deletedSecondaryMenu,
   deletedChecklist
 } from "@/apis/standard";
-import { uploadIp, Ip } from "@/apis/upload";
+import { uploadIp, ImgIp } from "@/apis/upload";
 import { splitStr } from "@/utils/publictool";
 //富文本
 import { quillEditor, Quill } from "vue-quill-editor";

@@ -76,11 +76,11 @@
               </el-option>
             </el-select> -->
 
-            <el-cascader :options="constructionOptions" :props="props" clearable v-model="form.constructionPartId" @change="changeUnit('construction')" class="w80P"></el-cascader>
+            <el-cascader :options="constructionOptions" :props="props" clearable v-model="form.constructionPartId" class="w80P"></el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="联系人">
+          <el-form-item label="项目负责人">
             <el-input v-model="person1" class="w80P" disabled></el-input>
           </el-form-item>
         </el-col>
@@ -99,11 +99,11 @@
               <el-option v-for="j in serviceOptions" :key="j.factoryId" :label="j.factoryName" :value="j.factoryId">
               </el-option>
             </el-select> -->
-            <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" @change="changeUnit('service')" class="w80P"></el-cascader>
+            <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" class="w80P" filterable :filter-method='filterservice' ref='filterserviceTree'></el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="联系人">
+          <el-form-item label="项目负责人">
             <el-input v-model="person2" class="w80P" disabled></el-input>
           </el-form-item>
         </el-col>
@@ -126,7 +126,7 @@
           </el-form-item> -->
 
           <el-form-item label="验收单位">
-            <el-cascader :options="AcceptanceFactorysOptions" :props="props" clearable v-model="form.acceptancePartId"  class="w80P"></el-cascader>
+            <el-cascader :options="AcceptanceFactorysOptions" :props="props" clearable v-model="form.acceptancePartId" class="w80P"></el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -420,7 +420,7 @@ export default {
         value: "id",
         emitPath: false
       },
-      allUserdList:[], // 保存特殊建设工程情形的数据
+      allUserdList: [], // 保存特殊建设工程情形的数据
       userdList: [], //特殊建设工程情形
       userdListStr: "", //特殊建设工程情形
       person1: "", //建设单位联系人
@@ -443,6 +443,11 @@ export default {
     this.getProjectInformation();
     this.chosedcity();
   },
+  updated(){
+    // this.$nextTick(function(){
+    //   this.filterservice()
+    // })
+  },
   methods: {
     onSubmit() {
       if (!this.$store.state.projectInfor.projectId) {
@@ -460,7 +465,7 @@ export default {
           typeId: this.form.typeId,
           lat: this.form.lat,
           lon: this.form.lon,
-          usageId:this.userdList.join(',')
+          usageId: this.userdList.join(",")
         })
           .then(res => {
             if (res.httpStatus == 200) {
@@ -476,8 +481,8 @@ export default {
               let bool =
                 this.$store.state.addProjectSuccessed == "1" ? "2" : "1";
               this.$store.commit("addProjectSuccess", bool);
-              this.getProjectInformation()
-              } else {
+              this.getProjectInformation();
+            } else {
               this.$message({
                 type: "warning",
                 message: "提交失败"
@@ -493,7 +498,7 @@ export default {
       } else {
         updateProject({
           projectId: this.$store.state.projectInfor.projectId,
-           projectName: this.form.projectName,
+          projectName: this.form.projectName,
           regionId: this.form.regionId,
           detailedAddress: this.form.detailedAddress,
           money: this.form.money,
@@ -506,7 +511,7 @@ export default {
           typeId: this.form.typeId,
           lat: this.form.lat,
           lon: this.form.lon,
-          usageId:this.userdList.join(',')
+          usageId: this.userdList.join(",")
         })
           .then(res => {
             if (res.httpStatus == 200) {
@@ -517,7 +522,7 @@ export default {
               let bool =
                 this.$store.state.addProjectSuccessed == "1" ? "2" : "1";
               this.$store.commit("addProjectSuccess", bool);
-              this.getProjectInformation()
+              this.getProjectInformation();
             } else {
               this.$message({
                 type: "info",
@@ -692,7 +697,7 @@ export default {
         .then(res => {
           // console.log(res);
           if (res.httpStatus == 200) {
-            this.allUserdList = res.result
+            this.allUserdList = res.result;
             this.getUsedList = res.result.reduce((res1, item) => {
               res1[item.code]
                 ? res1[item.code].push(item)
@@ -715,7 +720,7 @@ export default {
         projectId: this.$store.state.projectInfor.projectId
       })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.httpStatus == 200) {
             //h获取三级联动
             if (res.result.project.regionId) {
@@ -732,32 +737,45 @@ export default {
               });
             }
             this.form = {
-                projectName: res.result.project.projectName, //工程名称
-                regionId: res.result.project.regionId, //工程地址
-                detailedAddress: res.result.project.detailedAddress, //详细地址
-                money: res.result.project.money, // 投资额
-                constructionArea: res.result.project.constructionArea, //总建筑面积
-                time: res.result.project.time, //申请验收日期
-                constructionPartId: res.result.project.authConstructionIds[0], //建设单位
-                servicePartId: res.result.project.authServiceIds[0], //技术服务机构
-                acceptancePartId: res.result.project.authAcceptanceIds[0], //验收单位
-                certificateNumber: res.result.project.certificateNumber, //消防验收申请受理凭证文号
-                reviewCertificateNumber: res.result.project.reviewCertificateNumber, //消防设计审查意见书文号
-                typeId: res.result.project.typeId, //工程类别：
-                provinceRegion: "云南省",
-                cityRegion: "昆明市",
-                lat: res.result.project.lat,
-                lon: res.result.project.lon
+              projectName: res.result.project.projectName, //工程名称
+              regionId: res.result.project.regionId, //工程地址
+              detailedAddress: res.result.project.detailedAddress, //详细地址
+              money: res.result.project.money, // 投资额
+              constructionArea: res.result.project.constructionArea, //总建筑面积
+              time: res.result.project.time, //申请验收日期
+              constructionPartId: res.result.project.authConstructionIds[0], //建设单位
+              servicePartId: res.result.project.authServiceIds[0], //技术服务机构
+              acceptancePartId: res.result.project.authAcceptanceIds[0], //验收单位
+              certificateNumber: res.result.project.certificateNumber, //消防验收申请受理凭证文号
+              reviewCertificateNumber:
+                res.result.project.reviewCertificateNumber, //消防设计审查意见书文号
+              typeId: res.result.project.typeId, //工程类别：
+              provinceRegion: "云南省",
+              cityRegion: "昆明市",
+              lat: res.result.project.lat,
+              lon: res.result.project.lon
             };
+            //建设单位联系
+            this.person1 = res.result.constructionProjectLeader
+              ? res.result.constructionProjectLeader
+              : "";
+            this.person2 = res.result.serviceProjectLeader
+              ? res.result.serviceProjectLeader
+              : "";
+            this.phone1 = res.result.constructionProjectLeaderPhone
+              ? res.result.constructionProjectLeaderPhone
+              : "";
+            this.phone2 = res.result.serviceProjectLeaderPhone
+              ? res.result.serviceProjectLeaderPhone
+              : "";
             // console.log(this.form)
-            this.userdList = res.result.projectInfoUsages.map(item=>{
-              return item.dictionaryId
-            })
-            let arr = res.result.projectInfoUsages.map(item=>{
-              return item.usageName
-            })
-            this.userdListStr = arr.join(',')
-
+            this.userdList = res.result.projectInfoUsages.map(item => {
+              return item.dictionaryId;
+            });
+            let arr = res.result.projectInfoUsages.map(item => {
+              return item.usageName;
+            });
+            this.userdListStr = arr.join(",");
           }
         })
         .catch(err => {
@@ -861,14 +879,27 @@ export default {
       this.zoomUp = this.zoomUp == false ? true : false;
       this.show2 = this.show2 == false ? true : false;
     },
-    //改变建设单位和服务机构获取人员和电话
-    changeUnit(unit) {
-      console.log(unit)
-      if(unit =='construction'){
-
-      }else{
-
-      }
+    //过滤服务机构
+    filterservice(node, keyword) {
+      
+      getFactoryMenus({
+        factoryType: "10",
+        onlyFactory: true,
+        rootName: keyword
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            this.serviceOptions = res.result.map(item => {
+              return item;
+            });
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: "网络请求失败"
+          });
+        });
     }
   },
   watch: {
