@@ -17,7 +17,7 @@
     </div>
     <div class="switch" v-show="isDataReview">
       <span>记录归档</span>
-      <el-switch v-model="status" active-color="#13ce66" inactive-color="#777A82" :active-value="true" :inactive-value="false" @change='changeStatus()'>
+      <el-switch v-model="status" active-color="#13ce66" inactive-color="#777A82" :active-value="true" :inactive-value="false" @change='changeStatus()' :disabled='roleDisabled'>
       </el-switch>
     </div>
     <div class="searchContent">
@@ -93,15 +93,16 @@ export default {
       },
       isDataReview: false, //是否是资料评审，控制记录归档是否显示
       //下拉框显示
-      importantShow:false,
+      importantShow: false,
       completionInspectionShow: false,
       fireDetectionShow: false,
       evaluationShow: false,
-      primaryTitleIdValue:'', //分部/分项
-      importantValue:'',//重要程度
-      inspectionValue:'',//查验结论
-      detectionValue:'',//检测结论
-      evaluationValue:'',//评定结论
+      primaryTitleIdValue: "", //分部/分项
+      importantValue: "", //重要程度
+      inspectionValue: "", //查验结论
+      detectionValue: "", //检测结论
+      evaluationValue: "", //评定结论
+      roleDisabled:true, //角色归档
       // primaryTitleId: "",
       // primaryTitleIdOptopns: [],
       // secondaryTitleId: "",
@@ -109,19 +110,52 @@ export default {
     };
   },
   created() {
-    this.getCategorysMethods();
-    this.getProjectList();
     this.projectValue = this.$store.state.projectInfor;
-    // console.log(this.$store.state.projectInfor)
-    // console.log(this.projectValue)
     this.status = this.projectValue.status == 1 ? false : true;
     this.pProjectName = this.$store.state.projectInfor.projectName;
+    this.getCategorysMethods();
+    this.getProjectList();
+    // console.log(this.$store.state.projectInfor)
+    // console.log(this.projectValue)
     //清除筛选保存的条件
     this.$store.commit("saveScreeningRecordObj", {});
 
     // console.log(this.$store.state.projectInfor.projectId)
   },
   methods: {
+    //权限控制
+    roleControl() {
+      let roleCode = this.$store.state.userRole.roleCode;
+      if(roleCode == 500 || roleCode ==700 || roleCode==900){
+        this.roleDisabled = true
+      }else{
+        this.roleDisabled = false
+      }
+      if (roleCode == 600 || roleCode == 650 || roleCode == 700) {
+        this.navList = this.navList.filter(item => {
+          if (item.name == "资料审查" || item.name == "竣工查验") {
+            return item;
+          }
+        });
+      } else if (roleCode == 800 || roleCode == 850 || roleCode == 900) {
+        this.navList = this.navList.filter(item => {
+          if (item.name == "资料审查" || item.name == "消防检测") {
+            return item;
+          }
+        });
+      } else {
+        this.navList = this.navList
+      }
+      this.cindex = this.navList[0].standardId;
+            this.standardName = this.navList[0].name;
+            if (this.standardName == "资料审查") {
+              this.isDataReview = false;
+            } else {
+              this.isDataReview = true;
+            }
+            this.$router.history.push(this.navList[0].path);
+            this.constroShow(this.standardName);
+    },
     // 获取项目列表
     getProjectList(name = "") {
       getProjects({ name })
@@ -260,15 +294,8 @@ export default {
                 path
               };
             });
-            this.cindex = this.navList[0].standardId;
-            this.standardName = this.navList[0].name;
-            if (this.standardName == "资料审查") {
-              this.isDataReview = false;
-            } else {
-              this.isDataReview = true;
-            }
-            this.constroShow(this.standardName)
-            this.$router.history.push(this.navList[0].path);
+            
+            this.roleControl()
           }
         })
         .catch(err => {
@@ -356,8 +383,8 @@ export default {
       // this.$store.commit("saveStandardId", i.standardId);
       this.$store.commit("saveRecodeStandard", i);
       this.$store.commit("saveScreeningRecordObj", {});
-      this.constroShow(this.standardName)
-      this.clearValue()
+      this.constroShow(this.standardName);
+      this.clearValue();
       this.$router.history.push(i.path);
     },
     //获取分部/分项选项
@@ -374,28 +401,28 @@ export default {
     constroShow(name) {
       switch (name) {
         case "现场评定":
-          this.completionInspectionShow=true,
-          this.fireDetectionShow=true,
-          this.evaluationShow=true
-          this.importantShow=true
+          (this.completionInspectionShow = true),
+            (this.fireDetectionShow = true),
+            (this.evaluationShow = true);
+          this.importantShow = true;
           break;
         case "资料审查":
-          this.importantShow=false,
-          this.completionInspectionShow=false,
-          this.fireDetectionShow=false,
-          this.evaluationShow=true
+          (this.importantShow = false),
+            (this.completionInspectionShow = false),
+            (this.fireDetectionShow = false),
+            (this.evaluationShow = true);
           break;
         case "竣工查验":
-          this.importantShow=true,
-          this.completionInspectionShow=true,
-          this.fireDetectionShow=false,
-          this.evaluationShow=false
+          (this.importantShow = true),
+            (this.completionInspectionShow = true),
+            (this.fireDetectionShow = false),
+            (this.evaluationShow = false);
           break;
         default:
-          this.completionInspectionShow=false,
-          this.importantShow=true,
-          this.fireDetectionShow=true,
-          this.evaluationShow=false
+          (this.completionInspectionShow = false),
+            (this.importantShow = true),
+            (this.fireDetectionShow = true),
+            (this.evaluationShow = false);
       }
     },
     //点击查询
@@ -404,28 +431,29 @@ export default {
       // console.log(this.primaryTitleIdValue);
       // let value = value
       let ascaderValue;
-      if(this.$refs.ascaderPrimaryTitleId.getCheckedNodes().length>0){
-        ascaderValue = this.$refs.ascaderPrimaryTitleId.getCheckedNodes()[0].value
-      }else{
-        ascaderValue=''
+      if (this.$refs.ascaderPrimaryTitleId.getCheckedNodes().length > 0) {
+        ascaderValue = this.$refs.ascaderPrimaryTitleId.getCheckedNodes()[0]
+          .value;
+      } else {
+        ascaderValue = "";
       }
       let obj = {
-      ascaderValue:ascaderValue,//分部分项
-      importantValue:this.importantValue,//重要程度
-      inspectionValue:this.inspectionValue,//查验结论
-      detectionValue:this.detectionValue,//检测结论
-      evaluationValue:this.evaluationValue,//评定结论
+        ascaderValue: ascaderValue, //分部分项
+        importantValue: this.importantValue, //重要程度
+        inspectionValue: this.inspectionValue, //查验结论
+        detectionValue: this.detectionValue, //检测结论
+        evaluationValue: this.evaluationValue //评定结论
       };
-      console.log(obj)
+      console.log(obj);
       this.$store.commit("saveScreeningRecordObj", obj);
     },
     //清空选项
-    clearValue(){
-      this.primaryTitleIdValue=''//分部分项
-     this.importantValue=''//重要程度
-      this.inspectionValue=''//查验结论
-      this.detectionValue=''//检测结论
-      this.evaluationValue=''//评定结论
+    clearValue() {
+      this.primaryTitleIdValue = ""; //分部分项
+      this.importantValue = ""; //重要程度
+      this.inspectionValue = ""; //查验结论
+      this.detectionValue = ""; //检测结论
+      this.evaluationValue = ""; //评定结论
     }
     // ascaderPrimaryTitleId
   }

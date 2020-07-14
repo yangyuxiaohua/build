@@ -168,36 +168,147 @@
         </el-table-column>
       </el-table>
       <div>
-        <!-- <el-dialog title="用户详情" :visible.sync="dialoguserFormVisible">
-          <el-form :model="userForm">
-            <el-form-item label="用户账号" :label-width="formLabelWidth">
-              <el-input v-model="userForm.account" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="用户密码" :label-width="formLabelWidth">
-              <el-input v-model="userForm.password" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="所属组织" :label-width="formLabelWidth">
-              <el-cascader :options="options" :props="props" clearable v-model="userForm.partIds" class="w100" ref="ascader2"></el-cascader>
-            </el-form-item>
-            <el-form-item label="用户角色" :label-width="formLabelWidth">
-              <el-select v-model="userForm.administrator" placeholder="请选择用户角色" class="w100" @focus="changeLastUnit()">
-                <el-option label="单位管理员" value="1"></el-option>
-                <el-option label="部门管理员" value="5" v-show="RoleShow"></el-option>
-                <el-option label="验收人员" value="10" v-show="RoleShow"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="用户姓名" :label-width="formLabelWidth">
-              <el-input v-model="userForm.username" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="联系电话" :label-width="formLabelWidth">
-              <el-input v-model="userForm.phone" autocomplete="off"></el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="dialoguserFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="onSubmit()">提交</el-button>
-          </div>
-        </el-dialog> -->
+       <el-dialog title="用户详情" :visible.sync="dialoguserFormVisible">
+              <el-form :model="userForm">
+                <el-row>
+                  <el-col :span='12'>
+                    <el-form-item label="用户账号" :label-width="formLabelWidth">
+                      <el-input v-model="userForm.account" autocomplete="off"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span='12'>
+                    <el-form-item label="用户密码" :label-width="formLabelWidth">
+                      <el-input v-model="userForm.password" autocomplete="off"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <!-- <el-row>
+                  <el-col :span='12'></el-col>
+                  <el-col :span='12'></el-col>
+                </el-row> -->
+                <el-row>
+                  <el-col :span='12'>
+                    <el-form-item label="用户姓名" :label-width="formLabelWidth">
+                      <el-input v-model="userForm.username" autocomplete="off"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span='12'>
+                    <el-form-item label="联系电话" :label-width="formLabelWidth">
+                      <el-input v-model="userForm.phone" autocomplete="off"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+
+                <el-row>
+                  <el-col :span='12'>
+                    <el-form-item label="所属组织" :label-width="formLabelWidth">
+                      <!-- <el-input v-model="userForm.partId" autocomplete="off"></el-input> -->
+                      <el-cascader :options="options" :props="props" clearable v-model="userForm.partIds" class="w100" ref="ascader2"></el-cascader>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span='12'>
+                    <el-form-item label="用户角色" :label-width="formLabelWidth">
+                      <el-select v-model="userForm.administrator" placeholder="请选择用户角色" class="w100" @focus="changeLastUnit()">
+                        <el-option label="单位管理员" value="1"></el-option>
+                        <el-option label="部门管理员" value="5" v-show="RoleShow"></el-option>
+                        <el-option label="验收人员" value="10" v-show="RoleShow"></el-option>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span='12'>
+                    <el-form-item label="身份证号" :label-width="formLabelWidth">
+                      <el-input v-model="userForm.idcard" autocomplete="off"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span='12'>
+                    <el-form-item label="使用状态" :label-width="formLabelWidth">
+                      <el-radio-group v-model="userForm.enable">
+                        <el-radio :label="1">启用</el-radio>
+                        <el-radio :label="-1">禁用</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+
+                <el-row  v-show="isService">
+                  <el-col :span='12'>
+                    <el-form-item label="执业资格证" :label-width="formLabelWidth">
+                      <!-- <el-input v-model="userForm.professionalCertificate" autocomplete="off"></el-input> -->
+
+                      <el-select v-model="userForm.professionalCertificate" placeholder="执业资格证书" class="w100">
+                        <el-option label="一级注册消防工程师" value="1"></el-option>
+                        <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
+                        <el-option label="消防设施操作员（三级/高级技能）" value="10"></el-option>
+                        <el-option label="消防设施操作员（三级/高级技能）" value="15"></el-option>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span='12'>
+
+                    <el-form-item label="技术岗位" :label-width="formLabelWidth">
+                      <!-- <el-input v-model="userForm.technicalPositions" autocomplete="off"></el-input> -->
+                      <el-select v-model="userForm.technicalPositions" placeholder="技术岗位" class="w100">
+                        <el-option label="技术责任人" value="5"></el-option>
+                        <el-option label="项目负责人" value="1"></el-option>
+                        <el-option label="检测人员" value="10"></el-option>
+                      </el-select>
+                    </el-form-item>
+
+                  </el-col>
+                </el-row>
+
+                <el-row  v-show="isService">
+                  <el-col :span='24'>
+                    <!-- <el-input v-model="userForm.professionalImage2Url" autocomplete="off"></el-input> -->
+                    <el-form-item label="资格证书" :label-width="formLabelWidth" class="flexFormItem">
+                      <div v-for="(item,index) in imgList" :key="index" class="imgList wh80px"><img :src="item" alt="" class="wh80px">
+                        <div class="imgMask">
+                          <i class="el-icon-zoom-in" @click="lookImg(item)"></i>
+                          <i class="el-icon-delete" @click="deleteImage(index)"></i>
+                        </div>
+                      </div>
+                      <!-- <div class="uploadIcon wh80px">
+                       <i class="el-icon-plus"></i>
+                     </div> -->
+                      <!-- <el-upload action="#" list-type="picture-card" :auto-upload="false">
+                        <i slot="default" class="el-icon-plus"></i>
+                        <div slot="file" slot-scope="{file}">
+                          <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
+                          <span class="el-upload-list__item-actions">
+                            <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
+                              <i class="el-icon-zoom-in"></i>
+                            </span>
+                            <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleDownload(file)">
+                              <i class="el-icon-download"></i>
+                            </span>
+                            <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file)">
+                              <i class="el-icon-delete"></i>
+                            </span>
+                          </span>
+                        </div>
+                      </el-upload> -->
+                      <el-upload class="avatar-uploader" :action="uploadIp" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" v-loading="loading">
+                        <!-- <img v-if="imageUrl" :src="imageUrl" class="avatar wh80px"> -->
+                        <i class="el-icon-plus avatar-uploader-icon"></i>
+                      </el-upload>
+
+                      <el-dialog :visible.sync="dialogVisible" append-to-body>
+                        <img width="100%" :src="dialogImageUrl" alt="">
+                      </el-dialog>
+
+                    </el-form-item>
+                  </el-col>
+
+                </el-row>
+
+              </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="dialoguserFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="onSubmit()">提交</el-button>
+              </div>
+            </el-dialog>   
 
       </div>
     </div>
@@ -423,7 +534,11 @@ export default {
     },
     //获取所有部门
     getLastFactoryMenus() {
-      getFactoryMenus()
+      getFactoryMenus(
+        {
+        factoryType:this.$store.state.userInfor.factoryType
+        }
+      )
         .then(res => {
           if (res.httpStatus == 200) {
             this.options = res.result.map(item => {

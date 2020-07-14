@@ -4,7 +4,7 @@
       <el-row>
         <el-col :span="8">
           <el-form-item label="工程名称">
-            <el-input v-model="form.projectName" class="w80P"></el-input>
+            <el-input v-model="form.projectName" class="w80P" :disabled='roleDisabled'></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -17,7 +17,7 @@
               <el-option v-for="(item,index) in cityOptions" :key="index" :label="item.name" :value="item.id">
               </el-option>
             </el-select>
-            <el-select v-model="form.regionId" :placeholder="coPh" :disabled='countyDisabled' @change="chosedCounty()">
+            <el-select v-model="form.regionId" :placeholder="coPh" @change="chosedCounty()" :disabled='roleDisabled'>
               <el-option v-for="(item,index) in countyOptions" :key="index" :label="item.name" :value="item.id">
               </el-option>
             </el-select>
@@ -25,10 +25,10 @@
         </el-col>
         <el-col :span="6">
           <el-form-item label="详细地址">
-            <el-input v-model="form.detailedAddress"></el-input>
+            <el-input v-model="form.detailedAddress" :disabled='roleDisabled'></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="1">
+        <el-col :span="1" v-show="roleHandle">
           <span class="coordinate">
             <i class="el-icon-map-location" @click="openMask()"></i>
           </span>
@@ -38,9 +38,9 @@
 
       <el-row class="construction">
         <el-col :span="8">
-          <el-form-item label="工程投资额">
+          <el-form-item label="工程投资额" :disabled='roleDisabled'>
             <!-- <el-input v-model="form.name" class="w80P"></el-input> -->
-            <el-input v-model="form.money" class="w80P">
+            <el-input v-model="form.money" class="w80P" :disabled='roleDisabled'>
               <template slot="append">万元</template>
             </el-input>
           </el-form-item>
@@ -50,7 +50,7 @@
             <el-input v-model="form.name" class="w80P"></el-input>
           </el-form-item> -->
           <el-form-item label="总建筑面积">
-            <el-input v-model="form.constructionArea" class="w80P">
+            <el-input v-model="form.constructionArea" class="w80P" :disabled='roleDisabled'>
               <template slot="append">m²</template>
             </el-input>
           </el-form-item>
@@ -60,7 +60,7 @@
             <el-input v-model="form.detailedAddress"></el-input>
           </el-form-item> -->
           <el-form-item label="申请验收日期">
-            <el-date-picker v-model="form.time" type="date" placeholder="选择日期" value-format="timestamp" class="w80P">
+            <el-date-picker v-model="form.time" type="date" placeholder="选择日期" value-format="timestamp" class="w80P" :disabled='roleDisabled'>
             </el-date-picker>
           </el-form-item>
         </el-col>
@@ -76,7 +76,7 @@
               </el-option>
             </el-select> -->
 
-            <el-cascader :options="constructionOptions" :props="props" clearable v-model="form.constructionPartId" class="w80P"></el-cascader>
+            <el-cascader :options="constructionOptions" :props="props" clearable v-model="form.constructionPartId" class="w80P" :disabled='roleDisabled'></el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -99,7 +99,7 @@
               <el-option v-for="j in serviceOptions" :key="j.factoryId" :label="j.factoryName" :value="j.factoryId">
               </el-option>
             </el-select> -->
-            <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" class="w80P" filterable :filter-method='filterservice' ref='filterserviceTree'></el-cascader>
+            <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" class="w80P" filterable :filter-method='filterservice' ref='filterserviceTree' :disabled='roleDisabled'></el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -126,12 +126,12 @@
           </el-form-item> -->
 
           <el-form-item label="验收单位">
-            <el-cascader :options="AcceptanceFactorysOptions" :props="props" clearable v-model="form.acceptancePartId" class="w80P"></el-cascader>
+            <el-cascader :options="AcceptanceFactorysOptions" :props="props" clearable v-model="form.acceptancePartId" class="w80P" :disabled='roleDisabled'></el-cascader>
           </el-form-item>
         </el-col>
         <el-col :span="8">
           <el-form-item label="消防验收申请受理凭证文号" label-width="180px">
-            <el-input v-model="form.certificateNumber" class="w75P"></el-input>
+            <el-input v-model="form.certificateNumber" class="w75P" :disabled='roleDisabled'></el-input>
           </el-form-item>
           <!-- <el-form-item label="联系人">
             <el-input v-model="form.person" class="w80P"></el-input>
@@ -139,7 +139,7 @@
         </el-col>
         <el-col :span="8">
           <el-form-item label="消防设计审查意见书文号" label-width="180px">
-            <el-input v-model="form.reviewCertificateNumber" class="w75P"></el-input>
+            <el-input v-model="form.reviewCertificateNumber" class="w75P" :disabled='roleDisabled'></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -191,7 +191,7 @@
       <el-row class="construction">
         <el-col :span="12">
           <el-form-item label="工程类别：" class="Engineering">
-            <el-radio-group v-model="form.typeId">
+            <el-radio-group v-model="form.typeId" :disabled='roleDisabled'>
               <el-radio :label="item.dictionaryId" v-for="item in EngineeringList" :key="item.dictionaryId">{{item.name}}</el-radio>
             </el-radio-group>
           </el-form-item>
@@ -227,7 +227,7 @@
         <div v-show="show2" class="transition-box userd">
           <el-form-item>
             <span>总建筑物面积大于二万平方米的 ：</span>
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_2w" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -237,7 +237,7 @@
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_15w" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
 
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_15w" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -246,7 +246,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_1w" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_1w" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -255,7 +255,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Water" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Water" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -264,7 +264,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_01" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_01" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -273,7 +273,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_05" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_05" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -281,7 +281,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Standard" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Standard" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -289,7 +289,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Car" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Car" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -298,7 +298,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Produce" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Produce" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -306,7 +306,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -314,7 +314,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_project" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_project" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -322,7 +322,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Public" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <el-checkbox-group v-model="userdList">
+            <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Public" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
@@ -344,7 +344,7 @@
         <div class="map">
           <MapCoordinateWrapper></MapCoordinateWrapper>
         </div>
-        <div class="mapBtn">
+        <div class="mapBtn" v-show="roleHandle">
           <el-button type="primary" @click="sureMap()">确定</el-button>
           <el-button @click="hideMask">返回</el-button>
         </div>
@@ -430,10 +430,13 @@ export default {
       zoomText: "展开",
       zoomDown: true,
       zoomUp: false,
-      show2: false
+      show2: false,
+      roleDisabled: true,
+      roleHandle:false
     };
   },
   mounted() {
+    this.roleControl()
     this.getRegionsData();
     this.getEngineeringInfor();
     this.getFireInfor();
@@ -443,12 +446,28 @@ export default {
     this.getProjectInformation();
     this.chosedcity();
   },
-  updated(){
+  updated() {
     // this.$nextTick(function(){
     //   this.filterservice()
     // })
   },
   methods: {
+    roleControl() {
+      let roleCode = this.$store.state.userRole.roleCode;
+      if (
+        roleCode == 300 ||
+        roleCode == 600 ||
+        roleCode == 650 ||
+        roleCode == 700
+      ) {
+        this.roleDisabled = false;
+        this.roleHandle = true;
+      } else {
+        this.roleDisabled = true;
+        this.roleHandle = false;
+      }
+      
+    },
     onSubmit() {
       if (!this.$store.state.projectInfor.projectId) {
         addProject2({
@@ -465,6 +484,7 @@ export default {
           typeId: this.form.typeId,
           lat: this.form.lat,
           lon: this.form.lon,
+          constructionArea: this.form.constructionArea,
           usageId: this.userdList.join(",")
         })
           .then(res => {
@@ -511,6 +531,7 @@ export default {
           typeId: this.form.typeId,
           lat: this.form.lat,
           lon: this.form.lon,
+          constructionArea: this.form.constructionArea,
           usageId: this.userdList.join(",")
         })
           .then(res => {
@@ -881,7 +902,6 @@ export default {
     },
     //过滤服务机构
     filterservice(node, keyword) {
-      
       getFactoryMenus({
         factoryType: "10",
         onlyFactory: true,

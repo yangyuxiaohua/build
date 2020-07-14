@@ -316,10 +316,8 @@ export default {
       if (
         this.$store.state.userRole.roleCode == 600 ||
         this.$store.state.userRole.roleCode == 650 ||
-        this.$store.state.userRole.roleCode == 700 ||
         this.$store.state.userRole.roleCode == 800 ||
-        this.$store.state.userRole.roleCode == 850 ||
-        this.$store.state.userRole.roleCode == 900
+        this.$store.state.userRole.roleCode == 850 
       ) {
         this.construContentShow = true;
         this.contentShow = false;
@@ -333,15 +331,14 @@ export default {
             text: "验收任务",
             path: "/index/acaceptTask/taskArrangement"
           },
-          // { id:4, text: "验收记录", path: "/index/recode" },
+          { id: 4, text: "验收记录", path: "/index/recode" },
           // { id:5, text: "验收标准", path: "/index/standard" },
           { id: 6, text: "用户管理", path: "/index/user/userManage" },
           { id: 7, text: "系统管理", path: "" }
         ];
       } else if (
         this.$store.state.userRole.roleCode == 400 ||
-        this.$store.state.userRole.roleCode == 450 ||
-        this.$store.state.userRole.roleCode == 500
+        this.$store.state.userRole.roleCode == 450 
       ) {
         this.getFourData();
         this.getCharts();
@@ -357,6 +354,25 @@ export default {
           { id: 4, text: "验收记录", path: "/index/recode" },
           // { id:5, text: "验收标准", path: "/index/standard" },
           { id: 6, text: "用户管理", path: "/index/user/userManage" },
+          { id: 7, text: "系统管理", path: "" }
+        ];
+      } else if (
+        this.$store.state.userRole.roleCode == 500 ||
+        this.$store.state.userRole.roleCode == 700 ||
+        this.$store.state.userRole.roleCode == 900
+      ) {
+        this.navList = [
+          //导航列表
+          { id: 1, text: "首页", path: "/index/home", index: 0 },
+          { id: 2, text: "工程项目", path: "/index/project/basicInfor" },
+          {
+            id: 3,
+            text: "验收任务",
+            path: "/index/acaceptTask/taskArrangement"
+          },
+          { id: 4, text: "验收记录", path: "/index/recode" },
+          // { id:5, text: "验收标准", path: "/index/standard" },
+          // { id: 6, text: "用户管理", path: "/index/user/userManage" },
           { id: 7, text: "系统管理", path: "" }
         ];
       } else {
@@ -486,7 +502,7 @@ export default {
           console.log(err);
           this.$message({
             type: "warning",
-            message: err
+            message: '报表暂无数据'
           });
         });
     },

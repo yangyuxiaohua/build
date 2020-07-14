@@ -83,24 +83,45 @@ export default {
         { type: 1, name: "建设单位" },
         { type: 10, name: "服务机构" }
       ],
-      factoryType: 5, //单位类型
+      factoryType: '', //单位类型
       factoryTypeName: "验收单位"
     };
   },
   created() {
+    this.roleControl()
     this.defaultActive = this.$route.path;
     // console.log(this.$store.state.userInfor.factoryType)
     this.getUnit(this.unitNavList[0].type);
-      this.$store.commit('saveFactoryType',this.unitNavList[0].type) //默认储存单位类型 
+      this.factoryTypeName = this.unitNavList[0].name
+      this.factoryType = this.unitNavList[0].type
     
+    this.$store.commit("saveFactoryType", this.unitNavList[0].type); //默认储存单位类型
+    console.log(this.$store.state);
   },
   methods: {
+    //权限控制
+    roleControl() {
+      let roleCode = this.$store.state.userRole.roleCode;
+      if (roleCode == 400 || roleCode == 450) {
+        this.unitNavList = [{ type: 5, name: "验收单位" }];
+      } else if (roleCode == 800 || roleCode == 850) {
+        this.unitNavList = [{ type: 10, name: "服务机构" }];
+      } else if (roleCode == 600 || roleCode == 650) {
+        this.unitNavList = [{ type: 1, name: "建设单位" }];
+      } else if (roleCode == 300) {
+        this.unitNavList = [
+          { type: 5, name: "验收单位" },
+          { type: 1, name: "建设单位" },
+          { type: 10, name: "服务机构" }
+        ];
+      }
+    },
     //单位类型切换
     choseUnitType(i) {
       this.factoryType = i.type;
       this.factoryTypeName = i.name;
       this.getUnit(i.type);
-      this.$store.commit('saveFactoryType',i.type)
+      this.$store.commit("saveFactoryType", i.type);
     },
     getUnit(type) {
       getFactoryMenus({
@@ -133,7 +154,6 @@ export default {
       this.addFlag = this.$store.state.unitStatus == 1 ? 2 : 1;
       this.$store.commit("saveUnitInfo", {});
       this.$store.commit("changeUnitStatus", this.addFlag);
-
     }
   },
   watch: {

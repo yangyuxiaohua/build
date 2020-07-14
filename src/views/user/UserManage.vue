@@ -149,13 +149,14 @@ export default {
       uploadIp: "", //上传地址
       // businessLicense:'',//营业执照
       loading: false,
-      dialogVisible:false, //查看大图
+      dialogVisible: false //查看大图
     };
   },
   created() {
     // authPartsIds
     this.getLastFactoryMenus();
     this.uploadIp = uploadIp;
+    // console.log(this.$store.state)
   },
 
   methods: {
@@ -271,7 +272,7 @@ export default {
         //     });
         // } else {
         updatedPart({
-          authPartsIds: this.form.authPartsIds,
+          // authPartsIds: this.form.authPartsIds,
           partsName: this.form.partsName,
           departmentPosition: this.form.departmentPosition,
           // factoryId: this.factoryId,
@@ -313,7 +314,9 @@ export default {
     changeOrganizationType() {},
     //获取上一级机构的数据
     getLastFactoryMenus() {
-      getFactoryMenus()
+      getFactoryMenus({
+        factoryType:this.$store.state.userInfor.factoryType
+      })
         .then(res => {
           if (res.httpStatus == 200) {
             console.log(res);
@@ -427,7 +430,7 @@ export default {
     getFormData(val) {
       console.log(val);
       this.form = {
-        authPartsIds: val.authPartsIds,
+        authPartsIds: val.isRoot == 1 ? "000" : val.authPartsIds,
         partsName: val.partsName,
         contactMasterUser: val.contactMasterUser,
         departmentPosition: val.departmentPosition,
@@ -450,6 +453,8 @@ export default {
       } else {
         this.imageUrl = "";
       }
+      console.log(this.form)
+      console.log(this.options)
     },
     //修改,添加成功和删除成功修改操作的flag
     changeConfiStatus() {

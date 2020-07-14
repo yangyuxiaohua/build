@@ -308,9 +308,11 @@ export default {
   mounted() {},
   methods: {
     //角色控制
-    roleShow() {
+   roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 500) {
+      if (roleCode == 800 || roleCode == 850 || roleCode == 300) {
+        this.roleShow4 = true;
+      }else{
         this.roleShow4 = false;
       }
     },
@@ -318,13 +320,14 @@ export default {
     unitCurrentChange(val) {
       val = val <= 0 ? 1 : val;
       getRecordsByProjectId3({
+        standardId:this.$store.state.projectInfor.inspectStandardId,
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
         primaryTitleId: this.primaryTitleId,
         secondaryTitleId: this.secondaryTitleId,
          checkTypeName:this.checkTypeName,
-        copyInspectRecordResult:this.copyInspectRecordResult,
+        result:this.copyInspectRecordResult,
       })
         .then(res => {
           console.log(res);

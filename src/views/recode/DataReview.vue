@@ -304,20 +304,24 @@ export default {
   created() {
     this.unitCurrentChange(this.unitCurrentPage);
     this.roleShow();
+    console.log(this.$store.state.projectInfor)
   },
   mounted() {},
   methods: {
     //角色控制
     roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 500) {
+      if (roleCode == 500 || roleCode == 700 || roleCode == 900 ) {
         this.roleShow4 = false;
+      }else{
+        this.roleShow4 = true;
       }
     },
     //分页
     unitCurrentChange(val) {
       val = val <= 0 ? 1 : val;
       getRecordsByProjectId2({
+        standardId:this.$store.state.projectInfor.reviewStandardId,
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,

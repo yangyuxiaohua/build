@@ -1,7 +1,6 @@
 <template>
   <div id="acceptanceContentWrapper">
     <div class="top">
-
       <div class="individualBuild">
         <div class="individualBuildTit">
           <!-- <el-button type="primary" plain size=""  @click="addIndividualBuildInfor('individualBuildList')">新增+</el-button> -->
@@ -10,7 +9,7 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">单体建筑 <br>
-            <el-button type="primary" plain @click="addIndividualBuildInfor('individualBuildList')" v-show="individualBuildShow">新增+</el-button>
+            <el-button type="primary" plain @click="addIndividualBuildInfor('individualBuildList')" v-show="individualBuildShow" :disabled='roleDisabled'>新增+</el-button>
           </span>
           <span class="individualName">建筑名称</span>
           <span class="individuaUsed">使用性质</span>
@@ -23,7 +22,7 @@
           <span class="individualArea">占地面积</span>
           <span class="individualOnArea">地上建筑面积</span>
           <span class="individualUnderArea">地下建筑面积</span>
-          <span class="handle">操作</span>
+          <span class="handle" v-show="roleHandle">操作</span>
         </div>
         <div class="individualBuildContainer" v-show="individualBuildShow">
           <div class="individualBuildList" v-for="(item,index) in individualBuildList" :key="index">
@@ -31,68 +30,68 @@
 
             </span>
             <span class="individualName">
-              <el-input v-model="item.individualName" :title="item.individualName"></el-input>
+              <el-input v-model="item.individualName" :title="item.individualName" :disabled="roleDisabled"></el-input>
             </span>
             <span class="individuaUsed">
-              <el-input v-model="item.usages" size=''></el-input>
+              <el-input v-model="item.usages" size='' :disabled="roleDisabled"></el-input>
             </span>
             <span class="individuaType">
-              <el-select v-model="item.individuaType">
+              <el-select v-model="item.individuaType" :disabled="roleDisabled">
                 <el-option v-for="i in individuaTypeOptions" :key="i.dictionaryId" :label="i.name" :value="i.dictionaryId">
                 </el-option>
               </el-select>
             </span>
             <span class="individualRefractory">
-              <el-select v-model="item.individualRefractory">
-                <el-option v-for="j in individualRefractoryOptions" :key="j.dictionaryId" :label="j.name" :value="j.dictionaryId">
+              <el-select v-model="item.individualRefractory" :disabled="roleDisabled">
+                <el-option v-for="j in individualRefractoryOptions" :key="j.dictionaryId" :label="j.name" :value="j.dictionaryId" >
                 </el-option>
               </el-select>
             </span>
             <span class="individualOnFloorNum">
-              <el-input v-model="item.individualOnFloorNum" size=''>
+              <el-input v-model="item.individualOnFloorNum" size='' :disabled="roleDisabled">
                 <template slot="append">层</template>
 
               </el-input>
             </span>
             <span class="individualUnderFloorNum">
-              <el-input v-model="item.individualUnderFloorNum" size=''>
+              <el-input v-model="item.individualUnderFloorNum" size='' :disabled="roleDisabled">
                 <template slot="append">层</template>
 
               </el-input>
             </span>
             <span class="individualHeight">
-              <el-input v-model="item.individualHeight" size=''>
+              <el-input v-model="item.individualHeight" size='' :disabled="roleDisabled">
                 <template slot="append">m</template>
 
               </el-input>
             </span>
             <span class="individualLength">
-              <el-input v-model="item.individualLength" size=''>
+              <el-input v-model="item.individualLength" size='' :disabled="roleDisabled">
                 <template slot="append">m</template>
 
               </el-input>
             </span>
             <span class="individualArea">
-              <el-input v-model="item.individualArea" size=''>
+              <el-input v-model="item.individualArea" size='' :disabled="roleDisabled">
                 <template slot="append">m²</template>
 
               </el-input>
             </span>
             <span class="individualOnArea">
-              <el-input v-model="item.individualOnArea" size=''>
+              <el-input v-model="item.individualOnArea" size='' :disabled="roleDisabled">
                 <template slot="append">m²</template>
 
               </el-input>
             </span>
             <span class="individualUnderArea">
-              <el-input v-model="item.individualUnderArea" size=''>
+              <el-input v-model="item.individualUnderArea" size='' :disabled="roleDisabled">
                 <template slot="append">m²</template>
               </el-input>
             </span>
-            <span class="handle">
-              <el-button type="primary" size="mini" @click="save('individualBuildList',item)">保存</el-button>
+            <span class="handle" v-show="roleHandle">
+              <el-button type="primary" size="mini" @click="save('individualBuildList',item)" >保存</el-button>
               <!-- <el-button type="danger" size="mini">修改</el-button> -->
-              <el-button type="danger" size="mini" @click="deleteI('individualBuildList',item.acContentBuildId)">删除</el-button>
+              <el-button type="danger" size="mini" @click="deleteI('individualBuildList',item.acContentBuildId)" v-show="roleDeleteBtn">删除</el-button>
             </span>
           </div>
         </div>
@@ -104,14 +103,14 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">储罐<br>
-            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('tankList')" v-show="tankShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('tankList')" v-show="tankShow" :disabled='roleDisabled'>新增+</el-button>
           </span>
           <span class="individualName">设备位置</span>
           <span class="individuaType">总容量</span>
           <span class="individualRefractory">设置形式</span>
           <span class="individualOnFloorNum w100px">储存形式</span>
           <span class="individualUnderFloorNum w100px">储存物质名称</span>
-          <span class="handle">操作</span>
+          <span class="handle" v-show="roleHandle">操作</span>
 
         </div>
         <div class="individualBuildContainer" v-show="tankShow">
@@ -120,33 +119,33 @@
 
             </span>
             <span class="individualName">
-              <el-input v-model="item.individualName" size=''></el-input>
+              <el-input v-model="item.individualName" size='' :disabled="roleDisabled"></el-input>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size=''>
+              <el-input v-model="item.individuaType" size='' :disabled="roleDisabled">
                 <template slot="append">m³</template>
 
               </el-input>
             </span>
             <span class="individualRefractory">
-              <el-select v-model="item.individualRefractory">
+              <el-select v-model="item.individualRefractory" :disabled="roleDisabled">
                 <el-option v-for="j in setTypesOptions" :key="j.dictionaryId" :label="j.name" :value="j.dictionaryId">
                 </el-option>
               </el-select>
             </span>
             <span class="individualOnFloorNum w100px">
 
-              <el-select v-model="item.individualOnFloorNum">
+              <el-select v-model="item.individualOnFloorNum" :disabled="roleDisabled">
                 <el-option v-for="i in saveTypesOptions" :key="i.dictionaryId" :label="i.name" :value="i.dictionaryId">
                 </el-option>
               </el-select>
             </span>
             <span class="individualUnderFloorNum w100px">
-              <el-input v-model="item.individualUnderFloorNum" size=''></el-input>
+              <el-input v-model="item.individualUnderFloorNum" size='' :disabled="roleDisabled"></el-input>
             </span>
-            <span class="handle">
+            <span class="handle" v-show="roleHandle">
               <el-button type="primary" size="mini" @click="save('tankList',item)">保存</el-button>
-              <el-button type="danger" size="mini" @click="deleteI('tankList',item.acContentStorageTankId)">删除</el-button>
+              <el-button type="danger" size="mini" @click="deleteI('tankList',item.acContentStorageTankId)" v-show="roleDeleteBtn">删除</el-button>
             </span>
           </div>
         </div>
@@ -158,11 +157,11 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">堆场<br>
-            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('yardList')" v-show="yardShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('yardList')" v-show="yardShow" :disabled='roleDisabled'>新增+</el-button>
           </span>
           <span class="individualName">储存物质名称</span>
           <span class="individuaType">储量</span>
-          <span class="handle">操作</span>
+          <span class="handle" v-show="roleHandle">操作</span>
 
         </div>
         <div class="individualBuildContainer" v-show="yardShow">
@@ -171,18 +170,18 @@
 
             </span>
             <span class="individualName">
-              <el-input v-model="item.individualName" size=''></el-input>
+              <el-input v-model="item.individualName" size='' :disabled="roleDisabled"></el-input>
             </span>
             <span class="individuaType">
 
-              <el-input v-model="item.individuaType" size=''>
+              <el-input v-model="item.individuaType" size='' :disabled="roleDisabled">
                 <template slot="append">m³</template>
 
               </el-input>
             </span>
-            <span class="handle">
+            <span class="handle" v-show="roleHandle">
               <el-button type="primary" size="mini" @click="save('yardList',item)">保存</el-button>
-              <el-button type="danger" size="mini" @click="deleteI('yardList',item.acceptanceContentYardId)">删除</el-button>
+              <el-button type="danger" size="mini" @click="deleteI('yardList',item.acceptanceContentYardId)" v-show="roleDeleteBtn">删除</el-button>
             </span>
           </div>
         </div>
@@ -194,13 +193,13 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">建筑保温 <br>
-            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('keepWarmList')" v-show="keepWarmShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('keepWarmList')" v-show="keepWarmShow" :disabled='roleDisabled'>新增+</el-button>
           </span>
           <span class="individualName">材料类别</span>
           <span class="individuaType">保温所在层数</span>
           <span class="individualRefractory">保温部位</span>
           <span class="individualOnFloorNum">保温材料</span>
-          <span class="handle">操作</span>
+          <span class="handle" v-show="roleHandle">操作</span>
 
         </div>
         <div class="individualBuildContainer" v-show="keepWarmShow">
@@ -209,26 +208,26 @@
 
             </span>
             <span class="individualName">
-              <el-select v-model="item.individualName">
+              <el-select v-model="item.individualName" :disabled="roleDisabled">
                 <el-option v-for="i in materialTypesOptions" :key="i.dictionaryId" :label="i.name" :value="i.dictionaryId">
                 </el-option>
               </el-select>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size=''>
+              <el-input v-model="item.individuaType" size='' :disabled="roleDisabled">
                 <template slot="append">层</template>
 
               </el-input>
             </span>
             <span class="individualRefractory">
-              <el-input v-model="item.individualRefractory" size=''></el-input>
+              <el-input v-model="item.individualRefractory" size='' :disabled="roleDisabled"></el-input>
             </span>
             <span class="individualOnFloorNum">
-              <el-input v-model="item.individualOnFloorNum" size=''></el-input>
+              <el-input v-model="item.individualOnFloorNum" size='' :disabled="roleDisabled"></el-input>
             </span>
-            <span class="handle">
+            <span class="handle" v-show="roleHandle">
               <el-button type="primary" size="mini" @click="save('keepWarmList',item)">保存</el-button>
-              <el-button type="danger" size="mini" @click="deleteI('keepWarmList',item.acContentBuildingInsulationsId)">删除</el-button>
+              <el-button type="danger" size="mini" @click="deleteI('keepWarmList',item.acContentBuildingInsulationsId)" v-show="roleDeleteBtn">删除</el-button>
             </span>
           </div>
         </div>
@@ -241,12 +240,12 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">装饰装修 <br>
-            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('decorateList')" v-show="decorateShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('decorateList')" v-show="decorateShow" :disabled='roleDisabled'>新增+</el-button>
           </span>
           <span class="individualName">装修部位</span>
           <span class="individuaType">装修面积</span>
           <span class="individualRefractory">装修所在层数</span>
-          <span class="handle">操作</span>
+          <span class="handle" v-show="roleHandle">操作</span>
 
         </div>
         <div class="individualBuildContainer" v-show="decorateShow">
@@ -256,26 +255,26 @@
             </span>
             <span class="individualName">
 
-              <el-select v-model="item.individualName">
+              <el-select v-model="item.individualName" :disabled="roleDisabled">
                 <el-option v-for="i in partTypesOptions" :key="i.dictionaryId" :label="i.name" :value="i.dictionaryId">
                 </el-option>
               </el-select>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size=''>
+              <el-input v-model="item.individuaType" size='' :disabled="roleDisabled">
                 <template slot="append">m²</template>
 
               </el-input>
             </span>
             <span class="individualRefractory">
-              <el-input v-model="item.individualRefractory" size=''>
+              <el-input v-model="item.individualRefractory" size='' :disabled="roleDisabled">
                 <template slot="append">层</template>
 
               </el-input>
             </span>
-            <span class="handle">
+            <span class="handle" v-show="roleHandle">
               <el-button type="primary" size="mini" @click="save('decorateList',item)">保存</el-button>
-              <el-button type="danger" size="mini" @click="deleteI('decorateList',item.acDecorationId)">删除</el-button>
+              <el-button type="danger" size="mini" @click="deleteI('decorateList',item.acDecorationId)" v-show="roleDeleteBtn">删除</el-button>
             </span>
           </div>
         </div>
@@ -289,11 +288,11 @@
             <!-- <i class="el-icon-arrow-up"></i> -->
           </span>
           <span class="individualText">用途改变<br>
-            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('changeUseList')" v-show="changeUseShow">新增+</el-button>
+            <el-button type="primary" plain size="" @click="addIndividualBuildInfor('changeUseList')" v-show="changeUseShow" :disabled='roleDisabled'>新增+</el-button>
           </span>
           <span class="individualName">使用性质</span>
           <span class="individuaType">原有用途</span>
-          <span class="handle">操作</span>
+          <span class="handle" v-show="roleHandle">操作</span>
 
         </div>
         <div class="individualBuildContainer" v-show="changeUseShow">
@@ -302,20 +301,20 @@
             </span>
             <span class="individualName">
 
-              <el-select v-model="item.individualName">
+              <el-select v-model="item.individualName" :disabled="roleDisabled">
                 <el-option v-for="i in useTypesOptions" :key="i.dictionaryId" :label="i.name" :value="i.dictionaryId">
                 </el-option>
               </el-select>
             </span>
             <span class="individuaType">
-              <el-input v-model="item.individuaType" size=''></el-input>
+              <el-input v-model="item.individuaType" size='' :disabled="roleDisabled"></el-input>
             </span>
             <!-- <span class="individualRefractory">
                             <el-input v-model="item.individualRefractory" size=''></el-input>
                         </span> -->
-            <span class="handle">
+            <span class="handle" v-show="roleHandle">
               <el-button type="primary" size="mini" @click="save('changeUseList',item)">保存</el-button>
-              <el-button type="danger" size="mini" @click="deleteI('changeUseList',item.acContentUsagesId)">删除</el-button>
+              <el-button type="danger" size="mini" @click="deleteI('changeUseList',item.acContentUsagesId)" v-show="roleDeleteBtn">删除</el-button>
             </span>
           </div>
         </div>
@@ -327,15 +326,14 @@
         </div>
         <div class="individualBuildContainer fireFightingDeviceContainer">
           <el-checkbox-group v-model="fireFightingDevice">
-            <el-checkbox :label="item.standardPrimaryTitleId" v-for="item in fireFightingDeviceList" :key="item.standardPrimaryTitleId">{{item.titleName}}</el-checkbox>
+            <el-checkbox :label="item.standardPrimaryTitleId" v-for="item in fireFightingDeviceList" :key="item.standardPrimaryTitleId" :disabled="roleDisabled">{{item.titleName}}</el-checkbox>
           </el-checkbox-group>
         </div>
 
       </div>
     </div>
-
     <div class="bottom">
-      <div class="btns">
+      <div class="btns" v-show="roleHandle">
         <el-button type="primary" @click="onSubmit">保存</el-button>
         <el-button>取消</el-button>
       </div>
@@ -410,15 +408,34 @@ export default {
       yardShow: false,
       keepWarmShow: false,
       decorateShow: false,
-      changeUseShow: false
+      changeUseShow: false,
+      roleDisabled:true, //权限控制输入框
+      roleHandle:false,//权限控制操作
+      roleDeleteBtn:false,// 权限控制删除按钮
     };
   },
   created() {
+    this.roleControl()
     this.getOptions();
     this.getFormInfor();
     this.getCheckMenus();
   },
   methods: {
+     roleControl() {
+      let roleCode = this.$store.state.userRole.roleCode;
+      if(roleCode==300||roleCode==600||roleCode==650||roleCode==700){
+            this.roleDisabled = false
+            this.roleHandle = true
+      }else{
+            this.roleDisabled = true
+            this.roleHandle = false
+      }
+       if(roleCode==700){
+           this.roleDeleteBtn = false
+      }else{
+           this.roleDeleteBtn = true
+      }
+    },
     //保存消防设施
     onSubmit() {
       let fireNoCkecked = [];
@@ -1226,7 +1243,6 @@ export default {
   height: 100%;
   font-size: 14px;
   padding-left: 20px;
-  // box-sizing: border-box;
   .top {
     .individualBuild {
       span {
@@ -1296,10 +1312,10 @@ export default {
       width: 80px;
     }
     .individualOnArea {
-      width: 80px;
+      width: 100px;
     }
     .individualUnderArea {
-      width: 80px;
+      width: 100px;
     }
     .fireFightingDevice {
       line-height: 30px;

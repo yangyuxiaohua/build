@@ -362,9 +362,11 @@ export default {
   mounted() {},
   methods: {
     //角色控制
-    roleShow() {
+   roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 500) {
+      if (roleCode == 400 || roleCode == 450 || roleCode == 300) {
+        this.roleShow4 = true;
+      }else{
         this.roleShow4 = false;
       }
     },
@@ -372,6 +374,7 @@ export default {
     unitCurrentChange(val) {
       val = val <= 0 ? 1 : val;
       getRecordsByProjectId2({
+        standardId:this.$store.state.projectInfor.standardId,
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,

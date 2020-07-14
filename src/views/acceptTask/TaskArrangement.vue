@@ -5,28 +5,17 @@
 
     </div>
     <div class="taskArrangementContent">
-
       <div class="acceptance" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
         <p class="acceptanceText lh48">验收内容</p>
         <el-divider></el-divider>
         <div class="acceptanceContainer">
           <div class="acceptanceTree1">
-            <!-- <p class="l30">{{acceptanceTree1Name}} :</p> -->
             <el-tree :data="acceptanceData1" show-checkbox node-key="id" highlight-current :props="defaultProps" :default-checked-keys='checkedList' ref='acceptanceTree1'>
               <span class="custom-tree-node" slot-scope="{node,data}">
                 <span class="nodeText">{{node.label }}</span>
               </span>
             </el-tree>
           </div>
-          <!-- <div class="acceptanceTree2">
-            <p class="l30">{{acceptanceTree2Name}} :</p>
-            <el-tree :data="acceptanceData2" show-checkbox node-key="id" highlight-current :props="defaultProps" :default-checked-keys='checkedList' ref='acceptanceTree2'>
-              <span class="custom-tree-node" slot-scope="{node,data}">
-                <span class="nodeText">{{node.label }}</span>
-              </span>
-            </el-tree>
-          </div> -->
-
         </div>
       </div>
       <div class="apply">
@@ -60,7 +49,7 @@
         <el-divider></el-divider>
         <div class="staffingConiner">
           <p class="personTit"> 项目负责人</p>
-            <el-tree :data="acceptancePersonData2" show-checkbox ref="personTree2" highlight-current :props="partDefaultProps" :default-checked-keys='checkedPersonList2' :expand-on-click-node='expandOnClickNode' :check-on-click-node="checkOnClickNode" :check-strictly='checkStrictly' node-key="id" :default-expanded-keys="defaultOnNode">
+          <el-tree :data="acceptancePersonData2" show-checkbox ref="personTree2" highlight-current :props="partDefaultProps" :default-checked-keys='checkedPersonList2' :expand-on-click-node='expandOnClickNode' :check-on-click-node="checkOnClickNode" :check-strictly='checkStrictly' node-key="id" :default-expanded-keys="defaultOnNode">
           </el-tree>
           <el-divider></el-divider>
           <p class="personTit"> 所有人</p>
@@ -68,7 +57,7 @@
           </el-tree>
         </div>
       </div>
-      <div class="btns">
+      <div class="btns" v-show="roleShowBtn">
         <el-button type="primary" @click="onSubmit">提交</el-button>
         <el-button>取消</el-button>
       </div>
@@ -148,9 +137,9 @@ export default {
       ],
       checkedList: [], //默认选中
       acceptancePersonData: [], // 人员列表
-      acceptancePersonData2:[], //项目负责人列表
+      acceptancePersonData2: [], //项目负责人列表
       checkedPersonList: [], // 默认选中人员
-      checkedPersonList2:[], //默认选中项目负责人
+      checkedPersonList2: [], //默认选中项目负责人
       departments: [],
       StandardNames: [],
       checkList: [], //筛选标准
@@ -159,45 +148,104 @@ export default {
       dialogFormVisible: false,
       radio: "", //使用记录
       useRecodeRadioList: [], //使用记录数据
-      defaultOnNode: [] //人员默认展开
+      defaultOnNode: [], //人员默认展开
+      roleShowBtn:false, //
     };
   },
   created() {
     // this.getStandard();
     // this.getTree1Data();
     // this.getTree2Data();
-    this.getPersonData();
-    this.getPersonData2()
-    this.getStandardNames();
+      this.projectInfor = this.$store.state.projectInfor;
     this.factoryType = this.$store.state.userInfor.factoryType;
-    console.log(this.$store.state);
+    this.roleControl()
+    this.getPersonData();
+    this.getPersonData2();
+    this.getStandardNames();
+    // console.log(this.$store.state);
   },
   mounted() {
     this.init();
   },
   methods: {
+    //权限控制
+    roleControl() {
+      let roleCode = this.$store.state.userRole.roleCode;
+      if (roleCode == 400 || roleCode == 450 || roleCode == 500) {
+        this.rightNav = [
+          {
+            id: this.projectInfor.reviewStandardId,
+            text: "资料审查",
+            roleShow4: true
+          },
+          {
+            id: this.projectInfor.standardId,
+            text: "现场评定",
+            roleShow4: true
+          }
+        ];
+      } else if (roleCode == 800 || roleCode == 850 || roleCode == 900) {
+          this.rightNav = [
+          {
+            id: this.projectInfor.reviewStandardId,
+            text: "资料审查",
+            roleShow4: true
+          },
+          {
+            id: this.projectInfor.inspectStandardId,
+            text: "消防检测",
+            roleShow4: true
+          },
+        ];
+      } else if (roleCode == 600 || roleCode == 650 || roleCode == 700) {
+          this.rightNav = [
+          {
+            id: this.projectInfor.reviewStandardId,
+            text: "资料审查",
+            roleShow4: true
+          },
+          {
+            id: this.projectInfor.completStandardId,
+            text: "竣工查验",
+            roleShow4: true
+          }
+        ];
+      } else if (roleCode == 300) {
+        this.rightNav = [
+          {
+            id: this.projectInfor.reviewStandardId,
+            text: "资料审查",
+            roleShow4: true
+          },
+          {
+            id: this.projectInfor.completStandardId,
+            text: "竣工查验",
+            roleShow4: true
+          },
+          {
+            id: this.projectInfor.inspectStandardId,
+            text: "消防检测",
+            roleShow4: true
+          },
+          {
+            id: this.projectInfor.standardId,
+            text: "现场评定",
+            roleShow4: true
+          }
+        ];
+      }
+      if(roleCode ==500||roleCode ==700 || roleCode==900){
+        this.roleShowBtn = false
+      }else{
+        this.roleShowBtn = true
+      }
+    },
     //初始化页面
     init() {
-      this.projectInfor = this.$store.state.projectInfor;
-      this.cindex = this.projectInfor.reviewStandardId;
-      this.rightNav = [
-        {
-          id: this.projectInfor.reviewStandardId,
-          text: "资料审查",
-          roleShow4: true
-        },
-        {
-          id: this.projectInfor.completStandardId,
-          text: "竣工查验",
-          roleShow4: true
-        },
-        {
-          id: this.projectInfor.inspectStandardId,
-          text: "消防检测",
-          roleShow4: true
-        },
-        { id: this.projectInfor.standardId, text: "现场评定", roleShow4: true }
-      ];
+      // console.log(this.projectInfor)
+
+      this.cindex = this.rightNav[0].id;
+
       this.getTree1Data();
       // console.log(this.projectInfor)
     },
@@ -231,25 +279,25 @@ export default {
         projectId: this.$store.state.projectInfor.projectId,
         standardNames: [],
         projectLeaders: [
-    // {
-    //   "factoryId": "string",
-    //   "factoryType": "string",
-    //   "id": "string",
-    //   "projectId": "string",
-    //   "projectLeader": "string"
-    // }
-  ],
+          // {
+          //   "factoryId": "string",
+          //   "factoryType": "string",
+          //   "id": "string",
+          //   "projectId": "string",
+          //   "projectLeader": "string"
+          // }
+        ]
       };
       let arr1 = this.$refs.acceptanceTree1.getCheckedKeys();
       // let arr2 = this.$refs.acceptanceTree2.getCheckedKeys();
       let arr3 = this.$refs.personTree.getCheckedKeys();
-      let arr4 = this.$refs.personTree2.getCheckedKeys()
-      obj.projectLeaders = arr4.map(item=>{
-         if (item.indexOf("_") !== -1) {
+      let arr4 = this.$refs.personTree2.getCheckedKeys();
+      obj.projectLeaders = arr4.map(item => {
+        if (item.indexOf("_") !== -1) {
           // obj.acceptancePartIds.push(item);
-          return {projectLeader:splitStr(item)[0]}
-        } 
-      })
+          return { projectLeader: splitStr(item)[0] };
+        }
+      });
       //================================================
       // let level1NoChecked = [];
       // let level2NoChecked = [];
@@ -341,8 +389,8 @@ export default {
       //     level2NoChecked.push(totalF2[i]);
       //   }
       // }
-   
-    console.log(arr4)
+
+      console.log(arr4);
       arr3.forEach(item => {
         if (item.indexOf("_") == -1) {
           obj.acceptancePartIds.push(item);
@@ -353,7 +401,7 @@ export default {
           obj.placements.push(item);
         }
       });
- 
+
       // level1NoChecked = level1NoChecked.map(item => {
       //   return {
       //     menuLevel: 1,
@@ -607,7 +655,7 @@ export default {
         factoryType: this.factoryType,
         onlyFactory: false,
         queryUser: true,
-        leader:1,
+        leader: 1
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -817,7 +865,6 @@ export default {
     .acceptance {
       flex: 0 0 400px;
       border: 1px solid #f2f2f2;
-      // padding: 10px 0 0 40px;
       .acceptanceText {
         font-size: 16px;
         // line-height: 40px;

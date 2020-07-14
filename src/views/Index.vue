@@ -53,57 +53,7 @@ import { updateUser } from "@/apis/userUnit.js";
 export default {
   data() {
     return {
-      navList: [
-        {
-          id: 1,
-          img: require("../assets/imgs/index/shouye.png"),
-          text: "首页",
-          path: "/index/home",
-          roleShow4: true
-        },
-        {
-          id: 2,
-          img: require("../assets/imgs/index/gongchengxiangmu.png"),
-          text: "工程项目",
-          path: "/index/project/basicInfor",
-          roleShow4: true
-        },
-        {
-          id: 3,
-          img: require("../assets/imgs/index/task.png"),
-          text: "验收任务",
-          path: "/index/acaceptTask/taskArrangement",
-          roleShow4: true
-        },
-        {
-          id: 4,
-          img: require("../assets/imgs/index/jilu.png"),
-          text: "验收记录",
-          path: "/index/recode",
-          roleShow4: true
-        },
-        {
-          id: 5,
-          img: require("../assets/imgs/index/biaozhun.png"),
-          text: "验收标准",
-          path: "/index/standard",
-          roleShow4: true
-        },
-        {
-          id: 6,
-          img: require("../assets/imgs/index/yonghuguanli.png"),
-          text: "用户管理",
-          path: "/index/user/userManage",
-          roleShow4: true
-        },
-        {
-          id: 7,
-          img: require("../assets/imgs/index/system.png"),
-          text: "系统管理",
-          path: "",
-          roleShow4: true
-        }
-      ],
+      navList: [],
       cindex: 0,
       userName: "用户未登录",
       dialoguserFormVisible: false,
@@ -127,11 +77,10 @@ export default {
       this.cindex = 4;
     } else if (inDexOfStr(this.$route.path, "standard")) {
       this.cindex = 5;
-    }else if(inDexOfStr(this.$route.path, "user")){
+    } else if (inDexOfStr(this.$route.path, "user")) {
       this.cindex = 6;
-    }else{
+    } else {
       this.cindex = 7;
-
     }
     getLoginAccountInfo()
       .then(res => {
@@ -191,7 +140,7 @@ export default {
     //角色控制
     roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 600 || roleCode == 650 || roleCode == 700) {
+      if (roleCode == 300) {
         this.navList = [
           {
             id: 1,
@@ -209,7 +158,7 @@ export default {
           },
           {
             id: 3,
-            img: require("../assets/imgs/index/gongchengxiangmu.png"),
+            img: require("../assets/imgs/index/task.png"),
             text: "验收任务",
             path: "/index/acaceptTask/taskArrangement",
             roleShow4: true
@@ -219,14 +168,14 @@ export default {
             img: require("../assets/imgs/index/jilu.png"),
             text: "验收记录",
             path: "/index/recode",
-            roleShow4: false
+            roleShow4: true
           },
           {
             id: 5,
             img: require("../assets/imgs/index/biaozhun.png"),
             text: "验收标准",
             path: "/index/standard",
-            roleShow4: false
+            roleShow4: true
           },
           {
             id: 6,
@@ -243,8 +192,47 @@ export default {
             roleShow4: true
           }
         ];
-      } else if (roleCode == 500) {
-        this.navList = [
+      } else {
+        if (roleCode == 500 || roleCode == 700 || roleCode == 900) {
+          this.navList = [
+            {
+              id: 1,
+              img: require("../assets/imgs/index/shouye.png"),
+              text: "首页",
+              path: "/index/home",
+              roleShow4: true
+            },
+            {
+              id: 2,
+              img: require("../assets/imgs/index/gongchengxiangmu.png"),
+              text: "工程项目",
+              path: "/index/project/basicInfor",
+              roleShow4: true
+            },
+            {
+              id: 3,
+              img: require("../assets/imgs/index/task.png"),
+              text: "验收任务",
+              path: "/index/acaceptTask/taskArrangement",
+              roleShow4: true
+            },
+            {
+              id: 4,
+              img: require("../assets/imgs/index/jilu.png"),
+              text: "验收记录",
+              path: "/index/recode",
+              roleShow4: true
+            },
+            {
+              id: 7,
+              img: require("../assets/imgs/index/system.png"),
+              text: "系统管理",
+              path: "",
+              roleShow4: true
+            }
+          ];
+        }else{
+           this.navList = [
           {
             id: 1,
             img: require("../assets/imgs/index/shouye.png"),
@@ -261,7 +249,7 @@ export default {
           },
           {
             id: 3,
-            img: require("../assets/imgs/index/gongchengxiangmu.png"),
+            img: require("../assets/imgs/index/task.png"),
             text: "验收任务",
             path: "/index/acaceptTask/taskArrangement",
             roleShow4: true
@@ -274,65 +262,21 @@ export default {
             roleShow4: true
           },
           {
-            id: 5,
-            img: require("../assets/imgs/index/biaozhun.png"),
-            text: "验收标准",
-            path: "/index/standard",
-            roleShow4: false
-          },
-          {
-            id: 6,
-            img: require("../assets/imgs/index/yonghuguanli.png"),
-            text: "用户管理",
-            path: "/index/user/userManage",
-            roleShow4: false
-          }
-        ];
-      } else if (roleCode == 400 || roleCode == 450) {
-        this.navList = [
-          {
-            id: 1,
-            img: require("../assets/imgs/index/shouye.png"),
-            text: "首页",
-            path: "/index/home",
-            roleShow4: true
-          },
-          {
-            id: 2,
-            img: require("../assets/imgs/index/gongchengxiangmu.png"),
-            text: "工程项目",
-            path: "/index/project/basicInfor",
-            roleShow4: true
-          },
-          {
-            id: 3,
-            img: require("../assets/imgs/index/gongchengxiangmu.png"),
-            text: "验收任务",
-            path: "/index/acaceptTask/taskArrangement",
-            roleShow4: true
-          },
-          {
-            id: 4,
-            img: require("../assets/imgs/index/jilu.png"),
-            text: "验收记录",
-            path: "/index/recode",
-            roleShow4: true
-          },
-          {
-            id: 5,
-            img: require("../assets/imgs/index/biaozhun.png"),
-            text: "验收标准",
-            path: "/index/standard",
-            roleShow4: false
-          },
-          {
             id: 6,
             img: require("../assets/imgs/index/yonghuguanli.png"),
             text: "用户管理",
             path: "/index/user/userManage",
             roleShow4: true
+          },
+          {
+            id: 7,
+            img: require("../assets/imgs/index/system.png"),
+            text: "系统管理",
+            path: "",
+            roleShow4: true
           }
         ];
+        }
       }
     }
     // //请求登录详情
@@ -340,15 +284,15 @@ export default {
 
     // }
   },
-  computed:{
-    getCindex(){
-      return this.$store.state.cindex
+  computed: {
+    getCindex() {
+      return this.$store.state.cindex;
     }
   },
-  watch:{
-    getCindex(val1,val2){
-      console.log(val1,val2)
-      this.cindex = val1
+  watch: {
+    getCindex(val1, val2) {
+      console.log(val1, val2);
+      this.cindex = val1;
     }
   }
 };

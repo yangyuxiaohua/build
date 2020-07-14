@@ -311,7 +311,9 @@ export default {
     //角色控制
     roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 500) {
+      if (roleCode == 600 || roleCode == 650 || roleCode == 300) {
+        this.roleShow4 = true;
+      }else{
         this.roleShow4 = false;
       }
     },
@@ -319,13 +321,14 @@ export default {
     unitCurrentChange(val) {
       val = val <= 0 ? 1 : val;
       getRecordsByProjectId3({
+        standardId:this.$store.state.projectInfor.completStandardId,
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
         primaryTitleId: this.primaryTitleId,
         secondaryTitleId: this.secondaryTitleId,
         checkTypeName:this.checkTypeName,
-        copyCompleteRecordResult:this.copyCompleteRecordResult,
+        result:this.copyCompleteRecordResult,
         // result: this.result,
       })
         .then(res => {
