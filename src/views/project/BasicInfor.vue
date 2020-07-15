@@ -68,7 +68,7 @@
 
       <el-divider></el-divider>
 
-      <el-row class="construction">
+      <el-row class="construction prompBox">
         <el-col :span="8">
           <el-form-item label="建设单位">
             <!-- <el-select v-model="form.constructionPartId" class="w80P">
@@ -77,7 +77,10 @@
             </el-select> -->
 
             <el-cascader :options="constructionOptions" :props="props" clearable v-model="form.constructionPartId" class="w80P" :disabled='roleDisabled'></el-cascader>
+            <i class="el-icon-question promptIcon" @click="showPromptText2 = !showPromptText2"></i>
+            
           </el-form-item>
+
         </el-col>
         <el-col :span="8">
           <el-form-item label="项目负责人">
@@ -89,17 +92,19 @@
             <el-input v-model="phone1" class="w80P" disabled></el-input>
           </el-form-item>
         </el-col>
+        <span class="promptText" v-show="showPromptText2">列表中没有显示的，需在【用户管理】中创建组织</span>
       </el-row>
 
       <el-divider></el-divider>
-      <el-row class="construction">
+      <el-row class="construction prompBox">
         <el-col :span="8">
-          <el-form-item label="技术服务机构">
+          <el-form-item label="技术服务机构" >
             <!-- <el-select v-model="form.servicePartId" class="w80P">
               <el-option v-for="j in serviceOptions" :key="j.factoryId" :label="j.factoryName" :value="j.factoryId">
               </el-option>
             </el-select> -->
             <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" class="w80P" filterable :filter-method='filterservice' ref='filterserviceTree' :disabled='roleDisabled'></el-cascader>
+            <i class="el-icon-question promptIcon" @click="showPromptText1 = !showPromptText1"></i>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -112,6 +117,8 @@
             <el-input v-model="form.phone2" class="w80P" disabled></el-input>
           </el-form-item>
         </el-col>
+            <span class="promptText" v-show="showPromptText1">列表中没有显示的，需告知对方注册新用户</span>
+        
       </el-row>
 
       <el-divider></el-divider>
@@ -332,7 +339,7 @@
       <!-- <el-divider></el-divider> -->
 
       <el-form-item class="btn construction">
-        <div class="btnWrapper">
+        <div class="btnWrapper" v-show="roleHandle">
           <el-button type="primary" @click="onSubmit()">提交</el-button>
           <el-button>取消</el-button>
         </div>
@@ -432,11 +439,13 @@ export default {
       zoomUp: false,
       show2: false,
       roleDisabled: true,
-      roleHandle:false
+      roleHandle: false,
+      showPromptText1:false,
+      showPromptText2:false,
     };
   },
   mounted() {
-    this.roleControl()
+    this.roleControl();
     this.getRegionsData();
     this.getEngineeringInfor();
     this.getFireInfor();
@@ -466,7 +475,6 @@ export default {
         this.roleDisabled = true;
         this.roleHandle = false;
       }
-      
     },
     onSubmit() {
       if (!this.$store.state.projectInfor.projectId) {
@@ -902,7 +910,7 @@ export default {
     },
     //过滤服务机构
     filterservice(node, keyword) {
-      getFactoryMenus({
+      return getFactoryMenus({
         factoryType: "10",
         onlyFactory: true,
         rootName: keyword
@@ -1024,7 +1032,7 @@ export default {
     z-index: 10;
     display: flex;
     justify-content: center;
-    align-items: center;
+    // align-items: center;
     .maskContainer {
       width: 800px;
       height: 600px;
@@ -1060,6 +1068,23 @@ export default {
   }
   .clickZoom:hover {
     cursor: pointer;
+  }
+
+  .prompBox {
+    position: relative;
+    .promptIcon {
+      font-size: 16px;
+      margin-left: 5px;
+    }
+    .promptIcon:hover {
+      cursor: pointer;
+    }
+    .promptText {
+      font-size: 12px;
+      position: absolute;
+      left: 200px;
+      bottom: 2px;
+    }
   }
 }
 </style>

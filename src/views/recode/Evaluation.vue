@@ -405,13 +405,13 @@ export default {
                   recode: "",
                   importance: item.checklistDtos.checkTypeName,
                   conclusion1: item.completChecklistDtos
-                    ? item.inspectChecklistDtos.result == 1 ? "合格" : "不合格"
+                    ? (item.completChecklistDtos.result == 1 ? "合格" : "不合格")
                     : "无",
                   conclusion2: item.inspectChecklistDtos
-                    ? item.inspectChecklistDtos.result == 1 ? "合格" : "不合格"
+                    ? (item.inspectChecklistDtos.result == 1 ? "合格" : "不合格")
                     : "无",
                   conclusion3: item.curr2ChecklistDtos
-                    ? item.curr2ChecklistDtos.result == 1 ? "合格" : "不合格"
+                    ? (item.curr2ChecklistDtos.result == 1 ? "合格" : "不合格")
                     : "无",
 
                   // conclusion3: item.checklistDtos.result == 1 ? "合格" : "不合格",
@@ -450,6 +450,7 @@ export default {
         });
     },
     handleModify(flag, item) {
+      console.log(1111111)
       // console.log(item);
       if (flag == 1) {
         this.readonly = true;
@@ -460,13 +461,12 @@ export default {
         this.readonly = false;
         this.showSaveBtn = true;
       }
-
         if(!this.form.completChecklistDtos){
           this.form.completChecklistDtos={}
         }else{
            this.form.completChecklistDtos.contentRecord = changeEdit(this.form.completChecklistDtos.contentRecord)
       this.form.completChecklistDtos.createTime = getTime(this.form.completChecklistDtos.createTime)
-      this.form.completChecklistDtos.result = this.form.inspectChecklistDtos.result?(this.form.completChecklistDtos.result==1?'合格':'不合格'):''
+      this.form.completChecklistDtos.result = this.form.completChecklistDtos.result?(this.form.completChecklistDtos.result==1?'合格':'不合格'):''
         }
       if(!this.form.inspectChecklistDtos){
         this.form.inspectChecklistDtos={}

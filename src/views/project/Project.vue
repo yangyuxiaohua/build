@@ -6,7 +6,7 @@
           <img src="../../assets/imgs/index/xiangmu.png" alt="">
           <span>工程项目</span>
         </div>
-        <el-button type="primary" plain size="small" @click="addProject()">新增</el-button>
+        <el-button type="primary" plain size="small" @click="addProject()" v-show="roleShowAddBtn">新增</el-button>
       </div>
       <el-divider></el-divider>
       <el-input placeholder="请输入" v-model="projectSearch">
@@ -61,7 +61,8 @@ export default {
       dialogProjectFormVisible: false,
       // addProjectForm: {}, //新增项目
       formLabelWidth: "100px",
-      chosedProjectIdNum: "" //选中的项目
+      chosedProjectIdNum: "", //选中的项目
+      roleShowAddBtn:false
     };
   },
   created() {
@@ -86,23 +87,11 @@ export default {
         roleCode == 600 ||
         roleCode == 650 ||
         roleCode == 700 ||
-        roleCode == 500
+        roleCode == 300
       ) {
-        this.rightNav = [
-          {
-            id: 1,
-            path: "/index/project/basicInfor",
-            text: "基本信息",
-            roleShow4: true
-          },
-          {
-            id: 2,
-            path: "/index/project/acceptanceContent",
-            text: "验收内容",
-            roleShow4: true
-          }
-          // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:false }
-        ];
+       this.roleShowAddBtn = true
+      }else{
+        this.roleShowAddBtn = false
       }
     },
     handleIconClick() {

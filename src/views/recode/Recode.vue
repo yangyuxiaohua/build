@@ -102,7 +102,7 @@ export default {
       inspectionValue: "", //查验结论
       detectionValue: "", //检测结论
       evaluationValue: "", //评定结论
-      roleDisabled:true, //角色归档
+      roleDisabled: true //角色归档
       // primaryTitleId: "",
       // primaryTitleIdOptopns: [],
       // secondaryTitleId: "",
@@ -126,10 +126,10 @@ export default {
     //权限控制
     roleControl() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if(roleCode == 500 || roleCode ==700 || roleCode==900){
-        this.roleDisabled = true
-      }else{
-        this.roleDisabled = false
+      if (roleCode == 500 || roleCode == 700 || roleCode == 900) {
+        this.roleDisabled = true;
+      } else {
+        this.roleDisabled = false;
       }
       if (roleCode == 600 || roleCode == 650 || roleCode == 700) {
         this.navList = this.navList.filter(item => {
@@ -144,17 +144,17 @@ export default {
           }
         });
       } else {
-        this.navList = this.navList
+        this.navList = this.navList;
       }
       this.cindex = this.navList[0].standardId;
-            this.standardName = this.navList[0].name;
-            if (this.standardName == "资料审查") {
-              this.isDataReview = false;
-            } else {
-              this.isDataReview = true;
-            }
-            this.$router.history.push(this.navList[0].path);
-            this.constroShow(this.standardName);
+      this.standardName = this.navList[0].name;
+      if (this.standardName == "资料审查") {
+        this.isDataReview = false;
+      } else {
+        this.isDataReview = true;
+      }
+      this.$router.history.push(this.navList[0].path);
+      this.constroShow(this.standardName);
     },
     // 获取项目列表
     getProjectList(name = "") {
@@ -236,17 +236,25 @@ export default {
       })
         .then(res => {
           if (res.httpStatus == 200) {
-            this.$message({
-              type: "success",
-              message: "档案归档成功"
-            });
+            if (res.result.result == 1) {
+              this.$message({
+                type: "success",
+                message: "档案归档成功"
+              });
+            } else {
+              this.$message({
+                type: "info",
+                message: "档案已取消归档"
+              });
+            }
+
             console.log(res);
             // this.status = this.status == true ? false :true
             getProjectInfor({
               projectId: this.$store.state.projectInfor.projectId
             }).then(res => {
               if (res.httpStatus == 200) {
-                console.log(res.result.project);
+                // console.log(res.result.project);
                 this.$store.commit("chosedProjectId", res.result.project);
               }
             });
@@ -294,8 +302,8 @@ export default {
                 path
               };
             });
-            
-            this.roleControl()
+
+            this.roleControl();
           }
         })
         .catch(err => {
@@ -377,9 +385,23 @@ export default {
       this.standardName = i.name;
       if (this.standardName == "资料审查") {
         this.isDataReview = false;
+      } else if (
+        this.standardName == "竣工查验" ||
+        this.standardName == "消防检测"
+      ) {
+        // this.isDataReview = true;
+        if (
+          this.$store.state.userRole.roleCode == 400 ||
+          this.$store.state.userRole.roleCode == 450
+        ) {
+          this.isDataReview = false;
+        }else{
+          this.isDataReview = true
+        }
       } else {
         this.isDataReview = true;
       }
+
       // this.$store.commit("saveStandardId", i.standardId);
       this.$store.commit("saveRecodeStandard", i);
       this.$store.commit("saveScreeningRecordObj", {});

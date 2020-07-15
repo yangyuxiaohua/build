@@ -79,10 +79,14 @@ export default {
     this.$store.commit("chosedProjectId", {});
     this.$store.commit("saveStandardId", "");
     this.$store.commit("savePoint", {});
-    this.$store.commit("savePoint", {});
     this.$store.commit("saveUnitInfo", {});
     this.$store.commit("changeUnitStatus", '');
     this.$store.commit("changeConfiFlag", '');
+    this.$store.commit("filterMarkers", '');
+    this.$store.commit("changeCindex", '');
+    this.$store.commit("saveRecodeStandard", {});
+    this.$store.commit("saveFactoryType", "");
+    this.$store.commit("saveFactoryType", {});
   },
   methods: {
     //  切换眼睛开和闭
@@ -143,7 +147,7 @@ export default {
     register(){
       this.$message({
         type:'info',
-        message:'请下载手机app注册'
+        message:'请扫描页面二维码，下载手机app注册'
       })
     }
   }

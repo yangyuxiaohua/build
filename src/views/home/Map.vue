@@ -25,30 +25,46 @@
             <p>工程地址 ：
               <span>{{projectForm.regionName}}</span>
             </p>
-            <p>建设单位 ：
-              <span>{{projectForm.factoryName}}</span>
-            </p>
-            <p>受理/备案凭证文号 ：
-              <span>{{projectForm.certificateNumber}}</span>
-            </p>
-            <p>联系人 ：
-              <span>{{projectForm.contactUser}}</span>
-            </p>
-            <p>联系电话 ：
-              <span>{{projectForm.phone}}</span>
-            </p>
-            <p>工程类别 ：
-              <span>{{projectForm.typeName}}</span>
-            </p>
-            <p>火灾危险性 ：
-              <span>{{projectForm.dangerousLevelName}}</span>
-            </p>
-            <p>使用性质 ：
-              <span>{{projectForm.usageName}}</span>
+            <p>总建筑物面积 ：
+              <span>{{projectForm.regionName}}</span>
             </p>
             <p>申请日期 ：
               <span>{{projectForm.time}}</span>
             </p>
+            <p>建设单位 ：
+              <span>{{projectForm.factoryName}}</span>
+            </p>
+            <p>建设单位项目负责人 ：
+              <span>{{projectForm.constructionProjectLeader}}</span>
+            </p>
+            <p>建设单位项目负责人电话 ：
+              <span>{{projectForm.constructionProjectLeaderPhone}}</span>
+            </p>
+            <p>服务机构 ：
+              <span>{{projectForm.serviceFactoryName}}</span>
+            </p>
+            <p>服务机构项目负责人 ：
+              <span>{{projectForm.serviceProjectLeader}}</span>
+            </p>
+            <p>服务机构项目负责人电话 ：
+              <span>{{projectForm.serviceProjectLeaderPhone}}</span>
+            </p>
+            <p>验收单位 ：
+              <span>{{projectForm.acceptanceFactoryName}}</span>
+            </p>
+            <p>消防验收申请受理凭证文号 ：
+              <span>{{projectForm.certificateNumber}}</span>
+            </p>
+            <p>消防设计审查意见书文号 ：
+              <span>{{projectForm.reviewCertificateNumber}}</span>
+            </p>
+            <p>工程类别 ：
+              <span>{{projectForm.typeName}}</span>
+            </p>
+            <p>使用性质 ：
+              <span>{{projectForm.usageName}}</span>
+            </p>
+            
           </div>
           <div class="ProjectAcceptanceInfoWrapper" v-show="ProjectAcceptanceInfo">
             <!-- titleName: item.titleName,
@@ -216,18 +232,33 @@ export default {
           .then(res => {
             if (res.httpStatus == 200) {
               console.log(res);
+              let usageName = res.result.projectInfoUsages.map(item=>{
+                return item.usageName 
+              })
+              usageName = usageName.join(',')
               if (res.result.projectInfo) {
                 this.projectForm = {
+                  projectName: res.result.project.projectName,
+                  regionName:res.result.projectInfo.regionName+ res.result.project.detailedAddress,
                   time: getlTime(res.result.projectInfo.time),
-                  usageName: res.result.projectInfoUsages[0].usageName,
-                  dangerousLevelName: res.result.projectInfo.dangerousLevelName,
-                  typeName: res.result.projectInfo.typeName,
-                  contactUser: res.result.projectInfo.contactUser,
-                  phone: res.result.projectInfo.contactPhone,
-                  certificateNumber: res.result.projectInfo.certificateNumber,
                   factoryName: res.result.projectInfo.factoryName,
-                  regionName: res.result.project.detailedAddress,
-                  projectName: res.result.project.projectName
+                  constructionProjectLeader: res.result.projectInfo.constructionProjectLeader,
+                  constructionProjectLeaderPhone: res.result.projectInfo.constructionProjectLeaderPhone,
+                  
+                  serviceFactoryName: res.result.projectInfo.serviceFactoryName,
+                  serviceProjectLeader: res.result.projectInfo.serviceProjectLeader,
+                  serviceProjectLeaderPhone: res.result.projectInfo.serviceProjectLeaderPhone,
+                  
+                  acceptanceFactoryName: res.result.projectInfo.acceptanceFactoryName,
+                  
+                  certificateNumber: res.result.project.certificateNumber,
+                  
+                  reviewCertificateNumber: res.result.project.reviewCertificateNumber,
+                  typeName: res.result.projectInfo.typeName,
+                  usageName,
+                  
+                 
+                  
                 };
               } else {
                 this.projectForm = {};

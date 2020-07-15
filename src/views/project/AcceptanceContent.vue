@@ -1245,6 +1245,7 @@ export default {
   padding-left: 20px;
   .top {
     .individualBuild {
+      margin-top: 10px;
       span {
         display: inline-block;
         padding: 5px 5px;
@@ -1256,6 +1257,7 @@ export default {
         text-align: center;
         display: flex;
         position: relative;
+        background-color: #F8F4F2;
         .arrowIcons {
           position: absolute;
           left: -25px;
@@ -1275,6 +1277,7 @@ export default {
     }
     .individualText {
       width: 80px;
+      color: #8295C1;
       .el-button {
         // height: 30px;
         // line-height: 5px;

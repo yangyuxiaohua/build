@@ -52,7 +52,7 @@
           <el-tree :data="acceptancePersonData2" show-checkbox ref="personTree2" highlight-current :props="partDefaultProps" :default-checked-keys='checkedPersonList2' :expand-on-click-node='expandOnClickNode' :check-on-click-node="checkOnClickNode" :check-strictly='checkStrictly' node-key="id" :default-expanded-keys="defaultOnNode">
           </el-tree>
           <el-divider></el-divider>
-          <p class="personTit"> 所有人</p>
+          <p class="personTit"> 验收人员</p>
           <el-tree :data="acceptancePersonData" show-checkbox ref="personTree" highlight-current :props="partDefaultProps" :default-checked-keys='checkedPersonList' :expand-on-click-node='expandOnClickNode' :check-on-click-node="checkOnClickNode" :check-strictly='checkStrictly' node-key="id" :default-expanded-keys="defaultOnNode">
           </el-tree>
         </div>

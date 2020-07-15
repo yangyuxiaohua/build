@@ -32,7 +32,7 @@
           </el-form-item>
         </el-col>
         <!-- 建设单位 -->
-        <el-col :span="12">
+        <el-col :span="12" v-show="isACceptShow">
           <el-form-item label="资质等级">
             <el-input v-model="form.qualificationLevel"></el-input>
           </el-form-item>
@@ -40,7 +40,7 @@
 
       </el-row>
       <!-- 建设单位 -->
-      <el-row>
+      <el-row v-show="isACceptShow">
         <el-col :span="12">
           <el-form-item label="法定代表人">
             <el-input v-model="form.legalPerson"></el-input>
@@ -49,6 +49,19 @@
         <el-col :span="12">
           <el-form-item label="身份证号">
             <el-input v-model="form.idcard"></el-input>
+          </el-form-item>
+        </el-col>
+
+      </el-row>
+      <el-row v-show="isService">
+        <el-col :span="12">
+          <el-form-item label="技术责任人">
+            <el-input v-model="form.technicalDirectorPerson"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="身份证号">
+            <el-input v-model="form.technicalDirectorIdcard"></el-input>
           </el-form-item>
         </el-col>
 
@@ -87,7 +100,7 @@
           </el-form-item>
         </el-col>
         <!-- 建设单位 -->
-        <el-col :span="12">
+        <el-col :span="12" v-show="isACceptShow">
           <el-form-item label="营业执照">
             <div class="uploadBox" v-loading="loading">
               <el-upload class="avatar-uploader" :action="uploadIp" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
@@ -149,13 +162,25 @@ export default {
       uploadIp: "", //上传地址
       // businessLicense:'',//营业执照
       loading: false,
-      dialogVisible: false //查看大图
+      dialogVisible: false, //查看大图
+      isACceptShow: false, //验收单位表单隐藏
+      isService: false //服务机构
     };
   },
   created() {
     // authPartsIds
     this.getLastFactoryMenus();
     this.uploadIp = uploadIp;
+    if (this.$store.state.factoryType == 5) {
+      this.isACceptShow = false;
+    } else {
+      this.isACceptShow = true;
+    }
+    if (this.$store.state.factoryType == 10) {
+      this.isService = true;
+    } else {
+      this.isService = false;
+    }
     // console.log(this.$store.state)
   },
 
@@ -171,7 +196,9 @@ export default {
           type: this.form.type,
           qualificationLevel: this.form.qualificationLevel,
           legalPerson: this.form.legalPerson,
+          technicalDirectorPerson:this.form.technicalDirectorPerson,
           idcard: this.form.idcard,
+          technicalDirectorIdcard: this.form.technicalDirectorIdcard,
           contactMasterUser: this.form.contactMasterUser,
           contactMasterPhone: this.form.contactMasterPhone,
           enable: this.form.enable,
@@ -279,7 +306,9 @@ export default {
           type: this.form.type,
           qualificationLevel: this.form.qualificationLevel,
           legalPerson: this.form.legalPerson,
+          technicalDirectorPerson: this.form.technicalDirectorPerson,
           idcard: this.form.idcard,
+          idtechnicalDirectorIdcardcard: this.form.technicalDirectorIdcard,
           contactMasterUser: this.form.contactMasterUser,
           contactMasterPhone: this.form.contactMasterPhone,
           enable: this.form.enable,
@@ -315,7 +344,7 @@ export default {
     //获取上一级机构的数据
     getLastFactoryMenus() {
       getFactoryMenus({
-        factoryType:this.$store.state.userInfor.factoryType
+        factoryType: this.$store.state.userInfor.factoryType
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -437,7 +466,9 @@ export default {
         type: val.type,
         qualificationLevel: val.qualificationLevel,
         legalPerson: val.legalPerson,
+        technicalDirectorPerson: val.technicalDirectorPerson,
         idcard: val.idcard,
+        technicalDirectorIdcard: val.technicalDirectorIdcard,
         contactMasterUser: val.contactMasterUser,
         contactMasterPhone: val.contactMasterPhone,
         enable: val.enable,
@@ -453,8 +484,8 @@ export default {
       } else {
         this.imageUrl = "";
       }
-      console.log(this.form)
-      console.log(this.options)
+      console.log(this.form);
+      console.log(this.options);
     },
     //修改,添加成功和删除成功修改操作的flag
     changeConfiStatus() {
@@ -514,6 +545,16 @@ export default {
       }
     },
     getFactorytype: function(val1, val2) {
+      if (val1 == 5) {
+        this.isACceptShow = false;
+      } else {
+        this.isACceptShow = true;
+      }
+      if (val1==10) {
+        this.isService = true;
+      } else {
+        this.isService = false;
+      }
       this.form = {};
     }
   }

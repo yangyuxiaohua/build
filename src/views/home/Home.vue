@@ -25,7 +25,7 @@
 
         </div>
         <div class="chartsWrapper">
-          <el-divider content-position="left">报验工程数量数量</el-divider>
+          <el-divider content-position="left">工程数量统计</el-divider>
           <div class="charts3" ref="projectsNumEchrts"></div>
         </div>
       </div>
@@ -174,12 +174,12 @@
             <div class="lawsCon">
               <div class="laws">
                 <span class="titText">建设工程消防设计审查验收管理暂行规定</span>
-                <span class="releaseUnit">筑房和城乡建设部</span>
+                <span class="releaseUnit">住房和城乡建设部</span>
                 <span class="releaseTime">2020-02-03 11：26</span>
               </div>
               <div class="laws">
                 <span class="titText">建设工程消防设计审查验收工作细则</span>
-                <span class="releaseUnit">筑房和城乡建设部</span>
+                <span class="releaseUnit">住房和城乡建设部</span>
                 <span class="releaseTime">2020-02-03 11：26</span>
               </div>
               <div class="laws">
@@ -305,9 +305,9 @@ export default {
   created() {},
   mounted() {
     this.getData();
+    this.getRoleShow();
     this.getProjectsOptions();
     // console.log(this.$store.state)
-    this.getRoleShow();
     this.$store.commit("changeCindex", 0);
   },
   methods: {
@@ -317,31 +317,10 @@ export default {
         this.$store.state.userRole.roleCode == 600 ||
         this.$store.state.userRole.roleCode == 650 ||
         this.$store.state.userRole.roleCode == 800 ||
-        this.$store.state.userRole.roleCode == 850 
-      ) {
-        this.construContentShow = true;
-        this.contentShow = false;
-        this.getCharts2();
-        this.navList = [
-          //导航列表
-          { id: 1, text: "首页", path: "/index/home", index: 0 },
-          { id: 2, text: "工程项目", path: "/index/project/basicInfor" },
-          {
-            id: 3,
-            text: "验收任务",
-            path: "/index/acaceptTask/taskArrangement"
-          },
-          { id: 4, text: "验收记录", path: "/index/recode" },
-          // { id:5, text: "验收标准", path: "/index/standard" },
-          { id: 6, text: "用户管理", path: "/index/user/userManage" },
-          { id: 7, text: "系统管理", path: "" }
-        ];
-      } else if (
+        this.$store.state.userRole.roleCode == 850 ||
         this.$store.state.userRole.roleCode == 400 ||
-        this.$store.state.userRole.roleCode == 450 
+        this.$store.state.userRole.roleCode == 450
       ) {
-        this.getFourData();
-        this.getCharts();
         this.navList = [
           //导航列表
           { id: 1, text: "首页", path: "/index/home", index: 0 },
@@ -376,6 +355,31 @@ export default {
           { id: 7, text: "系统管理", path: "" }
         ];
       } else {
+        this.navList = [
+          //导航列表
+          { id: 1, text: "首页", path: "/index/home", index: 0 },
+          { id: 2, text: "工程项目", path: "/index/project/basicInfor" },
+          {
+            id: 3,
+            text: "验收任务",
+            path: "/index/acaceptTask/taskArrangement"
+          },
+          { id: 4, text: "验收记录", path: "/index/recode" },
+          { id: 5, text: "验收标准", path: "/index/standard" },
+          { id: 6, text: "用户管理", path: "/index/user/userManage" },
+          { id: 7, text: "系统管理", path: "" }
+        ];
+      }
+
+      if (
+        this.$store.state.userRole.roleCode == 600 ||
+        this.$store.state.userRole.roleCode == 650 ||
+        this.$store.state.userRole.roleCode == 700
+      ) {
+        this.construContentShow = true;
+        this.contentShow = false;
+        this.getCharts2();
+      } else {
         this.getFourData();
         this.getCharts();
         this.$store.commit("filterMarkers", "");
@@ -409,9 +413,9 @@ export default {
           if (res.httpStatus == 200) {
             console.log(res);
             let {
-              qualifiedProbabilityDto,
-              timeCompletionProbabilityDto,
-              totalCompletionProbabilityDto
+              qualifiedProbabilityDto, // 验收合格率
+              timeCompletionProbabilityDto, //项目总数
+              totalCompletionProbabilityDto //完成率
             } = res.result.result.evaluationStatisticalDto;
             let op1 = [
               {
@@ -502,7 +506,7 @@ export default {
           console.log(err);
           this.$message({
             type: "warning",
-            message: '报表暂无数据'
+            message: "报表暂无数据"
           });
         });
     },
@@ -797,15 +801,15 @@ export default {
             break;
           case 3:
             this.info =
-              "请验收人员登录APP，按要求开展竣工资料核查，并据实填写验收记录。";
+              "请验收人员登录APP，按要求开展竣工资料核查，现场填写的验收记录同步在【验收记录】显示。";
             break;
           case 4:
             this.info =
-              "请验收人员登录APP，按要求开展竣工验收消防查验，并据实填写验收记录。";
+              "请验收人员登录APP，按要求开展竣工验收消防查验，现场填写的验收记录同步在【验收记录】显示。";
             break;
           case 5:
             this.info =
-              "请检测人员登录APP，按要求开展消防设施检测，并据实填写检测记录。";
+              "请检测人员登录APP，按要求开展消防设施检测，现场填写的验收记录同步在【验收记录】显示。";
             break;
           default:
             this.info =
@@ -1332,6 +1336,7 @@ export default {
               text-indent: 30px;
               height: 250px;
               overflow: hidden;
+              line-height: 26px;
             }
             .infoPaging {
               position: absolute;

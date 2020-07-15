@@ -23,7 +23,7 @@
             <el-input v-model="projectName" placeholder="请输入内容" suffix-icon="el-icon-search"></el-input>
           </el-col>
           <el-col :span="4">
-            <el-button type="primary" plain @click="addUnit()" class="addBtn">增加</el-button>
+            <el-button type="primary" plain @click="addUnit()" class="addBtn">新增</el-button>
           </el-col>
         </el-row>
       </div>
@@ -84,7 +84,8 @@ export default {
         { type: 10, name: "服务机构" }
       ],
       factoryType: '', //单位类型
-      factoryTypeName: "验收单位"
+      factoryTypeName: "验收单位",
+      // roleAddBtn:false,
     };
   },
   created() {

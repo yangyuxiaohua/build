@@ -89,8 +89,8 @@
                       <el-select v-model="userForm.professionalCertificate" placeholder="执业资格证书" class="w100">
                         <el-option label="一级注册消防工程师" value="1"></el-option>
                         <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
-                        <el-option label="消防设施操作员（三级/高级技能）" value="10"></el-option>
-                        <el-option label="消防设施操作员（三级/高级技能）" value="15"></el-option>
+                        <el-option label="消防设施操作员（四级/中级技能）" value="10"></el-option>
+                        <el-option label="消防设施操作员（五级/初级技能）" value="15"></el-option>
                       </el-select>
                     </el-form-item>
                   </el-col>
@@ -240,8 +240,8 @@
                       <el-select v-model="userForm.professionalCertificate" placeholder="执业资格证书" class="w100">
                         <el-option label="一级注册消防工程师" value="1"></el-option>
                         <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
-                        <el-option label="消防设施操作员（三级/高级技能）" value="10"></el-option>
-                        <el-option label="消防设施操作员（三级/高级技能）" value="15"></el-option>
+                        <el-option label="消防设施操作员（四级/中级技能）" value="10"></el-option>
+                        <el-option label="消防设施操作员（五级/初级技能）" value="15"></el-option>
                       </el-select>
                     </el-form-item>
                   </el-col>
@@ -371,7 +371,7 @@ export default {
     this.getUserLsit(1);
     this.getLastFactoryMenus();
     // console.log(this.$store.state.factoryType)
-     if(this.$store.state.factoryType==10){
+     if(this.$store.state.factoryType==10||this.$store.state.factoryType==1){
         this.isService = true
       }else{
         this.isService = false
@@ -459,6 +459,7 @@ export default {
     },
     //提交修改
     onSubmit() {
+      this.userForm.professionalImage2Url = this.imgList.join(',')
       if (this.updata) {
         updateUserAndParts({
           userId: this.userForm.userId,
@@ -648,7 +649,7 @@ export default {
       this.getUserLsit(1);
     },
     getFactorytype: function(val1, val2) {
-      if(val1==10){
+      if(val1==10||val1==1){
         this.isService = true
       }else{
         this.isService = false
