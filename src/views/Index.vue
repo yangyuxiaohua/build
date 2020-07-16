@@ -24,7 +24,7 @@
         <el-row>
           <el-col :span='12'>
             <el-form-item label="用户账号" :label-width="formLabelWidth">
-              <el-input v-model="userForm.account" autocomplete="off" disabled></el-input>
+              <el-input v-model="userForm.account" autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span='12'>
@@ -61,7 +61,7 @@
         <el-row>
           <el-col :span='12'>
             <el-form-item label="身份证号" :label-width="formLabelWidth">
-              <el-input v-model="userForm.idcard" autocomplete="off" disabled></el-input>
+              <el-input v-model="userForm.idcard" autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span='12'>
@@ -77,7 +77,7 @@
         <el-row v-show="isService">
           <el-col :span='12'>
             <el-form-item label="执业资格证" :label-width="formLabelWidth">
-              <el-select v-model="userForm.professionalCertificate" placeholder="" class="w100" disabled>
+              <el-select v-model="userForm.professionalCertificate" placeholder="" class="w100">
                 <el-option label="一级注册消防工程师" value="1"></el-option>
                 <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
                 <el-option label="消防设施操作员（四级/中级技能）" value="10"></el-option>
@@ -104,12 +104,12 @@
               <div v-for="(item,index) in imgList" :key="index" class="imgList wh80px"><img :src="item" alt="" class="wh80px">
                 <div class="imgMask">
                   <i class="el-icon-zoom-in" @click="lookImg(item)"></i>
-                  <!-- <i class="el-icon-delete" @click="deleteImage(index)"></i> -->
+                  <i class="el-icon-delete" @click="deleteImage(index)"></i>
                 </div>
               </div>
-              <!-- <el-upload class="avatar-uploader" :action="uploadIp" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" v-loading="loading">
+              <el-upload class="avatar-uploader" :action="uploadIp" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" v-loading="loading">
                 <i class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload> -->
+              </el-upload>
 
               <el-dialog :visible.sync="dialogVisible" append-to-body>
                 <img width="100%" :src="dialogImageUrl" alt="">
@@ -123,7 +123,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogUserFormVisibleIndex = false">取 消</el-button>
-        <el-button type="primary" @click="onSubmit()">提交</el-button>
+        <el-button type="primary" @click="onModify()">提交</el-button>
       </div>
     </el-dialog>
 
@@ -134,6 +134,8 @@
 import { inDexOfStr } from "../utils/publictool.js";
 import { getLoginAccountInfo } from "@/apis/login.js";
 import { updateUser } from "@/apis/userUnit.js";
+import { uploadIp, ImgIp } from "@/apis/upload.js";
+
 export default {
   data() {
     return {
@@ -150,10 +152,13 @@ export default {
       isService: false,
       dialogVisible: false,
       dialogImageUrl: "",
-      imgList: []
+      imgList: [],
+      loading: false,
+      uploadIp: ""
     };
   },
   created() {
+    this.uploadIp = uploadIp;
     this.roleShow();
     if (inDexOfStr(this.$route.path, "home")) {
       this.cindex = 1;
@@ -184,8 +189,8 @@ export default {
         }
       })
       .catch(err => {
-        console.log(err)
-          this.$router.history.push("/");
+        console.log(err);
+        this.$router.history.push("/");
         this.$message({
           type: "warning",
           message: "账号未登录"
@@ -203,13 +208,18 @@ export default {
     },
     //修改账号
     onModify() {
+      this.userForm.professionalImage2Url = this.imgList.join(',')
+      
       updateUser({
-        userId: this.userForm.userId,
-        // account: this.userForm.account,
-        password: this.userForm.password,
-        username: this.userForm.username,
-        phone: this.userForm.phone,
-
+          userId: this.userForm.userId,
+            // account: this.userForm.account,
+          account: this.userForm.account,
+          password: this.userForm.password,
+          username: this.userForm.username,
+          phone: this.userForm.phone,
+          idcard: this.userForm.idcard,
+          professionalCertificate: this.userForm.professionalCertificate,
+          professionalImage2Url: this.userForm.professionalImage2Url
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -384,10 +394,38 @@ export default {
         this.isService = true;
       }
     },
+    //上传相关
+    handleAvatarSuccess(res, file) {
+      // this.imageUrl = URL.createObjectURL(file.raw);
+      // console.log(res, file);
+      this.imgList.push(ImgIp + res.result);
+      // if (res.httpStatus == 200) {
+      //   this.form.businessLicense = res.result;
+      //   this.imageUrl = ImgIp + res.result;
+      // }
+      this.userForm.professionalImage2Url = this.imgList.join(",");
+      this.loading = false;
+    },
+    beforeAvatarUpload(file) {
+      this.loading = true;
+      // const isJPG = file.type === "image/jpeg";
+      // const isLt2M = file.size / 1024 / 1024 < 2;
+      // if (!isJPG) {
+      //   this.$message.error("上传头像图片只能是 JPG 格式!");
+      // }
+      // if (!isLt2M) {
+      //   this.$message.error("上传头像图片大小不能超过 2MB!");
+      // }
+      // return isJPG && isLt2M;
+    },
     lookImg(src) {
       this.dialogVisible = true;
       this.dialogImageUrl = src;
     },
+    //删除图片
+    deleteImage(i) {
+      this.imgList.splice(i, 1);
+    }
     // //请求登录详情
     // getLoginAccountInfo(){
 
@@ -477,7 +515,7 @@ export default {
   .container {
     flex: 1;
   }
-   .flexFormItem {
+  .flexFormItem {
     // display: flex;
     .el-form-item__content {
       margin-left: 0;
@@ -513,7 +551,15 @@ export default {
       display: block;
       cursor: pointer;
     }
-
+    .el-upload,
+    .el-upload--picture-card,
+    .el-upload-list__item,
+    .is-ready {
+      width: 80px;
+      height: 80px;
+      line-height: 80px;
+      border: 1px dotted #ccc;
+    }
     // .uploadIcon{
     //   display: flex;
     //   justify-content: center;

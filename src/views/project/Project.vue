@@ -199,12 +199,12 @@ export default {
       }
       p:hover {
         cursor: pointer;
-        background-color: #aca1a1;
-        color: #fff;
+        background-color: #F5F7FA;
+        // color: #fff;
       }
       .chosedProjectClass {
-        background-color: #6d6666;
-        color: #fff;
+        background-color: #F0F7FF;
+        // color: #fff;
       }
     }
   }

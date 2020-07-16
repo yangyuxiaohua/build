@@ -66,7 +66,7 @@ export default {
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" }, // 非空
-          { min: 3, max: 6, message: "密码长度 3 ~ 6 位", trigger: "blur" } // 长度
+          { min: 3, max: 15, message: "密码长度 3 ~ 15 位", trigger: "blur" } // 长度
         ],
         system: [{ required: true, message: "请选择系统", trigger: "blur" }]
       },

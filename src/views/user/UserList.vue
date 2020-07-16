@@ -585,7 +585,7 @@ export default {
     //上传相关
     handleAvatarSuccess(res, file) {
       // this.imageUrl = URL.createObjectURL(file.raw);
-      console.log(res, file);
+      // console.log(res, file);
       this.imgList.push(ImgIp + res.result);
       // if (res.httpStatus == 200) {
       //   this.form.businessLicense = res.result;

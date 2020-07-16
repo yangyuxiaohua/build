@@ -69,7 +69,7 @@ export default {
       ProjectOptions: [],
       projectValue: {},
       pProjectName: "",
-      status: "true",
+      status: false,
       chosedPro: {},
       result: "", //下拉框的筛选
       resultOptions: [
@@ -225,6 +225,7 @@ export default {
     },
     //选中项目
     chosedProject() {
+      // console.log(this.projectValue )
       this.$store.commit("chosedProjectId", this.projectValue);
       this.status = this.projectValue.status == 1 ? false : true;
     },
@@ -248,13 +249,10 @@ export default {
               });
             }
 
-            console.log(res);
-            // this.status = this.status == true ? false :true
             getProjectInfor({
               projectId: this.$store.state.projectInfor.projectId
             }).then(res => {
               if (res.httpStatus == 200) {
-                // console.log(res.result.project);
                 this.$store.commit("chosedProjectId", res.result.project);
               }
             });

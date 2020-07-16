@@ -81,7 +81,7 @@
         </el-row>
         <el-row class="bottomLine">
           <el-col :span="12">
-            <div> 验收人员 : {{form.usernames}}</div>
+            <div> 验收人员 : {{form.username}}</div>
             
             <!-- <div>检查部位 :
               <el-input :readonly='readonly' v-model="form.parts"></el-input>
@@ -304,7 +304,7 @@ export default {
   created() {
     this.unitCurrentChange(this.unitCurrentPage);
     this.roleShow();
-    console.log(this.$store.state.projectInfor)
+    console.log(this.$store.state)
   },
   mounted() {},
   methods: {
@@ -352,7 +352,7 @@ export default {
                   contentRecord: changeEdit(item.contentRecord),
                   standardName: item.standardName,
                   createTime: getTime(item.createTime),
-                  usernames: item.usernames,
+                  username: item.username,
                   projectId: item.projectId,
                   id: item.id
                 });

@@ -233,13 +233,13 @@
       <transition name="el-zoom-in-top">
         <div v-show="show2" class="transition-box userd">
           <el-form-item>
-            <span>总建筑物面积大于二万平方米的 ：</span>
+            <span>(一)总建筑物面积大于二万平方米的 ：</span>
             <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_2w" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <span>总建筑物面积大于一万五千平方米的 ：</span>
+            <span>（二）总建筑物面积大于一万五千平方米的 ：</span>
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_15w" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
@@ -249,7 +249,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <span>总建筑物面积大于一万平方米的 ：</span>
+            <span>（三）总建筑物面积大于一万平方米的 ：</span>
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_1w" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
@@ -258,7 +258,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <span>总建筑物面积大于二千五百平方米的 ：</span>
+            <span>（四）总建筑物面积大于二千五百平方米的 ：</span>
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Water" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
@@ -267,7 +267,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <span>总建筑物面积大于一千平方米的 ：</span>
+            <span>（五）总建筑物面积大于一千平方米的 ：</span>
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_01" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
@@ -276,7 +276,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <span>总建筑物面积大于五百平方米的 ：</span>
+            <span>（六）总建筑物面积大于五百平方米的 ：</span>
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_05" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
@@ -288,11 +288,13 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Standard" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
+            <span>（七） ：</span>
             <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Standard" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
+            <span>（八） ：</span>
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Car" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
@@ -301,7 +303,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <span>生产、储存、装卸易燃易爆危险物品的 ：</span>
+            <span>（九）生产、储存、装卸易燃易爆危险物品的 ：</span>
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Produce" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
@@ -313,6 +315,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
+            <span>（十）生产、储存、装卸易燃易爆危险物品的 ：</span>
             <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
@@ -321,6 +324,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_project" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
+            <span>（十一）：</span>
             <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_project" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>
@@ -329,6 +333,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Public" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
+            <span>（十二）：</span>
             <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Public" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>

@@ -26,7 +26,7 @@
               <span>{{projectForm.regionName}}</span>
             </p>
             <p>总建筑物面积 ：
-              <span>{{projectForm.regionName}}</span>
+              <span>{{projectForm.constructionArea}}</span>
             </p>
             <p>申请日期 ：
               <span>{{projectForm.time}}</span>
@@ -61,7 +61,7 @@
             <p>工程类别 ：
               <span>{{projectForm.typeName}}</span>
             </p>
-            <p>使用性质 ：
+            <p>特殊建设工程情形 ：
               <span>{{projectForm.usageName}}</span>
             </p>
             
@@ -133,19 +133,6 @@ export default {
   },
   created() {},
   mounted() {
-    // let _this = this;
-    // this.markers = [
-    //   {
-    //     lng: 116.404,
-    //     lat: 39.915,
-    //     content: "TCL液晶产业园"
-    //   },
-    //   {
-    //     lng: 115.504,
-    //     lat: 39.915,
-    //     content: "TCL产业园"
-    //   }
-    // ];
     this.getProjectInforPosition();
   },
   methods: {
@@ -240,6 +227,7 @@ export default {
                 this.projectForm = {
                   projectName: res.result.project.projectName,
                   regionName:res.result.projectInfo.regionName+ res.result.project.detailedAddress,
+                  constructionArea:res.result.project.constructionArea+'m²',
                   time: getlTime(res.result.projectInfo.time),
                   factoryName: res.result.projectInfo.factoryName,
                   constructionProjectLeader: res.result.projectInfo.constructionProjectLeader,
@@ -304,7 +292,7 @@ export default {
     }
   },
   watch: {
-    filterMarkers: async function(val1, val2) {
+    filterMarkers: function(val1, val2) {
       // console.log(typeof val1);
       if (val1) {
         if (inDexOfStr(val1, "项目")) {
