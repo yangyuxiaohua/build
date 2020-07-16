@@ -3,7 +3,7 @@
     <baidu-map class="bm-view" ak="SNUcFOLFpX4Ra1HxR9OEHdSEdkzyDxll" :center="center" :zoom="zoom" @ready="map_handler" :scroll-wheel-zoom="true" :mapClick="false">
 
       <div v-for="marker in markers" :key="marker.projectId">
-        <bm-marker :position="{lng: marker.lng, lat: marker.lat}" @click="markerClick($event,marker)">
+        <bm-marker :position="{lng: marker.lng, lat: marker.lat}" @click="markerClick($event,marker)" :icon="{url: marker.icon, size: {width: 48, height: 48}}">
         </bm-marker>
         <!-- <bm-label :content="marker.content" :offset="{width:-55,height:-65}" :position="{lng: marker.lng, lat: marker.lat}" :labelStyle="{border:'1px solid #6ea4cd', padding:'8px',fontWeight: '600',fontSize:'14px',cursor: 'pointer'}" :title="marker.content" @click="markerClick(marker)" /> -->
       </div>
@@ -141,7 +141,7 @@ export default {
       this.map = map;
       // this.center.lng = 102.72;
       // this.center.lat = 25.05;
-      this.zoom = 12;
+      this.zoom = 13;
     },
     //获取项目位置及信息
     getProjectInforPosition() {
@@ -150,12 +150,23 @@ export default {
           console.log(res);
           if (res.httpStatus == 200) {
             this.markersSave = res.result.map(item => {
+              console.log(item.status)
+              let icon;
+              if(item.status==1){
+                  icon = require('../../assets/imgs/index/noPass.png')
+                
+                }else if(item.status==120){
+                  icon = require('../../assets/imgs/index/pass.png')
+              }else{
+                icon = require('../../assets/imgs/index/waitStart.png')
+              }
               return {
                 lng: item.lon,
                 lat: item.lat,
                 content: item.projectName,
                 projectId: item.projectId,
-                regionId: item.regionId
+                regionId: item.regionId,
+                icon,
               };
             });
           }
