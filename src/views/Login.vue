@@ -131,11 +131,11 @@ export default {
                 });
               //获取正在登录的角色
             } else {
-              Message.error("网络请求发生错误，请稍后再试");
+              Message.error("账号/密码错误");
             }
           })
           .catch(err => {
-            Message.error("网络请求发生错误，请稍后再试");
+            Message.error("账号/密码错误");
           });
         setTimeout(() => {
           this.loginFlag = true;

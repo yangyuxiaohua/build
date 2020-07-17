@@ -433,7 +433,7 @@ export default {
               this.text1 = "0%";
             } else {
               this.text1 =
-                Math.floor(
+                Math.ceil(
                   totalCompletionProbabilityDto.finishTasks /
                     totalCompletionProbabilityDto.totalTasks *
                     100
@@ -468,7 +468,7 @@ export default {
                 this.text2 = "0%";
               } else {
                 this.text2 =
-                  Math.floor(
+                  Math.ceil(
                     qualifiedProbabilityDto.qualifiedPassesNum /
                       (qualifiedProbabilityDto.qualifiedPassesNum +
                         qualifiedProbabilityDto.qualifiedNonPassesNum) *
@@ -789,7 +789,7 @@ export default {
     clickStep(num) {
       console.log(num);
       if (this.constructionProcessDto.length <= 0) {
-        console.log("没有项目");
+        // console.log("没有项目");
         switch (num) {
           case 1:
             this.info =
@@ -816,7 +816,7 @@ export default {
               "请联系“昆明市建设工程质量安全监督管理总站 杨某某 13577899123”，告知已具备现场评定条件，请安排现场评定。";
         }
       } else {
-        console.log("有项目");
+        // console.log("有项目");
         console.log(this.constructionProcessDto);
         switch (num) {
           case 1:

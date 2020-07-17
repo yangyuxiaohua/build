@@ -116,7 +116,7 @@
         </el-col>
       </el-row>
       <el-form-item class="tac">
-        <el-button type="primary" @click="onSubmit">提交</el-button>
+        <el-button type="primary" @click="onSubmit" v-loading="loading2" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">{{btnText}}</el-button>
         <el-button @click="clickDelete()" v-show="deleteBtnShow">删除</el-button>
       </el-form-item>
     </el-form>
@@ -162,9 +162,11 @@ export default {
       uploadIp: "", //上传地址
       // businessLicense:'',//营业执照
       loading: false,
+      loading2:false,
       dialogVisible: false, //查看大图
       isACceptShow: false, //验收单位表单隐藏
-      isService: false //服务机构
+      isService: false, //服务机构
+      btnText:'提交',
     };
   },
   created() {
@@ -188,6 +190,7 @@ export default {
     onSubmit() {
       if (!this.updata) {
         // if (this.form.authPartsIds && this.form.authPartsIds != "") {
+      this.loading2 = true
         addPart({
           authPartsIds: this.form.authPartsIds,
           partsName: this.form.partsName,
@@ -220,8 +223,10 @@ export default {
                 message: "网络请求失败"
               });
             }
+              this.loading2 = false
           })
           .catch(err => {
+              this.loading2 = false
             this.$message({
               type: "warning",
               message: err
@@ -535,6 +540,7 @@ export default {
       if (val1 == "updata" || val1 == "update2") {
         this.updata = true;
         this.deleteBtnShow = true;
+        this.btnText = '确定修改'
         //  this.disabledAuthPart = true
       } else {
         this.form = {};
@@ -542,6 +548,7 @@ export default {
         this.unitTypeShow = true;
         this.deleteBtnShow = false;
         this.updata = false;
+        this.btnText = '提交'
       }
     },
     getFactorytype: function(val1, val2) {

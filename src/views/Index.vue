@@ -177,7 +177,7 @@ export default {
     }
     getLoginAccountInfo()
       .then(res => {
-        console.log(res);
+        // console.log(res);
         if (res.httpStatus != 200) {
           this.$router.history.push("/");
         } else {
@@ -189,7 +189,7 @@ export default {
         }
       })
       .catch(err => {
-        console.log(err);
+        // console.log(err);
         this.$router.history.push("/");
         this.$message({
           type: "warning",

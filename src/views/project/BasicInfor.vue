@@ -114,7 +114,7 @@
         </el-col>
         <el-col :span="8">
           <el-form-item label="联系电话">
-            <el-input v-model="form.phone2" class="w80P" disabled></el-input>
+            <el-input v-model="phone2" class="w80P" disabled></el-input>
           </el-form-item>
         </el-col>
             <span class="promptText" v-show="showPromptText1">列表中没有显示的，需告知对方注册新用户</span>
@@ -506,6 +506,7 @@ export default {
                 type: "success",
                 message: "提交成功"
               });
+              // console.log(res)
               this.$store.commit("saveContentId", res.result.contentId);
               this.$store.commit("chosedProjectId", {
                 projectId: res.result.result.projectId,
@@ -790,17 +791,17 @@ export default {
               lon: res.result.project.lon
             };
             //建设单位联系
-            this.person1 = res.result.constructionProjectLeader
-              ? res.result.constructionProjectLeader
+            this.person1 = res.result.projectInfo.constructionProjectLeader
+              ? res.result.projectInfo.constructionProjectLeader
               : "";
-            this.person2 = res.result.serviceProjectLeader
-              ? res.result.serviceProjectLeader
+            this.person2 = res.result.projectInfo.serviceProjectLeader
+              ? res.result.projectInfo.serviceProjectLeader
               : "";
-            this.phone1 = res.result.constructionProjectLeaderPhone
-              ? res.result.constructionProjectLeaderPhone
+            this.phone1 = res.result.projectInfo.constructionProjectLeaderPhone
+              ? res.result.projectInfo.constructionProjectLeaderPhone
               : "";
-            this.phone2 = res.result.serviceProjectLeaderPhone
-              ? res.result.serviceProjectLeaderPhone
+            this.phone2 = res.result.projectInfo.serviceProjectLeaderPhone
+              ? res.result.projectInfo.serviceProjectLeaderPhone
               : "";
             // console.log(this.form)
             this.userdList = res.result.projectInfoUsages.map(item => {
@@ -943,6 +944,12 @@ export default {
         // this.submitFlag = false;
       } else {
         this.form = {};
+        this.person1='',
+        this.phone1='',
+        this.person2='',
+        this.phone2='',
+        this.userdListStr='',
+        this.userdList = []
         // this.submitFlag = true;
       }
     }

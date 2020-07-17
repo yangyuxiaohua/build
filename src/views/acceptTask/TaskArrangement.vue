@@ -1,11 +1,11 @@
 <template>
-  <div id="taskArrangementWrapper">
+  <div id="taskArrangementWrapper" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
     <div class="rightNav">
       <span :class="{c409eff:cindex==item.id}" @click="clickRightNav(item.id,item.text)" v-for="item in rightNav" :key="item.id" v-show="item.roleShow4">{{item.text}}</span>
 
     </div>
     <div class="taskArrangementContent">
-      <div class="acceptance" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
+      <div class="acceptance">
         <p class="acceptanceText lh48">验收内容</p>
         <el-divider></el-divider>
         <div class="acceptanceContainer">
@@ -100,10 +100,10 @@ export default {
   data() {
     return {
       rightNav: [
-        { id: 1, text: "资料审查", roleShow4: true },
-        { id: 2, text: "竣工查验", roleShow4: true },
-        { id: 3, text: "消防检测", roleShow4: true },
-        { id: 4, text: "现场评定", roleShow4: true }
+        // { id: 1, text: "资料审查", roleShow4: true },
+        // { id: 2, text: "竣工查验", roleShow4: true },
+        // { id: 3, text: "消防检测", roleShow4: true },
+        // { id: 4, text: "现场评定", roleShow4: true }
         // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:true }
       ],
       cindex: 1,
@@ -149,23 +149,21 @@ export default {
       radio: "", //使用记录
       useRecodeRadioList: [], //使用记录数据
       defaultOnNode: [], //人员默认展开
-      roleShowBtn:false, //
+      roleShowBtn: false //
     };
   },
   created() {
     // this.getStandard();
     // this.getTree1Data();
     // this.getTree2Data();
-      this.projectInfor = this.$store.state.projectInfor;
+    this.projectInfor = this.$store.state.projectInfor;
     this.factoryType = this.$store.state.userInfor.factoryType;
-    this.roleControl()
-    this.getPersonData();
-    this.getPersonData2();
+    this.roleControl();
+    this.init();
     this.getStandardNames();
     // console.log(this.$store.state);
   },
   mounted() {
-    this.init();
   },
   methods: {
     //权限控制
@@ -185,7 +183,7 @@ export default {
           }
         ];
       } else if (roleCode == 800 || roleCode == 850 || roleCode == 900) {
-          this.rightNav = [
+        this.rightNav = [
           {
             id: this.projectInfor.reviewStandardId,
             text: "资料审查",
@@ -195,10 +193,10 @@ export default {
             id: this.projectInfor.inspectStandardId,
             text: "消防检测",
             roleShow4: true
-          },
+          }
         ];
       } else if (roleCode == 600 || roleCode == 650 || roleCode == 700) {
-          this.rightNav = [
+        this.rightNav = [
           {
             id: this.projectInfor.reviewStandardId,
             text: "资料审查",
@@ -234,19 +232,26 @@ export default {
           }
         ];
       }
-      if(roleCode ==500||roleCode ==700 || roleCode==900){
-        this.roleShowBtn = false
-      }else{
-        this.roleShowBtn = true
+      if (roleCode == 500 || roleCode == 700 || roleCode == 900) {
+        this.roleShowBtn = false;
+      } else {
+        this.roleShowBtn = true;
       }
+      console.log(this.rightNav)
+      
+    // console.log(this.rightNav)
     },
     //初始化页面
     init() {
       // console.log(this.projectInfor)
-
       this.cindex = this.rightNav[0].id;
-
+      this.checkedList = []
+      this.checkedPersonList = []
+      this.checkedPersonList2 = []
+      this.checkList = []
       this.getTree1Data();
+        this.getPersonData();
+      this.getPersonData2();
       // console.log(this.projectInfor)
     },
     //点击筛选验收内容
@@ -255,9 +260,12 @@ export default {
       this.cText = text;
       this.loading = true;
       this.getTree1Data();
+        this.getPersonData();
+      this.getPersonData2();
     },
     //提交
     onSubmit() {
+      this.loading = true
       if (
         this.$store.state.userRole.roleCode == 300 ||
         this.$store.state.userRole.roleCode == 400 ||
@@ -292,12 +300,20 @@ export default {
       // let arr2 = this.$refs.acceptanceTree2.getCheckedKeys();
       let arr3 = this.$refs.personTree.getCheckedKeys();
       let arr4 = this.$refs.personTree2.getCheckedKeys();
-      obj.projectLeaders = arr4.map(item => {
+      obj.projectLeaders = arr4.filter(item => {
         if (item.indexOf("_") !== -1) {
           // obj.acceptancePartIds.push(item);
-          return { projectLeader: splitStr(item)[0] };
+          return item;
+          // console.log(item)
+          // return { projectLeader: splitStr(item)[1] };
         }
       });
+      obj.projectLeaders = obj.projectLeaders.map(item => {
+        return {
+          projectLeader: splitStr(item)[1]
+        };
+      });
+      console.log(obj.projectLeaders);
       //================================================
       // let level1NoChecked = [];
       // let level2NoChecked = [];
@@ -390,7 +406,7 @@ export default {
       //   }
       // }
 
-      console.log(arr4);
+      // console.log(arr4);
       arr3.forEach(item => {
         if (item.indexOf("_") == -1) {
           obj.acceptancePartIds.push(item);
@@ -444,9 +460,10 @@ export default {
           } else {
             this.$message({
               type: "warning",
-              message: "网络请求失败"
+              message: res.msg
             });
           }
+          this.loading = false
         })
         .catch(err => {
           this.$message({
@@ -573,7 +590,8 @@ export default {
         projectId: this.$store.state.projectInfor.projectId,
         factoryType: this.factoryType,
         onlyFactory: false,
-        queryUser: true
+        queryUser: true,
+        standardId: this.cindex
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -655,7 +673,8 @@ export default {
         factoryType: this.factoryType,
         onlyFactory: false,
         queryUser: true,
-        leader: 1
+        leader: 1,
+        standardId: this.cindex
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -737,7 +756,7 @@ export default {
     getStandardNames() {
       getChecklistStandards()
         .then(res => {
-          console.log(res);
+          // console.log(res);
           if (res.httpStatus == 200) {
             this.StandardNames = res.result.filter(item => {
               if (item) {
@@ -752,7 +771,7 @@ export default {
             this.checkList = this.StandardNames.map(item => {
               return item.name;
             });
-            console.log(this.StandardNames);
+            // console.log(this.StandardNames);
           }
         })
         .catch(err => {

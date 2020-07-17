@@ -147,10 +147,8 @@ export default {
     getProjectInforPosition() {
       getProjectsSites()
         .then(res => {
-          console.log(res);
           if (res.httpStatus == 200) {
             this.markersSave = res.result.map(item => {
-              console.log(item.status)
               let icon;
               if(item.status==1){
                   icon = require('../../assets/imgs/index/noPass.png')
@@ -229,7 +227,6 @@ export default {
         })
           .then(res => {
             if (res.httpStatus == 200) {
-              console.log(res);
               let usageName = res.result.projectInfoUsages.map(item=>{
                 return item.usageName 
               })

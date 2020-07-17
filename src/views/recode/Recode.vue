@@ -110,9 +110,7 @@ export default {
     };
   },
   created() {
-    this.projectValue = this.$store.state.projectInfor;
-    this.status = this.projectValue.status == 1 ? false : true;
-    this.pProjectName = this.$store.state.projectInfor.projectName;
+   
     this.getCategorysMethods();
     this.getProjectList();
     // console.log(this.$store.state.projectInfor)
@@ -167,9 +165,12 @@ export default {
               item.value = item.projectId;
               return item;
             });
-            if (!this.$store.state.projectInfor.standardId) {
+             this.projectValue = this.ProjectOptions[0];
+            this.status = this.projectValue.status == 1 ? false : true;
+            this.pProjectName = this.projectValue.projectName;
+            // if (!this.$store.state.projectInfor.standardId) {
               this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
-            }
+            // }
           }
         })
         .catch(err => {
@@ -358,7 +359,8 @@ export default {
     //获取一二级菜单的数据(消防检测和竣工查验)
     getFireRecode12() {
       getFiData12({
-        projectId: this.$store.state.projectInfor.projectId
+        projectId: this.$store.state.projectInfor.projectId,
+        standardId:this.cindex
       })
         .then(res => {
           // console.log(res);

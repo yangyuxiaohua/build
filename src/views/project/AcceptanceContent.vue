@@ -43,7 +43,7 @@
             </span>
             <span class="individualRefractory">
               <el-select v-model="item.individualRefractory" :disabled="roleDisabled">
-                <el-option v-for="j in individualRefractoryOptions" :key="j.dictionaryId" :label="j.name" :value="j.dictionaryId" >
+                <el-option v-for="j in individualRefractoryOptions" :key="j.dictionaryId" :label="j.name" :value="j.dictionaryId">
                 </el-option>
               </el-select>
             </span>
@@ -89,7 +89,7 @@
               </el-input>
             </span>
             <span class="handle" v-show="roleHandle">
-              <el-button type="primary" size="mini" @click="save('individualBuildList',item)" >保存</el-button>
+              <el-button type="primary" size="mini" @click="save('individualBuildList',item)">保存</el-button>
               <!-- <el-button type="danger" size="mini">修改</el-button> -->
               <el-button type="danger" size="mini" @click="deleteI('individualBuildList',item.acContentBuildId)" v-show="roleDeleteBtn">删除</el-button>
             </span>
@@ -409,31 +409,36 @@ export default {
       keepWarmShow: false,
       decorateShow: false,
       changeUseShow: false,
-      roleDisabled:true, //权限控制输入框
-      roleHandle:false,//权限控制操作
-      roleDeleteBtn:false,// 权限控制删除按钮
+      roleDisabled: true, //权限控制输入框
+      roleHandle: false, //权限控制操作
+      roleDeleteBtn: false // 权限控制删除按钮
     };
   },
   created() {
-    this.roleControl()
+    this.roleControl();
     this.getOptions();
     this.getFormInfor();
     this.getCheckMenus();
   },
   methods: {
-     roleControl() {
+    roleControl() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if(roleCode==300||roleCode==600||roleCode==650||roleCode==700){
-            this.roleDisabled = false
-            this.roleHandle = true
-      }else{
-            this.roleDisabled = true
-            this.roleHandle = false
+      if (
+        roleCode == 300 ||
+        roleCode == 600 ||
+        roleCode == 650 ||
+        roleCode == 700
+      ) {
+        this.roleDisabled = false;
+        this.roleHandle = true;
+      } else {
+        this.roleDisabled = true;
+        this.roleHandle = false;
       }
-       if(roleCode==700){
-           this.roleDeleteBtn = false
-      }else{
-           this.roleDeleteBtn = true
+      if (roleCode == 700) {
+        this.roleDeleteBtn = false;
+      } else {
+        this.roleDeleteBtn = true;
       }
     },
     //保存消防设施
@@ -509,7 +514,7 @@ export default {
         contentId: this.$store.state.projectInfor.acContentId
       })
         .then(res => {
-          console.log(res.result.ac1Builds);
+          // console.log(res.result.ac1Builds);
           if (res.httpStatus == 200) {
             if (res.result.ac1Builds <= 0) {
               this.individualBuildList = [{}];
@@ -634,7 +639,7 @@ export default {
                   type: "success",
                   message: "保存成功"
                 });
-                this.getFormInfor()
+                this.getFormInfor();
               }
             })
             .catch(err => {
@@ -692,7 +697,7 @@ export default {
                   type: "success",
                   message: "保存成功"
                 });
-                this.getFormInfor()
+                this.getFormInfor();
               }
             })
             .catch(err => {
@@ -741,7 +746,7 @@ export default {
                   type: "success",
                   message: "保存成功"
                 });
-                this.getFormInfor()
+                this.getFormInfor();
               }
             })
             .catch(err => {
@@ -789,8 +794,7 @@ export default {
                   type: "success",
                   message: "保存成功"
                 });
-                this.getFormInfor()
-                
+                this.getFormInfor();
               }
             })
             .catch(err => {
@@ -846,8 +850,7 @@ export default {
                 type: "warning",
                 message: err.msg
               });
-                this.getFormInfor()
-              
+              this.getFormInfor();
             });
         } else {
           updateAc5({
@@ -909,8 +912,7 @@ export default {
                   type: "success",
                   message: "保存成功"
                 });
-                this.getFormInfor()
-                
+                this.getFormInfor();
               }
             })
             .catch(err => {
@@ -929,122 +931,151 @@ export default {
       // }
     },
     deleteI(index, id) {
-      this.$confirm("确定删除, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "info"
-      })
-        .then(() => {
-          if (index == "individualBuildList") {
-            deletedAc1({ id })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.getFormInfor();
-                }
-              })
-              .catch(err => {
-                this.$message({
-                  type: "warning",
-                  message: err.msg
-                });
-              });
-          } else if (index == "tankList") {
-            deletedAc2({ id })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.getFormInfor();
-                }
-              })
-              .catch(err => {
-                this.$message({
-                  type: "warning",
-                  message: err.msg
-                });
-              });
-          } else if (index == "yardList") {
-            deletedAc3({ id })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.getFormInfor();
-                }
-              })
-              .catch(err => {
-                this.$message({
-                  type: "warning",
-                  message: err.msg
-                });
-              });
-          } else if (index == "keepWarmList") {
-            deletedAc4({ id })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.getFormInfor();
-                }
-              })
-              .catch(err => {
-                this.$message({
-                  type: "warning",
-                  message: err.msg
-                });
-              });
-          } else if (index == "decorateList") {
-            deletedAc5({ id })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.getFormInfor();
-                }
-              })
-              .catch(err => {
-                this.$message({
-                  type: "warning",
-                  message: err.msg
-                });
-              });
-          } else if (index == "changeUseList") {
-            deletedAc6({ id })
-              .then(res => {
-                if (res.httpStatus == 200) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.getFormInfor();
-                }
-              })
-              .catch(err => {
-                this.$message({
-                  type: "warning",
-                  message: err.msg
-                });
-              });
+      console.log(index, id);
+      if (!id) {
+        if (index == "individualBuildList") {
+          if (this.individualBuildList.length > 1) {
+            this.individualBuildList.pop();
           }
+        } else if (index == "tankList") {
+          if (this.tankList.length > 1) {
+            this.tankList.pop();
+          }
+        } else if (index == "yardList") {
+          if (this.yardList.length > 1) {
+            this.yardList.pop();
+          }
+        } else if (index == "keepWarmList") {
+          if (this.keepWarmList.length > 1) {
+            this.keepWarmList.pop();
+          }
+        } else if (index == "decorateList") {
+          if (this.decorateList.length > 1) {
+            this.decorateList.pop();
+          }
+        } else if (index == "changeUseList") {
+          if (this.changeUseList.length > 1) {
+            this.changeUseList.pop();
+          }
+        }
+      } else {
+        this.$confirm("确定删除, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "info"
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消操作"
+          .then(() => {
+            if (index == "individualBuildList") {
+              deletedAc1({ id })
+                .then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$message({
+                      type: "success",
+                      message: "删除成功"
+                    });
+                    this.getFormInfor();
+                  }
+                })
+                .catch(err => {
+                  this.$message({
+                    type: "warning",
+                    message: err.msg
+                  });
+                });
+            } else if (index == "tankList") {
+              deletedAc2({ id })
+                .then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$message({
+                      type: "success",
+                      message: "删除成功"
+                    });
+                    this.getFormInfor();
+                  }
+                })
+                .catch(err => {
+                  this.$message({
+                    type: "warning",
+                    message: err.msg
+                  });
+                });
+            } else if (index == "yardList") {
+              deletedAc3({ id })
+                .then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$message({
+                      type: "success",
+                      message: "删除成功"
+                    });
+                    this.getFormInfor();
+                  }
+                })
+                .catch(err => {
+                  this.$message({
+                    type: "warning",
+                    message: err.msg
+                  });
+                });
+            } else if (index == "keepWarmList") {
+              deletedAc4({ id })
+                .then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$message({
+                      type: "success",
+                      message: "删除成功"
+                    });
+                    this.getFormInfor();
+                  }
+                })
+                .catch(err => {
+                  this.$message({
+                    type: "warning",
+                    message: err.msg
+                  });
+                });
+            } else if (index == "decorateList") {
+              deletedAc5({ id })
+                .then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$message({
+                      type: "success",
+                      message: "删除成功"
+                    });
+                    this.getFormInfor();
+                  }
+                })
+                .catch(err => {
+                  this.$message({
+                    type: "warning",
+                    message: err.msg
+                  });
+                });
+            } else if (index == "changeUseList") {
+              deletedAc6({ id })
+                .then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$message({
+                      type: "success",
+                      message: "删除成功"
+                    });
+                    this.getFormInfor();
+                  }
+                })
+                .catch(err => {
+                  this.$message({
+                    type: "warning",
+                    message: err.msg
+                  });
+                });
+            }
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消操作"
+            });
           });
-        });
+      }
     },
     //获取页面下拉框选项
     getOptions() {
@@ -1257,7 +1288,7 @@ export default {
         text-align: center;
         display: flex;
         position: relative;
-        background-color: #F8F4F2;
+        background-color: #f8f4f2;
         .arrowIcons {
           position: absolute;
           left: -25px;
@@ -1277,7 +1308,7 @@ export default {
     }
     .individualText {
       width: 80px;
-      color: #8295C1;
+      color: #8295c1;
       .el-button {
         // height: 30px;
         // line-height: 5px;

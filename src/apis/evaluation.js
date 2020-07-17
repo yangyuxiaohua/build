@@ -9,7 +9,7 @@ export const updateRecode = params => rq.post('/record/curr/update', params)
 // Pc 获取上传验收文件地址信息
 export const getUploadsByChecklistId = params => rq.post('/getUploadsByChecklistId', params)
 
-//ip地址
+//ip地址getEvaluationRecode12
 // export const IP = "http://192.168.0.200:2225/image?url="
 export const IP = "http://39.104.90.111:2225/image?url="
 // /record/curr/getRecordsByProjectId2
