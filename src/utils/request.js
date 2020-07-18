@@ -19,8 +19,8 @@ import {
 
 // 设置默认请求的接口地址
 // axios.defaults.baseURL = 'http://192.168.0.200:2225'
-axios.defaults.baseURL = 'http://39.104.90.111:2225'
-// axios.defaults.baseURL = 'http://172.16.2.99:2225' 
+// axios.defaults.baseURL = 'http://39.104.90.111:2225'
+axios.defaults.baseURL = 'http://172.16.2.99:2225' 
 // axios.defaults.baseURL = 'http://192.168.0.19:2221'
 // axios.defaults.baseURL = 'http://192.168.0.19:3221'
 axios.defaults.timeout = 6000

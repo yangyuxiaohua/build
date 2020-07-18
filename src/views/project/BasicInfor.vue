@@ -808,9 +808,9 @@ export default {
               return item.dictionaryId;
             });
             let arr = res.result.projectInfoUsages.map(item => {
-              return item.usageName;
+              return item.usagesTips;
             });
-            this.userdListStr = arr.join(",");
+            this.userdListStr = arr.join(" , ");
           }
         })
         .catch(err => {

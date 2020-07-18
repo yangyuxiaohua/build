@@ -41,4 +41,4 @@ export const updateChecklist = params => rq.post('/standard/checklist/updateChec
 export const deletedChecklist = params => rq.post('/standard/checklist/deletedChecklist', params)
 
 // (新)获取标准名称
-export const getChecklistStandards = params => rq.post('/standard/getChecklistStandards', params)
+export const getChecklistStandards = params => rq.post('/record/personnel/getChecklistStandards', params)

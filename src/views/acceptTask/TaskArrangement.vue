@@ -32,8 +32,8 @@
           </el-form> -->
           <div class="chickListWrapper">
             <el-checkbox-group v-model="checkList">
-              <el-row v-for="(item,index) in this.StandardNames" :key='index'>
-                <el-checkbox :label="item.name">{{item.name}}</el-checkbox>
+              <el-row v-for="(item,index) in StandardNames" :key='index'>
+                <el-checkbox :label="item.value">{{item.name}}</el-checkbox>
               </el-row>
 
             </el-checkbox-group>
@@ -124,7 +124,7 @@ export default {
       acceptanceTree2Name: "",
       expandOnClickNode: false, //只有点击三角展开
       checkOnClickNode: false, //点击节点选中
-      checkStrictly: true, //父子之间不关联
+      checkStrictly: false, //父子之间不关联
       form: {
         standard: "现行标准" //标准
       },
@@ -141,7 +141,7 @@ export default {
       checkedPersonList: [], // 默认选中人员
       checkedPersonList2: [], //默认选中项目负责人
       departments: [],
-      StandardNames: [],
+      StandardNames: [], //所有使用标准
       checkList: [], //筛选标准
       projectInfor: {}, //项目信息
       factoryType: 1, //单位类型
@@ -160,11 +160,9 @@ export default {
     this.factoryType = this.$store.state.userInfor.factoryType;
     this.roleControl();
     this.init();
-    this.getStandardNames();
     // console.log(this.$store.state);
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     //权限控制
     roleControl() {
@@ -237,21 +235,22 @@ export default {
       } else {
         this.roleShowBtn = true;
       }
-      console.log(this.rightNav)
-      
-    // console.log(this.rightNav)
+      console.log(this.rightNav);
+
+      // console.log(this.rightNav)
     },
     //初始化页面
     init() {
       // console.log(this.projectInfor)
       this.cindex = this.rightNav[0].id;
-      this.checkedList = []
-      this.checkedPersonList = []
-      this.checkedPersonList2 = []
-      this.checkList = []
+      this.checkedList = [];
+      this.checkedPersonList = [];
+      this.checkedPersonList2 = [];
       this.getTree1Data();
-        this.getPersonData();
+      this.getPersonData();
       this.getPersonData2();
+      this.getStandardNames();
+
       // console.log(this.projectInfor)
     },
     //点击筛选验收内容
@@ -260,12 +259,13 @@ export default {
       this.cText = text;
       this.loading = true;
       this.getTree1Data();
-        this.getPersonData();
+      this.getPersonData();
       this.getPersonData2();
+      this.getStandardNames();
     },
     //提交
     onSubmit() {
-      this.loading = true
+      this.loading = true;
       if (
         this.$store.state.userRole.roleCode == 300 ||
         this.$store.state.userRole.roleCode == 400 ||
@@ -277,6 +277,7 @@ export default {
       }
     },
     SubmitTask(copyType = null) {
+      // console.log(this.checkList)
       let obj = {
         copyType,
         primaryChecklistIds: [],
@@ -285,7 +286,7 @@ export default {
         standardId: this.cindex,
         placements: [],
         projectId: this.$store.state.projectInfor.projectId,
-        standardNames: [],
+        standardNames: [], //标准名字
         projectLeaders: [
           // {
           //   "factoryId": "string",
@@ -294,7 +295,8 @@ export default {
           //   "projectId": "string",
           //   "projectLeader": "string"
           // }
-        ]
+        ],
+        checklistStandardIds: [] // 标准id
       };
       let arr1 = this.$refs.acceptanceTree1.getCheckedKeys();
       // let arr2 = this.$refs.acceptanceTree2.getCheckedKeys();
@@ -313,7 +315,7 @@ export default {
           projectLeader: splitStr(item)[1]
         };
       });
-      console.log(obj.projectLeaders);
+      // console.log(obj.projectLeaders);
       //================================================
       // let level1NoChecked = [];
       // let level2NoChecked = [];
@@ -443,12 +445,24 @@ export default {
           partId: splitStr(item)[0]
         };
       });
-      obj.standardNames = this.checkList;
-      console.log(obj);
+      obj.checklistStandardIds = this.checkList;
       // obj.primaryChecklistIds = obj.primaryChecklistIds.concat(level1NoChecked);
       // obj.secondaryChecklistIds = obj.secondaryChecklistIds.concat(
       //   level2NoChecked
       // );
+      // console.log(this.StandardNames)
+      // console.log(this.checkList)
+      this.checkList.forEach(item => {
+        this.StandardNames.forEach(i => {
+          //  console.log(i)
+          if (i.value == item) {
+            obj.standardNames.push(i.name);
+          }
+        });
+      });
+      console.log(obj);
+
+      // standardChecklistId
 
       submitData(obj)
         .then(res => {
@@ -463,7 +477,7 @@ export default {
               message: res.msg
             });
           }
-          this.loading = false
+          this.loading = false;
         })
         .catch(err => {
           this.$message({
@@ -472,6 +486,7 @@ export default {
           });
         });
     },
+
     //获取适用标准
     // getStandard() {
     //   getStandards()
@@ -754,10 +769,13 @@ export default {
     changeStandard() {},
     //获取标准名称
     getStandardNames() {
-      getChecklistStandards()
+      getChecklistStandards({
+        projectId: this.$store.state.projectInfor.projectId,
+        standardId: this.cindex
+      })
         .then(res => {
-          // console.log(res);
           if (res.httpStatus == 200) {
+            this.checkList = [];
             this.StandardNames = res.result.filter(item => {
               if (item) {
                 return item;
@@ -765,13 +783,17 @@ export default {
             });
             this.StandardNames = this.StandardNames.map(item => {
               return {
-                name: item.standardName
+                name: item.standardName,
+                value: item.standardChecklistId,
+                selected: item.selected
               };
             });
-            this.checkList = this.StandardNames.map(item => {
-              return item.name;
+
+            this.StandardNames.forEach(item => {
+              if (item.selected) {
+                this.checkList.push(item.value);
+              }
             });
-            // console.log(this.StandardNames);
           }
         })
         .catch(err => {
@@ -841,6 +863,7 @@ export default {
   },
   watch: {
     changeProject: function() {
+      this.loading = true;
       this.init();
     }
   }

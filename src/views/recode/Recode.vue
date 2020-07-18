@@ -156,7 +156,7 @@ export default {
     },
     // 获取项目列表
     getProjectList(name = "") {
-      getProjects({ name })
+      getProjects({ name,distribution:1  })
         .then(res => {
           if (res.httpStatus == 200) {
             // this.projectList = res.result;
@@ -233,7 +233,8 @@ export default {
     //改变开关状态
     changeStatus() {
       toArchive({
-        projectId: this.$store.state.projectInfor.projectId
+        projectId: this.$store.state.projectInfor.projectId,
+        standardId:this.cindex
         // status: this.status
       })
         .then(res => {

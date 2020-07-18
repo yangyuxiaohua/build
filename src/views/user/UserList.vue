@@ -649,11 +649,11 @@ export default {
       this.getUserLsit(1);
     },
     getFactorytype: function(val1, val2) {
+      console.log(val1)
       if(val1==10||val1==1){
         this.isService = true
       }else{
         this.isService = false
-        
       }
       // this.userList = []
       // this.userTotal = 0

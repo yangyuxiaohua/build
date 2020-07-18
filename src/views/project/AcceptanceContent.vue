@@ -1171,7 +1171,7 @@ export default {
         .then(res => {
           if (res.httpStatus == 200) {
             res.result.forEach(item => {
-              if (item.categoryCode == 99) {
+              if (item.categoryCode == 101) {
                 this.standardId = item.standard.standardId;
               }
             });
