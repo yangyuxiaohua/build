@@ -258,6 +258,9 @@ export default {
       this.cindex = id;
       this.cText = text;
       this.loading = true;
+      this.checkedList = [];
+      this.checkedPersonList = [];
+      this.checkedPersonList2 = [];
       this.getTree1Data();
       this.getPersonData();
       this.getPersonData2();
@@ -265,7 +268,6 @@ export default {
     },
     //提交
     onSubmit() {
-      this.loading = true;
       if (
         this.$store.state.userRole.roleCode == 300 ||
         this.$store.state.userRole.roleCode == 400 ||
@@ -273,10 +275,13 @@ export default {
       ) {
         this.usedRecode();
       } else {
+        this.loading = true;
         this.SubmitTask();
       }
     },
     SubmitTask(copyType = null) {
+      this.loading = true;
+
       // console.log(this.checkList)
       let obj = {
         copyType,
@@ -460,7 +465,7 @@ export default {
           }
         });
       });
-      console.log(obj);
+      // console.log(obj);
 
       // standardChecklistId
 
@@ -471,6 +476,8 @@ export default {
               type: "success",
               message: "提交成功"
             });
+            let bool = this.$store.state.addProjectSuccessed == "1" ? "2" : "1";
+            this.$store.commit("addProjectSuccess", bool);
           } else {
             this.$message({
               type: "warning",
@@ -480,10 +487,12 @@ export default {
           this.loading = false;
         })
         .catch(err => {
+          console.log(err);
           this.$message({
             type: "warning",
-            message: err.msg
+            message: err
           });
+          this.loading = false;
         });
     },
 
@@ -693,7 +702,7 @@ export default {
       })
         .then(res => {
           if (res.httpStatus == 200) {
-            console.log(res);
+            // console.log(res);
             this.acceptancePersonData2 = res.result.map(item => {
               // return {
               //   id: item.factoryId,

@@ -156,11 +156,10 @@ export default {
     // width: 320px;
     flex: 0 0 320px;
     // height: 100%;
-    height: 1120px;
     padding: 0 10px 0 15px;
     border-right: 1px solid #f4f4f4;
     box-shadow: 3px 0px 0px #f2f2f2;
-    overflow-y: auto;
+   
     // box-sizing: border-box;
     .tit {
       width: 100%;
@@ -191,7 +190,10 @@ export default {
       margin: 10px 0;
     }
     .projectList {
+      // border: 1px solid red;
       margin-top: 15px;
+       height: 740px;
+    overflow-y: auto;
       p {
         text-indent: 20px;
         line-height: 30px;

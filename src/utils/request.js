@@ -23,7 +23,7 @@ import {
 axios.defaults.baseURL = 'http://172.16.2.99:2225' 
 // axios.defaults.baseURL = 'http://192.168.0.19:2221'
 // axios.defaults.baseURL = 'http://192.168.0.19:3221'
-axios.defaults.timeout = 6000
+// axios.defaults.timeout = 6000 //请求超时
 
 // axios.defaults.withCredentials=true  //请求跨域的时候是否需要凭证
 // 请求拦截器

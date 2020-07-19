@@ -131,14 +131,14 @@ export default {
     }
   },
   computed: {
-    // addProjectSuccess() {
-    //   return this.$store.state.addProjectSuccessed;
-    // }
+    addProjectSuccess() {
+      return this.$store.state.addProjectSuccessed;
+    }
   },
   watch: {
-    // addProjectSuccess: function changeaddProjectStatus(val1,val2) {
-    //   this.getProjectList();
-    // }
+    addProjectSuccess: function changeaddProjectStatus(val1,val2) {
+      this.getProjectList();
+    }
   }
 };
 </script>
