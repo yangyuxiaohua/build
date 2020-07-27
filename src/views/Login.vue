@@ -145,10 +145,11 @@ export default {
     },
     // 注册
     register(){
-      this.$message({
-        type:'info',
-        message:'请扫描页面二维码，下载手机app注册'
-      })
+      // this.$message({
+      //   type:'info',
+      //   message:'请扫描页面二维码，下载手机app注册'
+      // })
+      this.$router.history.push('/register')
     }
   }
 };

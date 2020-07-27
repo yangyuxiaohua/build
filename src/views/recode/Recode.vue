@@ -156,7 +156,7 @@ export default {
     },
     // 获取项目列表
     getProjectList(name = "") {
-      getProjects({ name,distribution:1  })
+      getProjects({ name,distribution:2  })
         .then(res => {
           if (res.httpStatus == 200) {
             // this.projectList = res.result;
@@ -165,11 +165,20 @@ export default {
               item.value = item.projectId;
               return item;
             });
-             this.projectValue = this.ProjectOptions[0];
+            if(this.ProjectOptions.length>0){
+               this.projectValue = this.ProjectOptions[0];
             this.status = this.projectValue.status == 1 ? false : true;
             this.pProjectName = this.projectValue.projectName;
             // if (!this.$store.state.projectInfor.standardId) {
               this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
+            }else{
+               this.projectValue = {};
+            this.status = false;
+            this.pProjectName ='';
+            // if (!this.$store.state.projectInfor.standardId) {
+              this.$store.commit("chosedProjectId", {});
+            }
+            
             // }
           }
         })
@@ -467,7 +476,7 @@ export default {
         detectionValue: this.detectionValue, //检测结论
         evaluationValue: this.evaluationValue //评定结论
       };
-      console.log(obj);
+      // console.log(obj);
       this.$store.commit("saveScreeningRecordObj", obj);
     },
     //清空选项

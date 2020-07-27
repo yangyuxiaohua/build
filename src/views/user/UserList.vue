@@ -182,10 +182,6 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <!-- <el-row>
-                  <el-col :span='12'></el-col>
-                  <el-col :span='12'></el-col>
-                </el-row> -->
                 <el-row>
                   <el-col :span='12'>
                     <el-form-item label="用户姓名" :label-width="formLabelWidth">
@@ -199,7 +195,7 @@
                   </el-col>
                 </el-row>
 
-                <el-row>
+                <el-row class="prompBox">
                   <el-col :span='12'>
                     <el-form-item label="所属组织" :label-width="formLabelWidth">
                       <!-- <el-input v-model="userForm.partId" autocomplete="off"></el-input> -->
@@ -214,7 +210,9 @@
                         <el-option label="验收人员" value="10" v-show="RoleShow"></el-option>
                       </el-select>
                     </el-form-item>
+                      <i class="el-icon-question promptIcon" @click="showPromptText1 = !showPromptText1"></i>
                   </el-col>
+                   <span class="promptText" v-show="showPromptText1">列表中没有显示的，需告知对方注册新用户</span>
                 </el-row>
                 <el-row>
                   <el-col :span='12'>
@@ -329,7 +327,7 @@ import {
   updateUserAndParts,
   getFactoryByPartsId
 } from "@/apis/userUnit.js";
-import { getTime } from "@/utils/publictool";
+import { getTime,changNull } from "@/utils/publictool";
 import { uploadIp, ImgIp } from "@/apis/upload.js";
 
 export default {
@@ -364,6 +362,7 @@ export default {
       imgList: [],
       loading: false,
       isService:false, //是否是服务机构
+      showPromptText1:false
     };
   },
   created() {
@@ -550,6 +549,7 @@ export default {
 
               return item;
             });
+            changNull(this.options)
           }
         })
         .catch(err => {
@@ -746,6 +746,19 @@ export default {
     //   align-items: center;
     //   border: 1px dotted red;
     // }
+  }
+  .prompBox{
+    position: relative;
+    .promptIcon{
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    .promptText{
+      position: absolute;
+      bottom: 0;
+      left: 100px;
+    }
   }
 }
 </style>

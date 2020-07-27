@@ -12,10 +12,10 @@
         <i class="el-icon-search el-input__icon" slot="suffix" @click="handleIconClick"></i>
       </el-input>
       <div class="projectList">
-        <p>已分配：</p>
+        <div class="c409eff">已分配：</div>
         <p v-for="(item) in projectList" :key="item.projectId" @click="clickProject(item)" :class="{chosedProjectClass:chosedProjectIdNum==item.projectId}">{{item.projectName}}</p>
         <el-divider></el-divider>
-        <p>未分配：</p>
+        <div class="c409eff">未分配：</div>
         <p v-for="(item,index) in projectList2" :key="index" @click="clickProject(item)" :class="{chosedProjectClass:chosedProjectIdNum==item.projectId}">{{item.projectName}}</p>
       </div>
 
@@ -219,5 +219,9 @@ export default {
     //   padding: 20px 10px 0 15px;
     // }
   }
+  .c409eff {
+      // background-color: #409eff;
+      color: #409eff;
+    }
 }
 </style>

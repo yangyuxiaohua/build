@@ -60,8 +60,9 @@
             <el-input v-model="form.detailedAddress"></el-input>
           </el-form-item> -->
           <el-form-item label="申请验收日期">
-            <el-date-picker v-model="form.time" type="date" placeholder="选择日期" value-format="timestamp" class="w80P" :disabled='roleDisabled'>
-            </el-date-picker>
+            <!-- <el-date-picker v-model="form.time" type="date" placeholder="选择日期" value-format="timestamp" class="w80P" :disabled='roleDisabled'>
+            </el-date-picker> -->
+             <el-input v-model="form.time" disabled class="w80P"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -382,6 +383,7 @@ import {
   // getAcceptanceFactorys
 } from "@/apis/project.js";
 import { getFactoryMenus } from "@/apis/userUnit.js";
+import { getlTime,changNull } from "@/utils/publictool.js";
 
 export default {
   components: {
@@ -450,6 +452,7 @@ export default {
     };
   },
   mounted() {
+    console.log(this.$store.state)
     this.roleControl();
     this.getRegionsData();
     this.getEngineeringInfor();
@@ -457,7 +460,9 @@ export default {
     this.getUsedInfor();
     this.getAcceptanceFactorysOptions();
     // this.getConstructionFactoryOptions();
-    this.getProjectInformation();
+    if(this.$store.state.projectInfor.projectId){
+      this.getProjectInformation();
+    }
     this.chosedcity();
   },
   updated() {
@@ -777,7 +782,7 @@ export default {
               detailedAddress: res.result.project.detailedAddress, //详细地址
               money: res.result.project.money, // 投资额
               constructionArea: res.result.project.constructionArea, //总建筑面积
-              time: res.result.project.time, //申请验收日期
+              time: getlTime(res.result.project.time), //申请验收日期
               constructionPartId: res.result.project.authConstructionIds[0], //建设单位
               servicePartId: res.result.project.authServiceIds[0], //技术服务机构
               acceptancePartId: res.result.project.authAcceptanceIds[0], //验收单位
@@ -830,10 +835,12 @@ export default {
         queryUser: false
       })
         .then(res => {
+          // console.log('验收',res)
           if (res.httpStatus == 200) {
             this.AcceptanceFactorysOptions = res.result.map(item => {
               return item;
             });
+          changNull(this.AcceptanceFactorysOptions)
           }
         })
         .catch(err => {
@@ -850,10 +857,12 @@ export default {
         queryUser: false
       })
         .then(res => {
+          // console.log('建设',res)
           if (res.httpStatus == 200) {
             this.constructionOptions = res.result.map(item => {
               return item;
             });
+            changNull(this.constructionOptions)
           }
         })
         .catch(err => {
@@ -870,10 +879,13 @@ export default {
         queryUser: false
       })
         .then(res => {
+          // console.log('服务',res)
           if (res.httpStatus == 200) {
             this.serviceOptions = res.result.map(item => {
               return item;
             });
+            changNull(this.serviceOptions)
+            // console.log(this.serviceOptions)
           }
         })
         .catch(err => {
@@ -883,6 +895,17 @@ export default {
             message: err
           });
         });
+    },
+    //递归数组最后一级为空则变为null
+    changNull(arr){
+       arr.forEach(item=>{
+        if(item.departments.length>0){
+          this.changNull(item.departments)
+        }else{
+          item.departments=null
+        }
+      })
+      // console.log(arr)
     },
     //打开地图
     openMask() {

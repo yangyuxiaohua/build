@@ -135,7 +135,7 @@ import {
   updatedPart
 } from "@/apis/userUnit.js";
 import { uploadIp, ImgIp } from "@/apis/upload.js";
-import { splitStr2 } from "@/utils/publictool";
+import { splitStr2,changNull } from "@/utils/publictool";
 
 export default {
   data() {
@@ -362,8 +362,9 @@ export default {
               // item.partsName = item.factoryName;
               return item;
             });
-            console.log(this.options);
-            this.options.unshift({ partsName: "无", authPartsIds: "000" });
+            // console.log(this.options);
+            this.options.unshift({ partsName: "无", authPartsIds: "000" ,departments:[]});
+            changNull(this.options)
           }
         })
         .catch(err => {

@@ -3,7 +3,7 @@
     <baidu-map class="bm-view" ak="SNUcFOLFpX4Ra1HxR9OEHdSEdkzyDxll" :center="center" :zoom="zoom" @ready="map_handler" :scroll-wheel-zoom="true" :mapClick="false">
 
       <div v-for="marker in markers" :key="marker.projectId">
-        <bm-marker :position="{lng: marker.lng, lat: marker.lat}" @click="markerClick($event,marker)" :icon="{url: marker.icon, size: {width: 48, height: 48}}">
+        <bm-marker :position="{lng: marker.lng, lat: marker.lat}" @click="markerClick($event,marker)" :icon="{url: marker.icon, size: {width: 32, height: 32}}">
         </bm-marker>
         <!-- <bm-label :content="marker.content" :offset="{width:-55,height:-65}" :position="{lng: marker.lng, lat: marker.lat}" :labelStyle="{border:'1px solid #6ea4cd', padding:'8px',fontWeight: '600',fontSize:'14px',cursor: 'pointer'}" :title="marker.content" @click="markerClick(marker)" /> -->
       </div>
@@ -25,8 +25,8 @@
             <p>工程地址 ：
               <span>{{projectForm.regionName}}</span>
             </p>
-            <p>总建筑物面积 ：
-              <span>{{projectForm.constructionArea}}</span>
+            <p>工程类别 ：
+              <span>{{projectForm.typeName}}</span>
             </p>
             <p>申请日期 ：
               <span>{{projectForm.time}}</span>
@@ -34,37 +34,39 @@
             <p>建设单位 ：
               <span>{{projectForm.factoryName}}</span>
             </p>
-            <p>建设单位项目负责人 ：
-              <span>{{projectForm.constructionProjectLeader}}</span>
+            <p>项目负责 ：
+              <span>{{projectForm.constructionProjectLeader}}(
+                <span>{{projectForm.constructionProjectLeaderPhone}}</span>)</span>
             </p>
-            <p>建设单位项目负责人电话 ：
+            <!-- <p>建设单位项目负责人电话 ：
               <span>{{projectForm.constructionProjectLeaderPhone}}</span>
-            </p>
+            </p> -->
             <p>服务机构 ：
               <span>{{projectForm.serviceFactoryName}}</span>
             </p>
-            <p>服务机构项目负责人 ：
-              <span>{{projectForm.serviceProjectLeader}}</span>
+            <p>项目负责 ：
+              <span>{{projectForm.serviceProjectLeader}}(
+                <span>{{projectForm.serviceProjectLeaderPhone}}</span>)</span>
             </p>
-            <p>服务机构项目负责人电话 ：
-              <span>{{projectForm.serviceProjectLeaderPhone}}</span>
-            </p>
+            <!-- <p>服务机构项目负责人电话 ：
+             
+            </p> -->
             <p>验收单位 ：
               <span>{{projectForm.acceptanceFactoryName}}</span>
             </p>
-            <p>消防验收申请受理凭证文号 ：
+            <p>总建筑物面积 ：
+              <span>{{projectForm.constructionArea}}</span>
+            </p>
+            <p>验收申请文号 ：
               <span>{{projectForm.certificateNumber}}</span>
             </p>
-            <p>消防设计审查意见书文号 ：
+            <p>设计审查文号 ：
               <span>{{projectForm.reviewCertificateNumber}}</span>
-            </p>
-            <p>工程类别 ：
-              <span>{{projectForm.typeName}}</span>
             </p>
             <p>特殊建设工程情形 ：
               <span>{{projectForm.usageName}}</span>
             </p>
-            
+
           </div>
           <div class="ProjectAcceptanceInfoWrapper" v-show="ProjectAcceptanceInfo">
             <!-- titleName: item.titleName,
@@ -144,19 +146,28 @@ export default {
       this.zoom = 13;
     },
     //获取项目位置及信息
-    getProjectInforPosition() {
-      getProjectsSites()
+    getProjectInforPosition(startTime='',endTime='',projectId='',regionId='') {
+      getProjectsSites({
+        startTime,
+        endTime,
+        projectId,
+        regionId
+      })
         .then(res => {
+          console.log(res)
           if (res.httpStatus == 200) {
             this.markersSave = res.result.map(item => {
+              // console.log(item)
               let icon;
-              if(item.status==1){
-                  icon = require('../../assets/imgs/index/noPass.png')
-                
-                }else if(item.status==120){
-                  icon = require('../../assets/imgs/index/pass.png')
-              }else{
-                icon = require('../../assets/imgs/index/waitStart.png')
+              if (item.status == 130) {
+                icon = require("../../assets/imgs/index/noPass.png");
+                // icon = 130;
+              } else if (item.status == 120) {
+                icon = require("../../assets/imgs/index/pass.png");
+                // icon = 120;
+              } else {
+                icon = require("../../assets/imgs/index/waitStart.png");
+                // icon = 1;
               }
               return {
                 lng: item.lon,
@@ -164,9 +175,10 @@ export default {
                 content: item.projectName,
                 projectId: item.projectId,
                 regionId: item.regionId,
-                icon,
+                icon
               };
             });
+            // console.log( this.markersSave)
           }
           this.markers = Object.assign(this.markersSave);
         })
@@ -227,34 +239,39 @@ export default {
         })
           .then(res => {
             if (res.httpStatus == 200) {
-              let usageName = res.result.projectInfoUsages.map(item=>{
-                return item.usageName 
-              })
-              usageName = usageName.join(',')
+              let usageName = res.result.projectInfoUsages.map(item => {
+                return item.usageName;
+              });
+              usageName = usageName.join(",");
               if (res.result.projectInfo) {
                 this.projectForm = {
                   projectName: res.result.project.projectName,
-                  regionName:res.result.projectInfo.regionName+ res.result.project.detailedAddress,
-                  constructionArea:res.result.project.constructionArea+'m²',
+                  regionName:
+                    res.result.projectInfo.regionName +
+                    res.result.project.detailedAddress,
+                  constructionArea: res.result.project.constructionArea + "m²",
                   time: getlTime(res.result.projectInfo.time),
                   factoryName: res.result.projectInfo.factoryName,
-                  constructionProjectLeader: res.result.projectInfo.constructionProjectLeader,
-                  constructionProjectLeaderPhone: res.result.projectInfo.constructionProjectLeaderPhone,
-                  
+                  constructionProjectLeader:
+                    res.result.projectInfo.constructionProjectLeader,
+                  constructionProjectLeaderPhone:
+                    res.result.projectInfo.constructionProjectLeaderPhone,
+
                   serviceFactoryName: res.result.projectInfo.serviceFactoryName,
-                  serviceProjectLeader: res.result.projectInfo.serviceProjectLeader,
-                  serviceProjectLeaderPhone: res.result.projectInfo.serviceProjectLeaderPhone,
-                  
-                  acceptanceFactoryName: res.result.projectInfo.acceptanceFactoryName,
-                  
+                  serviceProjectLeader:
+                    res.result.projectInfo.serviceProjectLeader,
+                  serviceProjectLeaderPhone:
+                    res.result.projectInfo.serviceProjectLeaderPhone,
+
+                  acceptanceFactoryName:
+                    res.result.projectInfo.acceptanceFactoryName,
+
                   certificateNumber: res.result.project.certificateNumber,
-                  
-                  reviewCertificateNumber: res.result.project.reviewCertificateNumber,
+
+                  reviewCertificateNumber:
+                    res.result.project.reviewCertificateNumber,
                   typeName: res.result.projectInfo.typeName,
-                  usageName,
-                  
-                 
-                  
+                  usageName
                 };
               } else {
                 this.projectForm = {};
@@ -301,35 +318,13 @@ export default {
   },
   watch: {
     filterMarkers: function(val1, val2) {
-      // console.log(typeof val1);
-      if (val1) {
-        if (inDexOfStr(val1, "项目")) {
-          let projectId = splitStr(val1)[0];
-          this.markers = this.markersSave.filter(item => {
-            if (item.projectId == projectId) {
-              return item;
-            }
-          });
-
-          console.log(this.markers)
-        } else {
-          this.markers = this.markersSave.filter(item => {
-            if (item.regionId == val1) {
-              return item;
-            }
-            // console.log(item)
-          });
-          // console.log(this.markers);
-          // this.center.lng = this.markers[0].lng
-          // this.center.lat = this.markers[0].lat
-        }
-            this.center = {
-              lng:this.markers[0].lng,
-              lat:this.markers[0].lat
-            }
-      } else {
-        this.markers = Object.assign(this.markersSave);
+      // console.log(val1.time[1]);
+      if(val1.time.length>0){
+        this.getProjectInforPosition(val1.time[0],val1.time[1],val1.projectSearch,val1.rangeValue)
+      }else{
+         this.getProjectInforPosition('','',val1.projectSearch,val1.rangeValue)
       }
+      
     }
   }
 };

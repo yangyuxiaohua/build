@@ -95,6 +95,15 @@ export function getYMTime(time) {
     str = `${month}月`
     return str
 }
+export function getYNumTime(time) {
+    let str = ''
+    let date = new Date(time)
+    // let year = date.getFullYear()
+    let month = date.getMonth() + 1
+    // let day = date.getDate()
+    str = `${month}`
+    return str
+}
 //将富文内容变为普通文本
 export function changeEdit(str) {
     if(!str){
@@ -107,3 +116,13 @@ export function changeEdit(str) {
             str=str.replace(/ /ig,'');//去掉 
             return str
 }
+//递归数组最后一级为空则变为null
+export function changNull(arr){
+    arr.forEach(item=>{
+     if(item.departments.length>0){
+       changNull(item.departments)
+     }else{
+       item.departments=null
+     }
+   })
+ }

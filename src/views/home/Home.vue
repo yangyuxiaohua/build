@@ -35,7 +35,7 @@
             <span class="searchTit">选择建设工程</span>
           </el-col>
           <el-col :span="4">
-            <el-select v-model="rangeValue" placeholder="昆明市" :loading="loading" clearable @focus="getRangeOptions">
+            <el-select v-model="rangeValue" placeholder="昆明市" :loading="loading" clearable @focus="getRangeOptions" @change='changeRange()'>
               <el-option v-for="item in rangeOptions" :key="item.value" :label="item.name" :value="item.id">
               </el-option>
             </el-select>
@@ -46,13 +46,13 @@
             <el-option v-for="item in projectOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select> -->
-            <el-select v-model="projectSearch" filterable remote reserve-keyword placeholder="全部需验收的工程" :remote-method="remoteMethod" :loading="loading" class='w100' clearable>
+            <el-select v-model="projectSearch" filterable remote reserve-keyword placeholder="全部需验收的工程" :remote-method="remoteMethod" :loading="loading" class='w100' clearable @focus='getProjectsOptions()'>
               <el-option v-for="item in projectOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-col>
           <el-col :span="8">
-            <el-date-picker v-model="dataValue" type="monthrange" range-separator="至" start-placeholder="开始月份" end-placeholder="结束月份" value-format="timestamp" class="w100">
+            <el-date-picker v-model="dataValue" type="monthrange" range-separator="至" start-placeholder="开始月份" end-placeholder="结束月份" value-format="timestamp" class="w100" @change='chosedDataValue'>
             </el-date-picker>
           </el-col>
           <el-col :span="2">
@@ -109,7 +109,7 @@
         <div class="constructionContentLeftTop">
           <div class="constructionSearch">
             <span class="tit">验收办理提示：</span>
-            <el-select v-model="projectSearch" placeholder="全部需验收的工程" :loading="loading" clearable>
+            <el-select v-model="projectSearch" placeholder="全部需验收的工程" :loading="loading" clearable @focus='getProjectsOptions()'>
               <el-option v-for="item in projectOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
@@ -246,7 +246,7 @@ import {
   getPcProjectsStatisticalDto,
   get6ConstructionProcess
 } from "@/apis/home";
-import { getYMTime, getTime } from "@/utils/publictool";
+import { getYMTime, getTime, getYNumTime } from "@/utils/publictool";
 import { defaults } from "lodash-es";
 
 export default {
@@ -262,7 +262,7 @@ export default {
       text2: "", //表二显示的百分比
       projectSearch: "", //项目名称
       projectOptions: [],
-      dataValue: "",
+      dataValue:[],
       loading: false,
       rangeValue: "", //辖区范围
       rangeOptions: [],
@@ -299,14 +299,16 @@ export default {
       stepChangeColor3: false,
       stepChangeColor4: false,
       stepChangeColor5: false,
-      stepChangeColor6: false
+      stepChangeColor6: false,
+      //时间选择器
+      dataFlag: true
     };
   },
   created() {},
   mounted() {
     this.getData();
     this.getRoleShow();
-    this.getProjectsOptions();
+    // this.getProjectsOptions();
     // console.log(this.$store.state)
     this.$store.commit("changeCindex", 0);
   },
@@ -382,7 +384,11 @@ export default {
       } else {
         this.getFourData();
         this.getCharts();
-        this.$store.commit("filterMarkers", "");
+        this.$store.commit("filterMarkers", {
+           projectSearch: this.projectSearch,
+          rangeValue: this.rangeValue.toString(),
+          time: this.dataValue
+        });
       }
     },
     // 模糊查询
@@ -478,14 +484,18 @@ export default {
 
               this.chart2.clear();
               this.chart2.setOption(this.getPercentPassEchrtsOption(op2));
-
+              console.log(timeCompletionProbabilityDto.timeCompletionDtos);
               let op3 = timeCompletionProbabilityDto.timeCompletionDtos.sort(
                 function(a, b) {
                   return a.startTime - b.startTime;
                 }
               );
               // 搜索的时间回填
-              this.dataValue = [op3[0].startTime, op3[5].startTime];
+              this.dataValue = [
+                op3[0].startTime,
+                op3[op3.length - 1].startTime
+              ];
+
               let dateArr = op3.map(item => {
                 return getYMTime(item.startTime);
               });
@@ -728,12 +738,12 @@ export default {
     },
     //获取项目列表
     getProjectsOptions(name = "") {
-      getProjects({ name })
+      getProjects({ name, regionId: this.rangeValue })
         .then(res => {
-          if (res.result.length > 0) {
-            this.$store.commit("chosedProjectId", res.result[0]);
-          }
-          // console.log(res)
+          // if (res.result.length > 0) {
+          //   this.$store.commit("chosedProjectId", res.result[0]);
+          // }
+          console.log(res);
           if (res.httpStatus == 200) {
             this.projectOptions = res.result.map(item => {
               return {
@@ -766,24 +776,83 @@ export default {
           });
         });
     },
-    onSearch() {
-      // console.log(this.rangeValue)
-      if (this.projectSearch) {
-        this.$store.commit("filterMarkers", this.projectSearch + "_项目");
-      } else {
-        if (this.rangeValue) {
-          // let region
-          this.$store.commit("filterMarkers", this.rangeValue.toString());
-        } else {
-          this.$store.commit("filterMarkers", "");
+  //选中区域清空项目
+    changeRange(){
+      this.projectSearch = ''
+    },
+    // 时间选择器
+    chosedDataValue() {
+      //  console.log(this.dataValue)
+      this.dataFlag = true;
+      if (this.dataValue) {
+        let date = new Date().getTime();
+        this.dataValue.forEach(item => {
+          console.log(getTime(item));
+          if (item > date) {
+            this.dataFlag = false;
+            this.$message({
+              type: "info",
+              message: "请选择有效时间"
+            });
+          }
+        });
+        if (!this.dataFlag) return;
+        // console.log(getYNumTime(this.dataValue[1]) - getYNumTime(this.dataValue[0]))
+        if (
+          getYNumTime(this.dataValue[1]) - getYNumTime(this.dataValue[0]) >=
+          6
+        ) {
+          this.$message({
+            type: "info",
+            message: "选择时间间隔不能大于6个月，请重新选择"
+          });
+          this.dataFlag = false;
         }
       }
-      this.getData(
-        this.projectSearch,
-        this.rangeValue,
-        this.dataValue[0],
-        this.dataValue[1]
-      );
+    },
+    // 条件搜索
+    onSearch() {
+      // console.log(this.rangeValue)
+      // if(data)
+      if (this.dataFlag) {
+        // if(this.dataValue)1
+        // if (this.projectSearch) {
+        //   this.$store.commit("filterMarkers", this.projectSearch + "_项目");
+        // } else {
+        //   if (this.rangeValue) {
+        //     // let region
+        //     this.$store.commit("filterMarkers", this.rangeValue.toString());
+        //   } else {
+        //     this.$store.commit("filterMarkers", "");
+        //   }
+        // }
+        if (!this.dataValue) {
+          this.dataValue = [];
+        }
+        this.$store.commit("filterMarkers", {
+          projectSearch: this.projectSearch,
+          rangeValue: this.rangeValue.toString(),
+          time: this.dataValue
+        });
+
+        this.getData(
+          this.projectSearch,
+          this.rangeValue,
+          this.dataValue[0],
+          this.dataValue[1]
+        );
+        this.getFourData(
+          this.projectSearch,
+          this.rangeValue,
+          this.dataValue[0],
+          this.dataValue[1]
+        );
+      } else {
+        this.$message({
+          type: "info",
+          message: "请选择有效时间"
+        });
+      }
     },
     //点击步骤条
     clickStep(num) {
@@ -902,10 +971,19 @@ export default {
       // this.getUserLsit(val);
     },
     //获取4项
-    getFourData() {
-      getPcProjectsStatisticalDto()
+    getFourData(
+      projectId = "",
+      regionId = "",
+      startTime = null,
+      endTime = null
+    ) {
+      getPcProjectsStatisticalDto({
+        projectId,
+        regionId,
+        startTime,
+        endTime
+      })
         .then(res => {
-          console.log(res);
           if (res.httpStatus == 200) {
             this.num1 = res.result.result.totalNums;
             this.num2 = res.result.result.passNums;

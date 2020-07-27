@@ -57,8 +57,8 @@ export default new Vuex.Store({
     changeConfiFlag(state,s){ // 改变操作状态
       state.confiflag = s
     },
-    filterMarkers(state,s){
-      state.filterMarkersData = s
+    filterMarkers(state,obj){
+      state.filterMarkersData = obj
     },
     changeCindex(state,i){ //首页跳转变化菜单索引
          state.cindex = i

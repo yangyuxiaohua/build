@@ -326,8 +326,9 @@
         </div>
         <div class="individualBuildContainer fireFightingDeviceContainer">
           <el-checkbox-group v-model="fireFightingDevice">
-            <el-checkbox :label="item.standardPrimaryTitleId" v-for="item in fireFightingDeviceList" :key="item.standardPrimaryTitleId" :disabled="roleDisabled">{{item.titleName}}</el-checkbox>
+            <el-checkbox :label="item.standardPrimaryTitleId" v-for="item in fireFightingDeviceList" :key="item.standardPrimaryTitleId">{{item.titleName}}</el-checkbox>
           </el-checkbox-group>
+          <div class="fireFightingDeviceContainerMask" v-show="roleDisabled"></div>
         </div>
 
       </div>
@@ -1353,8 +1354,17 @@ export default {
     }
     .fireFightingDevice {
       line-height: 30px;
+      position: relative;
       .fireFightingDeviceContainer {
         padding: 10px 10px;
+      }
+      .fireFightingDeviceContainerMask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
       }
     }
     .handle {
@@ -1385,5 +1395,6 @@ export default {
   .el-input {
     // line-height: 40px;
   }
+  
 }
 </style>

@@ -32,3 +32,6 @@ export const getCurrCopyStatus = params => rq.post('/record/personnel/getCurrCop
 // 根据验收方式获取最新适用的标准内容
 // export const getDocumentByProjectId1 = params => rq.post('/record/curr/getDocumentByProjectId', params)
 
+
+// (新)获取标准名称
+export const getChecklistStandards2 = params => rq.post('/record/personnel/getChecklistStandardsRules', params,'json')

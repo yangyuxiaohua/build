@@ -10,7 +10,7 @@
         <el-divider></el-divider>
         <div class="acceptanceContainer">
           <div class="acceptanceTree1">
-            <el-tree :data="acceptanceData1" show-checkbox node-key="id" highlight-current :props="defaultProps" :default-checked-keys='checkedList' ref='acceptanceTree1'>
+            <el-tree :data="acceptanceData1" show-checkbox node-key="id" highlight-current :props="defaultProps" :default-checked-keys='checkedList' ref='acceptanceTree1' @check='getCheckList()'>
               <span class="custom-tree-node" slot-scope="{node,data}">
                 <span class="nodeText">{{node.label }}</span>
               </span>
@@ -91,7 +91,8 @@ import {
   getCurrStandardDocument,
   // getAcceptanceFactoryPartsMenuDto,
   submitData,
-  getCurrCopyStatus
+  getCurrCopyStatus,
+  getChecklistStandards2
 } from "@/apis/acceptMethods.js";
 import { getFactoryMenus } from "@/apis/userUnit.js";
 import { getChecklistStandards } from "@/apis/standard";
@@ -773,7 +774,7 @@ export default {
       }
       judgeChildren(data);
     },
-
+     
     //切换标准
     changeStandard() {},
     //获取标准名称
@@ -811,6 +812,48 @@ export default {
             message: "请求数据失败"
           });
         });
+    },
+    // 筛选标准
+    screeningStandards(names,standardId){
+      getChecklistStandards2({
+        names,
+        standardId
+      }).then(res=>{
+         if (res.httpStatus == 200) {
+            this.checkList = res.result;
+            }
+      }).catch(err=>{
+        this.$message({
+          type:'info',
+          message:err+'823'
+        })
+      })
+
+    },
+    //点击复选框
+    getCheckList(){
+      let arr1 = this.$refs.acceptanceTree1.getCheckedNodes();
+      arr1 = arr1.filter(item=>{
+        if(splitStr(item.id)[0]==='menuLevel1'){
+          return item 
+        }
+      })
+      arr1 = arr1.map(item=>{
+        return item.label
+      })
+      let arr2 = this.$refs.acceptanceTree1.getHalfCheckedNodes();
+      arr2 = arr2.filter(item=>{
+        if(splitStr(item.id)[0]==='menuLevel1'){
+          return item 
+        }
+      })
+      arr2 = arr2.map(item=>{
+        return item.label
+      })
+      let arr = arr1.concat(arr2)
+     
+     this.screeningStandards(arr,this.cindex)
+     
     },
     // 使用记录
     usedRecode() {
