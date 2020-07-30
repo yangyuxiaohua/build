@@ -79,7 +79,7 @@
             <div> 适用标准 : {{form.checklistDtos.standardName}}</div>
           </el-col>
         </el-row>
-        <el-row class="ti30">
+        <el-row class="ti30 lh30" >
           <el-col :span="16">
             <div>验收内容 : {{form.checklistDtos.checklistContent}}</div>
           </el-col>
@@ -123,7 +123,7 @@
                 <span>{{form.completChecklistDtos.createTime}}</span>
               </el-col>
             </el-row>
-            <el-row class="nopadding">
+            <el-row class="nopadding lh30">
               <el-col :span="6" class="w80">
                 <span>查验人员：</span>
               </el-col>
@@ -131,7 +131,7 @@
                 <span>{{form.completChecklistDtos.usernames}}</span>
               </el-col>
             </el-row>
-            <el-row class="nopadding">
+            <el-row class="nopadding lh30">
               <el-col :span="6" class="w80">
                 <span>查验结论：</span>
               </el-col>
@@ -160,7 +160,7 @@
             </el-row>
             <el-row class="nopadding">
               <el-col :span="6" class="w80">
-                <span>查验记录：</span>
+                <span>检测记录：</span>
               </el-col>
               <el-col :span="18">
                 <el-input type="textarea" v-model="form.inspectChecklistDtos.contentRecord" placeholder="" readonly></el-input>
@@ -168,23 +168,23 @@
             </el-row>
             <el-row class="nopadding">
               <el-col :span="6" class="w80">
-                <span>查验时间：</span>
+                <span>检测时间：</span>
               </el-col>
               <el-col :span="18">
                 <span>{{form.inspectChecklistDtos.createTime}}</span>
               </el-col>
             </el-row>
-            <el-row class="nopadding">
+            <el-row class="nopadding lh30">
               <el-col :span="6" class="w80">
-                <span>查验人员：</span>
+                <span>检测人员：</span>
               </el-col>
               <el-col :span="18">
                 <span>{{form.inspectChecklistDtos.usernames}}</span>
               </el-col>
             </el-row>
-            <el-row class="nopadding">
+            <el-row class="nopadding lh30">
               <el-col :span="6" class="w80">
-                <span>查验结论：</span>
+                <span>检测结论：</span>
               </el-col>
               <el-col :span="18">
                 <span>{{form.inspectChecklistDtos.result}}</span>
@@ -211,7 +211,7 @@
             </el-row>
             <el-row class="nopadding">
               <el-col :span="6" class="w80">
-                <span>查验记录：</span>
+                <span>评定记录：</span>
               </el-col>
               <el-col :span="18">
                 <el-input type="textarea" v-model="form.curr2ChecklistDtos.contentRecord" placeholder="" :readonly='readonly'></el-input>
@@ -219,32 +219,54 @@
             </el-row>
             <el-row class="nopadding">
               <el-col :span="6" class="w80">
-                <span>查验时间：</span>
+                <span>评定时间：</span>
               </el-col>
               <el-col :span="18">
                 <span>{{form.curr2ChecklistDtos.createTime}}</span>
               </el-col>
             </el-row>
-            <el-row class="nopadding">
+            <el-row class="nopadding lh30">
               <el-col :span="6" class="w80">
-                <span>查验人员：</span>
+                <span>评定人员：</span>
               </el-col>
               <el-col :span="18">
                 <span>{{form.curr2ChecklistDtos.usernames}}</span>
               </el-col>
             </el-row>
-            <el-row class="nopadding">
+            <el-row class="nopadding lh30">
               <el-col :span="6" class="w80">
-                <span>查验结论：</span>
+                <span>评定结论：</span>
               </el-col>
               <el-col :span="18">
-                <span>{{form.curr2ChecklistDtos.result}}</span>
+                <!-- <span>{{form.curr2ChecklistDtos.result}}</span> -->
+                 <el-radio-group v-model="form.curr2ChecklistDtos.result" :disabled='readonly'>
+                <el-radio label="合格"></el-radio>
+                <el-radio label="不合格"></el-radio>
+              </el-radio-group>
               </el-col>
             </el-row>
           </el-col>
 
         </el-row>
+        <el-row  class="ti30">
+          <el-col :span="12" v-show="!readonly">
+            <!-- bill -->
+            <div>
+              修改原由 :
+              <el-input type="textarea" placeholder="请填写修改验收记录的原因" class="textarea" v-model="form.curr2ChecklistDtos.bill" :readonly='readonly'>
+              </el-input>
+            </div>
 
+          </el-col>
+          <el-col :span="12">
+            <div>
+              修改记录 :
+              <el-input type="textarea" placeholder="" class="textarea" v-model="updateRecodeBill" readonly>
+              </el-input>
+            </div>
+          </el-col>
+
+        </el-row>
         <el-row>
           <el-col :span="24" class="btns">
             <el-button type='primary' @click="save()" v-show="showSaveBtn">保存</el-button>
@@ -282,6 +304,9 @@
         </div>
       </div>
     </div>
+    <div class="exportRecode" v-loading="loading">
+      <el-button type="primary" @click="downloadEvaiuationRecode()">导出</el-button>
+    </div>
   </div>
 </template>
 
@@ -292,9 +317,11 @@ import {
   getUploadsByChecklistId,
   IP,
   getRecordsByProjectIdGroup1,
-  getRecordsByProjectIdGroup2
+  getRecordsByProjectIdGroup2,
+  getRecordsBill,
+  downloadEvaiuation
 } from "@/apis/evaluation";
-import { getTime, changeEdit,splitStr} from "@/utils/publictool";
+import { getTime, changeEdit,splitStr,exportMethod} from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -319,7 +346,7 @@ export default {
     return {
       list: [],
       showMask: false,
-      readonly: "readonly",
+      readonly: true,
       form: {
         completChecklistDtos: {}, //竣工查验
         inspectChecklistDtos: {}, //消防检测
@@ -352,17 +379,20 @@ export default {
       resultOptions: [
         { label: "合格", value: "1" },
         { label: "不合格", value: "5" }
-      ]
+      ],
+      updateRecodeBill: "", //修改记录
+      loading:false
     };
   },
   created() {
     this.unitCurrentChange(this.unitCurrentPage);
     this.roleShow();
+    // console.log(this.$store.state.recodeStandard)
   },
   mounted() {},
   methods: {
     //角色控制
-   roleShow() {
+    roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
       if (roleCode == 400 || roleCode == 450 || roleCode == 300) {
         this.roleShow4 = true;
@@ -387,7 +417,7 @@ export default {
         result:this.result
       })
         .then(res => {
-          // console.log(res);
+          console.log(res);
           this.unitTotal = res.result.countRows;
           this.list = res.result.result.map(i => {
             let children = [];
@@ -443,14 +473,16 @@ export default {
           // console.log(this.list);
         })
         .catch(err => {
-          this.$message({
-            type: "warning",
-            message: err
-          });
+          // this.$message({
+          //   type: "warning",
+          //   message: err
+          // });
         });
     },
     handleModify(flag, item) {
-      console.log(1111111)
+      // console.log(1111111)
+      // curr2ChecklistDtos.id
+      this.getRecordsBills(item.curr2ChecklistDtos.id);
       // console.log(item);
       if (flag == 1) {
         this.readonly = true;
@@ -487,13 +519,40 @@ export default {
       // console.log(this.form);
       this.showMask = true;
     },
+     //根据recodeId获取验收记录修改日志
+    getRecordsBills(recordId) {
+      getRecordsBill({ recordId })
+        .then(res => {
+          // console.log(res)
+          if (res.httpStatus == 200) {
+            let str = "";
+            res.result.forEach((item, index) => {
+              console.log(item);
+              let s = `(${index + 1}) ${getTime(item.createTime)} ${
+                item.createUserName
+              } ${item.question}。`;
+              str += s;
+            });
+            this.updateRecodeBill = str;
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: err
+          });
+        });
+    },
     save() {
       if(this.form.curr2ChecklistDtos){
-          updateRecode({
+        if(this.form.curr2ChecklistDtos.bill){
+           updateRecode({
         id: this.form.curr2ChecklistDtos.id,
         contentRecord: this.form.curr2ChecklistDtos.contentRecord,
         checkNum: this.form.curr2ChecklistDtos.checkNum,
-        checkPart: this.form.curr2ChecklistDtos.checkPart
+        checkPart: this.form.curr2ChecklistDtos.checkPart,
+        bill:this.form.curr2ChecklistDtos.bill,
+        result:this.form.curr2ChecklistDtos.result=='合格'?1:5
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -515,6 +574,13 @@ export default {
             message: err.msg
           });
         });
+        }else{
+          this.$message({
+            type:'info',
+            message:'请填写修改原由'
+          })
+        }
+         
       }else{
         this.$message({
           type:'info',
@@ -548,7 +614,8 @@ export default {
       getUploadsByChecklistId({
         checklistId: item.checklistId,
         projectId: item.projectId,
-        type: i
+        type: i,
+        standardId:this.$store.state.recodeStandard.standardId
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -581,6 +648,52 @@ export default {
         //  this.videoSrc = url
         this.$refs.video.src = url;
       }
+    },
+    // 导出
+     downloadEvaiuationRecode(){
+              this.loading = true
+      // console.log(this.$store.state.ScreeningRecordObj)
+      // console.log(this.$store.state.projectInfor.standardId)
+      let primaryTitleId='',secondaryTitleId='';
+      if(this.$store.state.ScreeningRecordObj.ascaderValue){
+         if(splitStr(this.$store.state.ScreeningRecordObj.ascaderValue)[0]=='menuLevel1'){
+            primaryTitleId=splitStr(this.$store.state.ScreeningRecordObj.ascaderValue)[1];
+            secondaryTitleId=''
+        }else{
+            primaryTitleId='';
+            secondaryTitleId=this.$store.state.ScreeningRecordObj.ascaderValue
+        }
+      }else{
+        primaryTitleId='';
+        secondaryTitleId=''
+      }
+      let importantValue= this.$store.state.ScreeningRecordObj.importantValue?this.$store.state.ScreeningRecordObj.importantValue:''
+      let inspectionValue= this.$store.state.ScreeningRecordObj.inspectionValue?this.$store.state.ScreeningRecordObj.inspectionValue:''
+      let detectionValue= this.$store.state.ScreeningRecordObj.detectionValue?this.$store.state.ScreeningRecordObj.detectionValue:''
+      let evaluationValue= this.$store.state.ScreeningRecordObj.evaluationValue?this.$store.state.ScreeningRecordObj.evaluationValue:'';
+      // console.log(this.$store.state.ScreeningRecordObj.importantValue)
+       exportMethod({
+        projectId:this.$store.state.projectInfor.projectId,
+        projectName:this.$store.state.projectInfor.projectName,
+        standardId:this.$store.state.projectInfor.standardId,
+        checkTypeName:importantValue,
+        copyCompleteRecordResult:inspectionValue,
+        copyInspectRecordResult:detectionValue,
+        result:evaluationValue,
+        primaryTitleId,
+        secondaryTitleId,
+      })
+      .then(res=>{
+            if(res){
+              this.loading = false
+            }
+      }).catch(err=>{
+              this.loading = false
+        this.$message({
+          type:'info',
+          message:'导出失败'
+        })
+      })
     }
   },
   computed: {
@@ -696,7 +809,7 @@ export default {
   }
   .way {
     // width: 200px;
-    flex: 0 0 200px;
+    flex: 0 0 500px;
   }
   .parts {
     // width: 200px;
@@ -704,7 +817,7 @@ export default {
   }
   .num {
     // width: 60px;
-    flex: 0 0 60px;
+    flex: 0 0 200px;
   }
   .situation {
     // width: 350px;
@@ -756,6 +869,7 @@ export default {
     justify-content: center;
     // background-color: #f4f4f4;
     // opacity: 0.8;
+    background-color: rgba(0, 0, 0, 0.8);
     .maskInfor {
       width: 80%;
       min-width: 850px;
@@ -766,7 +880,7 @@ export default {
       border: 1px solid #000;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.04);
       & > p {
-        line-height: 60px;
+        line-height: 30px;
         text-indent: 30px;
         color: #409eff;
       }
@@ -793,9 +907,12 @@ export default {
         }
         .btns {
           text-align: center;
-          margin-top: 10px;
+          margin-top: 20px;
         }
       }
+      .lh30{
+    line-height: 30px;
+  }
     }
   }
   .attachment {
@@ -874,7 +991,7 @@ export default {
   }
   .rLine {
     border-right: 1px solid #ccc;
-    height: 400px;
+    height: 350px;
   }
   .ti30 {
     text-indent: 30px;
@@ -884,6 +1001,19 @@ export default {
   }
   .w80 {
     width: 80px;
+  }
+  .el-radio-group {
+    text-indent: 0;
+    .el-radio {
+      margin-right: 0;
+      margin-left: 10px;
+    }
+  }
+  .exportRecode{
+    position: absolute;
+    right:10px;
+    top: -55px; 
+    z-index: 100
   }
 }
 </style>

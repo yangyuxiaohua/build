@@ -15,3 +15,5 @@ export const getCurrentRole = params => req.post('/getCurrentRole', params)
 // 获取登录用户详情
 export const getLoginAccountInfo = params => req.post('/getLoginAccountInfo', params)
 
+// 2.单位注册
+export const register = params => req.post('/register', params)

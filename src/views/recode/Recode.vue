@@ -73,8 +73,8 @@ export default {
       chosedPro: {},
       result: "", //下拉框的筛选
       resultOptions: [
-        { label: "合格", value: "1" },
-        { label: "不合格", value: "5" }
+        { label: "合格项", value: "1" },
+        { label: "不合格项", value: "5" }
       ],
       importantOption: [
         { label: "A", value: "A" },
@@ -110,7 +110,6 @@ export default {
     };
   },
   created() {
-   
     this.getCategorysMethods();
     this.getProjectList();
     // console.log(this.$store.state.projectInfor)
@@ -151,12 +150,14 @@ export default {
       } else {
         this.isDataReview = true;
       }
+      // console.log(this.navList[0])
+      this.$store.commit("saveRecodeStandard", this.navList[0]);
       this.$router.history.push(this.navList[0].path);
       this.constroShow(this.standardName);
     },
     // 获取项目列表
     getProjectList(name = "") {
-      getProjects({ name,distribution:2  })
+      getProjects({ name, distribution: 2 })
         .then(res => {
           if (res.httpStatus == 200) {
             // this.projectList = res.result;
@@ -165,20 +166,20 @@ export default {
               item.value = item.projectId;
               return item;
             });
-            if(this.ProjectOptions.length>0){
-               this.projectValue = this.ProjectOptions[0];
-            this.status = this.projectValue.status == 1 ? false : true;
-            this.pProjectName = this.projectValue.projectName;
-            // if (!this.$store.state.projectInfor.standardId) {
+            if (this.ProjectOptions.length > 0) {
+              this.projectValue = this.ProjectOptions[0];
+              this.status = this.projectValue.status == 1 ? false : true;
+              this.pProjectName = this.projectValue.projectName;
+              // if (!this.$store.state.projectInfor.standardId) {
               this.$store.commit("chosedProjectId", this.ProjectOptions[0]);
-            }else{
-               this.projectValue = {};
-            this.status = false;
-            this.pProjectName ='';
-            // if (!this.$store.state.projectInfor.standardId) {
+            } else {
+              this.projectValue = {};
+              this.status = false;
+              this.pProjectName = "";
+              // if (!this.$store.state.projectInfor.standardId) {
               this.$store.commit("chosedProjectId", {});
             }
-            
+
             // }
           }
         })
@@ -241,46 +242,62 @@ export default {
     },
     //改变开关状态
     changeStatus() {
-      toArchive({
-        projectId: this.$store.state.projectInfor.projectId,
-        standardId:this.cindex
-        // status: this.status
+      // console.log(this.projectValue.status)
+      let confirmText = this.projectValue.status == 1 ? "验收记录存档后, 验收任务自动终止！" : '取消归档后, 验收任务将重新启用！';
+      this.$confirm(confirmText, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
       })
-        .then(res => {
-          if (res.httpStatus == 200) {
-            if (res.result.result == 1) {
-              this.$message({
-                type: "success",
-                message: "档案归档成功"
-              });
-            } else {
+        .then(() => {
+          toArchive({
+            projectId: this.$store.state.projectInfor.projectId,
+            standardId: this.cindex
+            // status: this.status
+          })
+            .then(res => {
+              if (res.httpStatus == 200) {
+                if (res.result.result == 1) {
+                  this.$message({
+                    type: "success",
+                    message: "档案归档成功"
+                  });
+                } else {
+                  this.$message({
+                    type: "info",
+                    message: "档案已取消归档"
+                  });
+                }
+
+                getProjectInfor({
+                  projectId: this.$store.state.projectInfor.projectId
+                }).then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$store.commit("chosedProjectId", res.result.project);
+                  }
+                });
+                this.getProjectList();
+              } else {
+                this.status = this.projectValue.status == 1 ? false : true;
+                this.$message({
+                  type: "warning",
+                  message: res.msg
+                });
+              }
+            })
+            .catch(err => {
+              this.status = this.projectValue.status == 1 ? false : true;
               this.$message({
                 type: "info",
-                message: "档案已取消归档"
+                message: err
               });
-            }
-
-            getProjectInfor({
-              projectId: this.$store.state.projectInfor.projectId
-            }).then(res => {
-              if (res.httpStatus == 200) {
-                this.$store.commit("chosedProjectId", res.result.project);
-              }
             });
-            this.getProjectList();
-          } else {
-            this.status = this.projectValue.status == 1 ? false : true;
-            this.$message({
-              type: "warning",
-              message: res.msg
-            });
-          }
         })
-        .catch(err => {
-          this.status = this.projectValue.status == 1 ? false : true;
+        .catch(() => {
+              this.status = this.projectValue.status == 1 ? false : true;
           this.$message({
             type: "info",
-            message: err
+            message: "已取消操作"
           });
         });
     },
@@ -370,7 +387,7 @@ export default {
     getFireRecode12() {
       getFiData12({
         projectId: this.$store.state.projectInfor.projectId,
-        standardId:this.cindex
+        standardId: this.cindex
       })
         .then(res => {
           // console.log(res);
@@ -399,14 +416,13 @@ export default {
         this.standardName == "竣工查验" ||
         this.standardName == "消防检测"
       ) {
-        // this.isDataReview = true;
         if (
           this.$store.state.userRole.roleCode == 400 ||
           this.$store.state.userRole.roleCode == 450
         ) {
           this.isDataReview = false;
-        }else{
-          this.isDataReview = true
+        } else {
+          this.isDataReview = true;
         }
       } else {
         this.isDataReview = true;
@@ -546,7 +562,7 @@ export default {
     width: 200px;
     height: 50px;
     position: absolute;
-    right: 0;
+    right: 60px;
     top: 10px;
     display: flex;
     flex-direction: row;

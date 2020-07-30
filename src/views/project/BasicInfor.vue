@@ -104,7 +104,7 @@
               <el-option v-for="j in serviceOptions" :key="j.factoryId" :label="j.factoryName" :value="j.factoryId">
               </el-option>
             </el-select> -->
-            <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" class="w80P" filterable :filter-method='filterservice' ref='filterserviceTree' :disabled='roleDisabled'></el-cascader>
+            <el-cascader :options="serviceOptions" :props="props" clearable v-model="form.servicePartId" class="w80P" filterable ref='filterserviceTree' :disabled='roleDisabled'></el-cascader>
             <i class="el-icon-question promptIcon" @click="showPromptText1 = !showPromptText1"></i>
           </el-form-item>
         </el-col>
@@ -493,7 +493,7 @@ export default {
           regionId: this.form.regionId,
           detailedAddress: this.form.detailedAddress,
           money: this.form.money,
-          time: this.form.time,
+          // time: this.form.time,
           constructionPartId: this.form.constructionPartId,
           servicePartId: this.form.servicePartId,
           acceptancePartId: this.form.acceptancePartId,
@@ -511,7 +511,7 @@ export default {
                 type: "success",
                 message: "提交成功"
               });
-              // console.log(res)
+              console.log(res)
               this.$store.commit("saveContentId", res.result.contentId);
               this.$store.commit("chosedProjectId", {
                 projectId: res.result.result.projectId,
@@ -541,7 +541,7 @@ export default {
           regionId: this.form.regionId,
           detailedAddress: this.form.detailedAddress,
           money: this.form.money,
-          time: this.form.time,
+          // time: this.form.time,
           constructionPartId: this.form.constructionPartId,
           servicePartId: this.form.servicePartId,
           acceptancePartId: this.form.acceptancePartId,
@@ -782,7 +782,7 @@ export default {
               detailedAddress: res.result.project.detailedAddress, //详细地址
               money: res.result.project.money, // 投资额
               constructionArea: res.result.project.constructionArea, //总建筑面积
-              time: getlTime(res.result.project.time), //申请验收日期
+              time: getlTime(res.result.project.createTime), //申请验收日期
               constructionPartId: res.result.project.authConstructionIds[0], //建设单位
               servicePartId: res.result.project.authServiceIds[0], //技术服务机构
               acceptancePartId: res.result.project.authAcceptanceIds[0], //验收单位
@@ -938,26 +938,26 @@ export default {
       this.show2 = this.show2 == false ? true : false;
     },
     //过滤服务机构
-    filterservice(node, keyword) {
-      return getFactoryMenus({
-        factoryType: "10",
-        onlyFactory: true,
-        rootName: keyword
-      })
-        .then(res => {
-          if (res.httpStatus == 200) {
-            this.serviceOptions = res.result.map(item => {
-              return item;
-            });
-          }
-        })
-        .catch(err => {
-          this.$message({
-            type: "info",
-            message: "网络请求失败"
-          });
-        });
-    }
+    // filterservice(node, keyword) {
+    //   return getFactoryMenus({
+    //     factoryType: "10",
+    //     onlyFactory: true,
+    //     rootName: keyword
+    //   })
+    //     .then(res => {
+    //       if (res.httpStatus == 200) {
+    //         this.serviceOptions = res.result.map(item => {
+    //           return item;
+    //         });
+    //       }
+    //     })
+    //     .catch(err => {
+    //       this.$message({
+    //         type: "info",
+    //         message: "网络请求失败"
+    //       });
+    //     });
+    // }
   },
   watch: {
     projectInfo: function changeProjectInfor(val1, val2) {

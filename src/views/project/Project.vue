@@ -71,13 +71,11 @@ export default {
       this.cindex = 1;
     } else if (inDexOfStr(this.$route.path, "acceptanceContent")) {
       this.cindex = 2;
-    } else if (inDexOfStr(this.$route.path, "taskArrangement")) {
-      this.cindex = 3;
     }
     this.getProjectList();
-    if (this.$store.state.projectInfor.projectId) {
-      this.chosedProjectIdNum = this.$store.state.projectInfor.projectId;
-    }
+    // if (this.$store.state.projectInfor.projectId) {
+    //   this.chosedProjectIdNum = this.$store.state.projectInfor.projectId;
+    // }
   },
   methods: {
     //角色控制
@@ -108,6 +106,12 @@ export default {
         .then(res => {
           if (res.httpStatus == 200) {
             this.projectList = res.result;
+            if(this.projectList.length>0 && !this.$store.state.projectInfor.projectId){
+              this.$store.commit('chosedProjectId',this.projectList[0])
+              this.chosedProjectIdNum = this.$store.state.projectInfor.projectId;
+            }else if(this.$store.state.projectInfor.projectId){
+              this.chosedProjectIdNum = this.$store.state.projectInfor.projectId;
+            }
           }
         })
         .catch(err => {

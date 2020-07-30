@@ -72,17 +72,17 @@
           <el-col :span="12">
             <div>验收内容 : {{form.way}}</div>
           </el-col>
-          <el-col :span="6">
-            <!-- <div> 重要程度 : {{form.importance}}</div> -->
-          </el-col>
-          <el-col :span="6">
+          <!-- <el-col :span="6">
+            <div> 重要程度 : {{form.importance}}</div>
+          </el-col> -->
+          <el-col :span="12">
             <div> 适用标准 : {{form.standardName}}</div>
           </el-col>
         </el-row>
         <el-row class="bottomLine">
           <el-col :span="12">
             <div> 验收人员 : {{form.username}}</div>
-            
+
             <!-- <div>检查部位 :
               <el-input :readonly='readonly' v-model="form.parts"></el-input>
             </div> -->
@@ -103,8 +103,8 @@
           </el-col>
 
         </el-row> -->
-        <el-row>
-          <el-col :span="18">
+        <el-row class="bottomLine">
+          <el-col :span="12">
             <div>验收记录 :
               <el-input type="textarea" placeholder="请输入内容" class="textarea" :readonly='readonly' v-model="form.contentRecord">
               </el-input>
@@ -122,13 +122,32 @@
             </div>
             <!-- </el-form-item> -->
           </el-col>
-          <el-col :span="6">
-            <div>子项评定 : {{form.conclusion}}</div>
+          <el-col :span="12">
+            <div> 子项评定 :
+              <el-radio-group v-model="form.conclusion" :disabled='readonly'>
+                <el-radio label="合格"></el-radio>
+                <el-radio label="不合格"></el-radio>
+              </el-radio-group>
+            </div>
           </el-col>
 
         </el-row>
         <el-row>
+          <el-col :span="12" v-show="!readonly">
+            <!-- bill -->
+            <div>
+              修改原由 :
+              <el-input type="textarea" placeholder="请填写修改验收记录的原因" class="textarea" v-model="form.bill" :readonly='readonly'>
+              </el-input>
+            </div>
+
+          </el-col>
           <el-col :span="12">
+            <div>
+              修改记录 :
+              <el-input type="textarea" placeholder="" class="textarea" v-model="updateRecodeBill" readonly>
+              </el-input>
+            </div>
           </el-col>
 
         </el-row>
@@ -175,14 +194,22 @@
 <script>
 import {
   getRecordsByProjectId2,
-  updateRecode,
+  updateRecode
   // getUploadsByChecklistId,
   // IP,
   // getRecordsByProjectIdGroup1,
   // getRecordsByProjectIdGroup2
 } from "@/apis/dataReview";
-import { getTime ,changeEdit,splitStr} from "@/utils/publictool";
-
+import { getTime, changeEdit, splitStr } from "@/utils/publictool";
+import {
+  getRecordsByProjectId3,
+  // updateRecode,
+  getUploadsByChecklistId,
+  IP,
+  getRecordsBill
+  // getRecordsByProjectIdGroup1,
+  // getRecordsByProjectIdGroup2
+} from "@/apis/evaluation";
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
 
@@ -205,7 +232,7 @@ export default {
     return {
       list: [],
       showMask: false,
-      readonly: "readonly",
+      readonly: true,
       form: {}, //详情表格
       showSaveBtn: false,
       unitCurrentPage: 1, //当前页
@@ -299,21 +326,22 @@ export default {
         { label: "合格", value: "1" },
         { label: "不合格", value: "5" }
       ],
+      updateRecodeBill: "" //修改记录
     };
   },
   created() {
     this.unitCurrentChange(this.unitCurrentPage);
     this.roleShow();
-    console.log(this.$store.state)
+    // console.log(this.$store.state)
   },
   mounted() {},
   methods: {
     //角色控制
     roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
-      if (roleCode == 500 || roleCode == 700 || roleCode == 900 ) {
+      if (roleCode == 500 || roleCode == 700 || roleCode == 900) {
         this.roleShow4 = false;
-      }else{
+      } else {
         this.roleShow4 = true;
       }
     },
@@ -321,23 +349,23 @@ export default {
     unitCurrentChange(val) {
       val = val <= 0 ? 1 : val;
       getRecordsByProjectId2({
-        standardId:this.$store.state.projectInfor.reviewStandardId,
+        standardId: this.$store.state.projectInfor.reviewStandardId,
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
-        primaryTitleId:this.primaryTitleId,
-        secondaryTitleId:this.secondaryTitleId,
-        result:this.result,
+        primaryTitleId: this.primaryTitleId,
+        secondaryTitleId: this.secondaryTitleId,
+        result: this.result
       })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.unitTotal = res.result.countRows;
           this.list = res.result.result.map(i => {
             let children = [];
             i.titleSecondaryDtos.forEach(j => {
               // console.log(i)
               j.recordsList.forEach(item => {
-                // console.log(item.contentRecord)
+                // console.log(item)
                 // console.log(changeEdit(item.contentRecord))
                 children.push({
                   listTit: item.primaryTitle,
@@ -348,7 +376,7 @@ export default {
                   situation: item.contentRecord,
                   recode: "",
                   importance: item.checkTypeName,
-                  conclusion: item.result == 1 ? "合格" : "不合格",
+                  conclusion: item.result == "1" ? "合格" : "不合格",
                   contentRecord: changeEdit(item.contentRecord),
                   standardName: item.standardName,
                   createTime: getTime(item.createTime),
@@ -365,14 +393,17 @@ export default {
           });
         })
         .catch(err => {
-          this.$message({
-            type: "warning",
-            message: err
-          });
+          // this.$message({
+          //   type: "warning",
+          //   message: err
+          // });
         });
     },
+    //详情
     handleModify(flag, item) {
       // console.log(item)
+      // this.form.bill
+      this.getRecordsBills(item.id);
       if (flag == 1) {
         this.readonly = true;
         this.form = item;
@@ -384,33 +415,67 @@ export default {
       }
       this.showMask = true;
     },
-    save() {
-      updateRecode({
-        id: this.form.id,
-        contentRecord: this.form.contentRecord,
-        checkNum: this.form.num,
-        checkPart: this.form.parts
-      })
+    //获取修改记录
+    getRecordsBills(recordId) {
+      getRecordsBill({ recordId })
         .then(res => {
+          // console.log(res)
           if (res.httpStatus == 200) {
-            this.$message({
-              type: "success",
-              message: "修改成功"
+            let str = "";
+            res.result.forEach((item, index) => {
+              console.log(item);
+              let s = `(${index + 1}) ${getTime(item.createTime)} ${
+                item.createUserName
+              } ${item.question}。`;
+              str += s;
             });
-            this.unitCurrentChange(this.unitCurrentPage);
-          } else {
-            this.$message({
-              type: "info",
-              message: res.msg
-            });
+            this.updateRecodeBill = str;
           }
         })
         .catch(err => {
           this.$message({
-            type: "warning",
-            message: err.msg
+            type: "info",
+            message: err
           });
         });
+    },
+    // 保存
+    save() {
+      if (this.form.bill) {
+        updateRecode({
+          id: this.form.id,
+          contentRecord: this.form.contentRecord,
+          checkNum: this.form.num,
+          checkPart: this.form.parts,
+          result: this.form.conclusion == "合格" ? 1 : 5,
+          bill: this.form.bill
+        })
+          .then(res => {
+            if (res.httpStatus == 200) {
+              this.$message({
+                type: "success",
+                message: "修改成功"
+              });
+              this.unitCurrentChange(this.unitCurrentPage);
+            } else {
+              this.$message({
+                type: "info",
+                message: res.msg
+              });
+            }
+          })
+          .catch(err => {
+            this.$message({
+              type: "warning",
+              message: err.msg
+            });
+          });
+      } else {
+        this.$message({
+          type: "info",
+          message: "请填写修改原由"
+        });
+      }
     },
     returnLast() {
       this.showMask = false;
@@ -437,7 +502,8 @@ export default {
       getUploadsByChecklistId({
         checklistId: i.checklistId,
         projectId: item.projectId,
-        type: i
+        type: i,
+        standardId:this.$store.state.recodeStandard.standardId
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -470,48 +536,47 @@ export default {
         //  this.videoSrc = url
         this.$refs.video.src = url;
       }
-    },
-   
+    }
   },
   computed: {
     getProjectId() {
       return this.$store.state.projectInfor;
     },
-     getSearchValue(){
-      return this.$store.state.ScreeningRecordObj
+    getSearchValue() {
+      return this.$store.state.ScreeningRecordObj;
     }
   },
   watch: {
     getProjectId: function() {
       this.unitCurrentChange(this.unitCurrentPage);
     },
-     getSearchValue: function(val1) {
+    getSearchValue: function(val1) {
       // console.log(val1)
-      let obj; 
-      if(val1.ascaderValue){
-        if(splitStr(val1.ascaderValue)[0]=='menuLevel1'){
+      let obj;
+      if (val1.ascaderValue) {
+        if (splitStr(val1.ascaderValue)[0] == "menuLevel1") {
           obj = {
-            primaryTitleId:splitStr(val1.ascaderValue)[1],
-            secondaryTitleId:'',
-          }
-        }else{
-           obj = {
-            primaryTitleId:'',
-            secondaryTitleId:val1.ascaderValue,
-          }
+            primaryTitleId: splitStr(val1.ascaderValue)[1],
+            secondaryTitleId: ""
+          };
+        } else {
+          obj = {
+            primaryTitleId: "",
+            secondaryTitleId: val1.ascaderValue
+          };
         }
-      }else{
+      } else {
         obj = {
-          primaryTitleId:'',
-          secondaryTitleId:'',
-        }
+          primaryTitleId: "",
+          secondaryTitleId: ""
+        };
       }
-      
-       this.primaryTitleId = obj.primaryTitleId
-       this.secondaryTitleId = obj.secondaryTitleId
-       this.result = val1.evaluationValue
-         this.unitCurrentPage = 1
-         this.unitCurrentChange(this.unitCurrentPage)
+
+      this.primaryTitleId = obj.primaryTitleId;
+      this.secondaryTitleId = obj.secondaryTitleId;
+      this.result = val1.evaluationValue;
+      this.unitCurrentPage = 1;
+      this.unitCurrentChange(this.unitCurrentPage);
     }
   }
 };
@@ -579,11 +644,11 @@ export default {
     flex: 0 0 300px;
     // text-align: start;
     // border: 1px solid red;
-    
   }
   .way {
     // width: 200px;
-    flex: 0 0 200px;
+    // flex: 0 0 200px;
+    flex: 0 0 500px;
   }
   // .parts {
   //   // width: 200px;
@@ -595,7 +660,9 @@ export default {
   // }
   .situation {
     // width: 350px;
-    flex: 0 0 340px;
+    // flex: 0 0 340px;
+    flex: 1;
+    min-width: 100px;
   }
   .recode {
     flex: 0 0 150px;
@@ -640,6 +707,8 @@ export default {
     top: 0;
     display: flex;
     justify-content: center;
+    background-color: rgba(0, 0, 0, 0.8);
+
     // background-color: #f4f4f4;
     // opacity: 0.8;
     .maskInfor {
@@ -741,6 +810,12 @@ export default {
   .w50 {
     width: 50%;
   }
- 
+  .el-radio-group {
+    text-indent: 0;
+    .el-radio {
+      margin-right: 0;
+      margin-left: 10px;
+    }
+  }
 }
 </style>

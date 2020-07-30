@@ -37,3 +37,11 @@ export const getDataReviewData12 = params => rq.post('/record/getRecordsByProjec
 
 // 项目归档
 export const toArchive = params => rq.post('/project/toArchive', params)
+
+// 1.根据recodeId获取验收记录修改日志
+export const getRecordsBill = params => rq.post('/getRecordsBill', params)
+
+
+// 1.现场评定导出excel
+export const downloadEvaiuation = params => rq.post('/export/download/records/curr', params)
+

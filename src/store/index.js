@@ -63,7 +63,7 @@ export default new Vuex.Store({
     changeCindex(state,i){ //首页跳转变化菜单索引
          state.cindex = i
     },
-    saveRecodeStandard(state,obj){
+    saveRecodeStandard(state,obj){ //记录的菜单
           state.recodeStandard = obj
     },
     saveFactoryType(state,str){ //保存单位类型

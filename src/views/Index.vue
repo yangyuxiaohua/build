@@ -82,6 +82,9 @@
                 <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
                 <el-option label="消防设施操作员（四级/中级技能）" value="10"></el-option>
                 <el-option label="消防设施操作员（五级/初级技能）" value="15"></el-option>
+                <el-option label="一级建造师" value="20"></el-option>
+                        <el-option label="二级建造师" value="25"></el-option>
+                        <el-option label="其他相关资格证" value="30"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -91,7 +94,7 @@
               <el-select v-model="userForm.technicalPositions" placeholder="" class="w100" disabled>
                 <el-option label="技术责任人" value="5"></el-option>
                 <el-option label="项目负责人" value="1"></el-option>
-                <el-option label="检测人员" value="10"></el-option>
+                <el-option label="验收人员" value="10"></el-option>
               </el-select>
             </el-form-item>
 

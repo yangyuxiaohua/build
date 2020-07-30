@@ -154,14 +154,12 @@ export default {
     };
   },
   created() {
-    // this.getStandard();
-    // this.getTree1Data();
-    // this.getTree2Data();
-    this.projectInfor = this.$store.state.projectInfor;
-    this.factoryType = this.$store.state.userInfor.factoryType;
-    this.roleControl();
-    this.init();
-    // console.log(this.$store.state);
+    // this.projectInfor = this.$store.state.projectInfor;
+    // this.factoryType = this.$store.state.userInfor.factoryType;
+    // this.roleControl();
+    if(this.$store.state.projectInfor.projectId){
+      this.init();
+    }
   },
   mounted() {},
   methods: {
@@ -236,12 +234,17 @@ export default {
       } else {
         this.roleShowBtn = true;
       }
-      console.log(this.rightNav);
+      // console.log(this.rightNav);
 
       // console.log(this.rightNav)
     },
     //初始化页面
     init() {
+      this.projectInfor = this.$store.state.projectInfor;
+      // console.log(this.projectInfor)
+      this.factoryType = this.$store.state.userInfor.factoryType;
+      this.roleControl();
+
       // console.log(this.projectInfor)
       this.cindex = this.rightNav[0].id;
       this.checkedList = [];
@@ -774,7 +777,7 @@ export default {
       }
       judgeChildren(data);
     },
-     
+
     //切换标准
     changeStandard() {},
     //获取标准名称
@@ -814,46 +817,46 @@ export default {
         });
     },
     // 筛选标准
-    screeningStandards(names,standardId){
+    screeningStandards(names, standardId) {
       getChecklistStandards2({
         names,
         standardId
-      }).then(res=>{
-         if (res.httpStatus == 200) {
-            this.checkList = res.result;
-            }
-      }).catch(err=>{
-        this.$message({
-          type:'info',
-          message:err+'823'
-        })
       })
-
+        .then(res => {
+          if (res.httpStatus == 200) {
+            this.checkList = res.result;
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: err + "823"
+          });
+        });
     },
     //点击复选框
-    getCheckList(){
+    getCheckList() {
       let arr1 = this.$refs.acceptanceTree1.getCheckedNodes();
-      arr1 = arr1.filter(item=>{
-        if(splitStr(item.id)[0]==='menuLevel1'){
-          return item 
+      arr1 = arr1.filter(item => {
+        if (splitStr(item.id)[0] === "menuLevel1") {
+          return item;
         }
-      })
-      arr1 = arr1.map(item=>{
-        return item.label
-      })
+      });
+      arr1 = arr1.map(item => {
+        return item.label;
+      });
       let arr2 = this.$refs.acceptanceTree1.getHalfCheckedNodes();
-      arr2 = arr2.filter(item=>{
-        if(splitStr(item.id)[0]==='menuLevel1'){
-          return item 
+      arr2 = arr2.filter(item => {
+        if (splitStr(item.id)[0] === "menuLevel1") {
+          return item;
         }
-      })
-      arr2 = arr2.map(item=>{
-        return item.label
-      })
-      let arr = arr1.concat(arr2)
-     
-     this.screeningStandards(arr,this.cindex)
-     
+      });
+      arr2 = arr2.map(item => {
+        return item.label;
+      });
+      let arr = arr1.concat(arr2);
+
+      this.screeningStandards(arr, this.cindex);
     },
     // 使用记录
     usedRecode() {

@@ -75,7 +75,7 @@
           <el-col :span="6">
             <div> 重要程度 : {{form.importance}}</div>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="6" class="lh30">
             <div> 适用标准 : {{form.standardName}}</div>
           </el-col>
         </el-row>
@@ -101,7 +101,7 @@
           </el-col>
 
         </el-row>
-        <el-row>
+        <el-row class="bottomLine">
           <el-col :span="18">
             <div>验收记录 :
               <el-input type="textarea" placeholder="请输入内容" class="textarea" :readonly='readonly' v-model="form.contentRecord">
@@ -121,12 +121,31 @@
             <!-- </el-form-item> -->
           </el-col>
           <el-col :span="6">
-            <div>子项评定 : {{form.conclusion}}</div>
+            <div>子项评定 : 
+              <el-radio-group v-model="form.conclusion" :disabled='readonly'>
+                <el-radio label="合格"></el-radio>
+                <el-radio label="不合格"></el-radio>
+              </el-radio-group>
+            </div>
           </el-col>
 
         </el-row>
         <el-row>
+          <el-col :span="12" v-show="!readonly">
+            <!-- bill -->
+            <div>
+              修改原由 :
+              <el-input type="textarea" placeholder="请填写修改验收记录的原因" class="textarea" v-model="form.bill" :readonly='readonly'>
+              </el-input>
+            </div>
+
+          </el-col>
           <el-col :span="12">
+            <div>
+              修改记录 :
+              <el-input type="textarea" placeholder="" class="textarea" v-model="updateRecodeBill" readonly>
+              </el-input>
+            </div>
           </el-col>
 
         </el-row>
@@ -175,11 +194,12 @@ import {
   getRecordsByProjectId3,
   updateRecode,
   getUploadsByChecklistId,
-  IP
+  IP,
+  getRecordsBill
   // getRecordsByProjectIdGroup1,
   // getRecordsByProjectIdGroup2
 } from "@/apis/evaluation";
-import { getTime,changeEdit,splitStr } from "@/utils/publictool";
+import { getTime, changeEdit, splitStr } from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -203,7 +223,7 @@ export default {
     return {
       list: [],
       showMask: false,
-      readonly: "readonly",
+      readonly: true,
       form: {}, //详情表格
       showSaveBtn: false,
       unitCurrentPage: 1, //当前页
@@ -292,14 +312,15 @@ export default {
       //     }
       //   }
       // },
-      primaryTitleId:'',
-      secondaryTitleId:'',
-      checkTypeName:'',
+      primaryTitleId: "",
+      secondaryTitleId: "",
+      checkTypeName: "",
       copyCompleteRecordResult: "", //下拉框的筛选
       resultOptions: [
         { label: "合格", value: "1" },
         { label: "不合格", value: "5" }
       ],
+      updateRecodeBill: "" //修改记录
     };
   },
   created() {
@@ -313,7 +334,7 @@ export default {
       let roleCode = this.$store.state.userRole.roleCode;
       if (roleCode == 600 || roleCode == 650 || roleCode == 300) {
         this.roleShow4 = true;
-      }else{
+      } else {
         this.roleShow4 = false;
       }
     },
@@ -321,14 +342,14 @@ export default {
     unitCurrentChange(val) {
       val = val <= 0 ? 1 : val;
       getRecordsByProjectId3({
-        standardId:this.$store.state.projectInfor.completStandardId,
+        standardId: this.$store.state.projectInfor.completStandardId,
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
         primaryTitleId: this.primaryTitleId,
         secondaryTitleId: this.secondaryTitleId,
-        checkTypeName:this.checkTypeName,
-        result:this.copyCompleteRecordResult,
+        checkTypeName: this.checkTypeName,
+        result: this.copyCompleteRecordResult
         // result: this.result,
       })
         .then(res => {
@@ -350,7 +371,7 @@ export default {
                   recode: "",
                   importance: item.checkTypeName,
                   conclusion: item.result == 1 ? "合格" : "不合格",
-                  contentRecord:  changeEdit(item.contentRecord),
+                  contentRecord: changeEdit(item.contentRecord),
                   standardName: item.standardName,
                   createTime: getTime(item.createTime),
                   usernames: item.usernames,
@@ -364,7 +385,7 @@ export default {
               children
             };
           });
-          console.log(this.list);
+          // console.log(this.list);
           // if (res.httpStatus == 200) {
           //   this.unitTotal = res.result.countRows;
           //   // item.createTime = getTime(item.createTime);
@@ -392,14 +413,16 @@ export default {
           // }
         })
         .catch(err => {
-          this.$message({
-            type: "warning",
-            message: err
-          });
+          // this.$message({
+          //   type: "warning",
+          //   message: err
+          // });
         });
     },
+    // 产看详情，修改
     handleModify(flag, item) {
       // console.log(item)
+      this.getRecordsBills(item.id);
       if (flag == 1) {
         this.readonly = true;
         this.form = item;
@@ -411,12 +434,40 @@ export default {
       }
       this.showMask = true;
     },
+    //根据recodeId获取验收记录修改日志
+    getRecordsBills(recordId) {
+      getRecordsBill({ recordId })
+        .then(res => {
+          // console.log(res)
+          if (res.httpStatus == 200) {
+            let str = "";
+            res.result.forEach((item, index) => {
+              console.log(item);
+              let s = `(${index + 1}) ${getTime(item.createTime)} ${
+                item.createUserName
+              } ${item.question}。`;
+              str += s;
+            });
+            this.updateRecodeBill = str;
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: err
+          });
+        });
+    },
+    //保存
     save() {
-      updateRecode({
+      if(this.form.bill){
+         updateRecode({
         id: this.form.id,
         contentRecord: this.form.contentRecord,
         checkNum: this.form.num,
-        checkPart: this.form.parts
+        checkPart: this.form.parts,
+        result: this.form.conclusion == "合格" ? 1 : 5,
+        bill: this.form.bill
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -438,6 +489,13 @@ export default {
             message: err.msg
           });
         });
+      }else{
+         this.$message({
+            type:'info',
+            message:'请填写修改原由'
+          })
+      }
+     
     },
     returnLast() {
       this.showMask = false;
@@ -464,7 +522,8 @@ export default {
       getUploadsByChecklistId({
         checklistId: i.checklistId,
         projectId: item.projectId,
-        type: i
+        type: i,
+        standardId:this.$store.state.recodeStandard.standardId
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -497,52 +556,50 @@ export default {
         //  this.videoSrc = url
         this.$refs.video.src = url;
       }
-    },
-   
+    }
   },
   computed: {
     getProjectId() {
       return this.$store.state.projectInfor;
     },
-     getSearchValue(){
-      return this.$store.state.ScreeningRecordObj
+    getSearchValue() {
+      return this.$store.state.ScreeningRecordObj;
     }
   },
   watch: {
     getProjectId: function() {
       this.unitCurrentChange(this.unitCurrentPage);
-    // this.getRecode12();
-      
+      // this.getRecode12();
     },
     getSearchValue: function(val1) {
       // console.log(val1)
       // splitStr
-      let obj; 
-      if(val1.ascaderValue){
-        if(splitStr(val1.ascaderValue)[0]=='menuLevel1'){
+      let obj;
+      if (val1.ascaderValue) {
+        if (splitStr(val1.ascaderValue)[0] == "menuLevel1") {
           obj = {
-            primaryTitleId:splitStr(val1.ascaderValue)[1],
-            secondaryTitleId:'',
-          }
-        }else{
-           obj = {
-            primaryTitleId:'',
-            secondaryTitleId:val1.ascaderValue,
-          }
+            primaryTitleId: splitStr(val1.ascaderValue)[1],
+            secondaryTitleId: ""
+          };
+        } else {
+          obj = {
+            primaryTitleId: "",
+            secondaryTitleId: val1.ascaderValue
+          };
         }
-      }else{
+      } else {
         obj = {
-          primaryTitleId:'',
-          secondaryTitleId:'',
-        }
+          primaryTitleId: "",
+          secondaryTitleId: ""
+        };
       }
-      
-       this.primaryTitleId = obj.primaryTitleId
-       this.secondaryTitleId = obj.secondaryTitleId
-       this.checkTypeName = val1.importantValue
-       this.copyCompleteRecordResult = val1.inspectionValue
-         this.unitCurrentPage = 1
-         this.unitCurrentChange(this.unitCurrentPage)
+
+      this.primaryTitleId = obj.primaryTitleId;
+      this.secondaryTitleId = obj.secondaryTitleId;
+      this.checkTypeName = val1.importantValue;
+      this.copyCompleteRecordResult = val1.inspectionValue;
+      this.unitCurrentPage = 1;
+      this.unitCurrentChange(this.unitCurrentPage);
     }
   }
 };
@@ -583,8 +640,8 @@ export default {
         justify-content: space-around;
         border-bottom: 1px solid #aca4a4;
         & > div {
-            display: flex;
-            justify-content:center;
+          display: flex;
+          justify-content: center;
           // align-items: center;
           // text-align: center;
           display: -webkit-box;
@@ -611,7 +668,7 @@ export default {
   }
   .way {
     // width: 200px;
-    flex: 0 0 200px;
+    flex: 0 0 500px;
   }
   .parts {
     // width: 200px;
@@ -619,11 +676,13 @@ export default {
   }
   .num {
     // width: 60px;
-    flex: 0 0 60px;
+    flex: 0 0 200px;
   }
   .situation {
     // width: 350px;
-    flex: 0 0 340px;
+    // flex: 0 0 340px;
+    flex: 1;
+    min-width: 100px;
   }
   .recode {
     flex: 0 0 150px;
@@ -668,6 +727,8 @@ export default {
     top: 0;
     display: flex;
     justify-content: center;
+    background-color: rgba(0, 0, 0, 0.8);
+
     // background-color: #f4f4f4;
     // opacity: 0.8;
     .maskInfor {
@@ -769,6 +830,15 @@ export default {
   .w50 {
     width: 50%;
   }
- 
+  .lh30{
+    line-height: 30px;
+  }
+  .el-radio-group {
+    text-indent: 0;
+    .el-radio {
+      margin-right: 0;
+      margin-left: 10px;
+    }
+  }
 }
 </style>

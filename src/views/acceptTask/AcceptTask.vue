@@ -111,6 +111,13 @@ export default {
         .then(res => {
           if (res.httpStatus == 200) {
             this.projectList2 = res.result;
+            if(this.$store.state.projectInfor.projectId&&!this.$store.state.projectInfor.reviewStandardId){
+              this.projectList2.forEach(item=>{
+                if(item.projectId ==this.$store.state.projectInfor.projectId){
+                  this.$store.commit('chosedProjectId',item)
+                }
+              })
+            }
           }
         })
         .catch(err => {

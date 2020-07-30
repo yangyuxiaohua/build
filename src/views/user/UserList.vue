@@ -48,14 +48,14 @@
                   </el-col>
                 </el-row>
 
-                <el-row>
+                <el-row class="prompBox">
                   <el-col :span='12'>
                     <el-form-item label="所属组织" :label-width="formLabelWidth">
                       <!-- <el-input v-model="userForm.partId" autocomplete="off"></el-input> -->
                       <el-cascader :options="options" :props="props" clearable v-model="userForm.partIds" class="w100" ref="ascader2"></el-cascader>
                     </el-form-item>
                   </el-col>
-                  <el-col :span='12'>
+                  <el-col :span='11'>
                     <el-form-item label="用户角色" :label-width="formLabelWidth">
                       <el-select v-model="userForm.administrator" placeholder="请选择用户角色" class="w100" @focus="changeLastUnit()">
                         <el-option label="单位管理员" value="1"></el-option>
@@ -64,6 +64,14 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
+                  <el-col :span="1" class="promptIconBox">
+                    <i class="el-icon-question promptIcon" @click="showPromptText1 = !showPromptText1"></i>
+                  </el-col>
+                  <div class="promptText" v-show="showPromptText1">
+                    <p>单位管理：具有本级及其下级组织的数据权限</p>
+                    <p>部门管理：具有本级组织的数据权限</p>
+                    <p>验收人员：仅有本人对应的数据权限</p>
+                  </div>
                 </el-row>
                 <el-row>
                   <el-col :span='12'>
@@ -81,7 +89,7 @@
                   </el-col>
                 </el-row>
 
-                <el-row  v-show="isService">
+                <el-row v-show="isService">
                   <el-col :span='12'>
                     <el-form-item label="执业资格证" :label-width="formLabelWidth">
                       <!-- <el-input v-model="userForm.professionalCertificate" autocomplete="off"></el-input> -->
@@ -91,6 +99,9 @@
                         <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
                         <el-option label="消防设施操作员（四级/中级技能）" value="10"></el-option>
                         <el-option label="消防设施操作员（五级/初级技能）" value="15"></el-option>
+                        <el-option label="一级建造师" value="20"></el-option>
+                        <el-option label="二级建造师" value="25"></el-option>
+                        <el-option label="其他相关资格证" value="30"></el-option>
                       </el-select>
                     </el-form-item>
                   </el-col>
@@ -101,14 +112,14 @@
                       <el-select v-model="userForm.technicalPositions" placeholder="技术岗位" class="w100">
                         <el-option label="技术责任人" value="5"></el-option>
                         <el-option label="项目负责人" value="1"></el-option>
-                        <el-option label="检测人员" value="10"></el-option>
+                        <el-option label="验收人员" value="10"></el-option>
                       </el-select>
                     </el-form-item>
 
                   </el-col>
                 </el-row>
 
-                <el-row  v-show="isService">
+                <el-row v-show="isService">
                   <el-col :span='24'>
                     <!-- <el-input v-model="userForm.professionalImage2Url" autocomplete="off"></el-input> -->
                     <el-form-item label="资格证书" :label-width="formLabelWidth" class="flexFormItem">
@@ -168,109 +179,119 @@
         </el-table-column>
       </el-table>
       <div>
-       <el-dialog title="用户详情" :visible.sync="dialoguserFormVisible">
-              <el-form :model="userForm">
-                <el-row>
-                  <el-col :span='12'>
-                    <el-form-item label="用户账号" :label-width="formLabelWidth">
-                      <el-input v-model="userForm.account" autocomplete="off"></el-input>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span='12'>
-                    <el-form-item label="用户密码" :label-width="formLabelWidth">
-                      <el-input v-model="userForm.password" autocomplete="off"></el-input>
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span='12'>
-                    <el-form-item label="用户姓名" :label-width="formLabelWidth">
-                      <el-input v-model="userForm.username" autocomplete="off"></el-input>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span='12'>
-                    <el-form-item label="联系电话" :label-width="formLabelWidth">
-                      <el-input v-model="userForm.phone" autocomplete="off"></el-input>
-                    </el-form-item>
-                  </el-col>
-                </el-row>
+        <el-dialog title="用户详情" :visible.sync="dialoguserFormVisible">
+          <el-form :model="userForm">
+            <el-row>
+              <el-col :span='12'>
+                <el-form-item label="用户账号" :label-width="formLabelWidth">
+                  <el-input v-model="userForm.account" autocomplete="off"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span='12'>
+                <el-form-item label="用户密码" :label-width="formLabelWidth">
+                  <el-input v-model="userForm.password" autocomplete="off"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span='12'>
+                <el-form-item label="用户姓名" :label-width="formLabelWidth">
+                  <el-input v-model="userForm.username" autocomplete="off"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span='12'>
+                <el-form-item label="联系电话" :label-width="formLabelWidth">
+                  <el-input v-model="userForm.phone" autocomplete="off"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
 
-                <el-row class="prompBox">
-                  <el-col :span='12'>
-                    <el-form-item label="所属组织" :label-width="formLabelWidth">
-                      <!-- <el-input v-model="userForm.partId" autocomplete="off"></el-input> -->
-                      <el-cascader :options="options" :props="props" clearable v-model="userForm.partIds" class="w100" ref="ascader2"></el-cascader>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span='12'>
-                    <el-form-item label="用户角色" :label-width="formLabelWidth">
-                      <el-select v-model="userForm.administrator" placeholder="请选择用户角色" class="w100" @focus="changeLastUnit()">
-                        <el-option label="单位管理员" value="1"></el-option>
-                        <el-option label="部门管理员" value="5" v-show="RoleShow"></el-option>
-                        <el-option label="验收人员" value="10" v-show="RoleShow"></el-option>
-                      </el-select>
-                    </el-form-item>
-                      <i class="el-icon-question promptIcon" @click="showPromptText1 = !showPromptText1"></i>
-                  </el-col>
-                   <span class="promptText" v-show="showPromptText1">列表中没有显示的，需告知对方注册新用户</span>
-                </el-row>
-                <el-row>
-                  <el-col :span='12'>
-                    <el-form-item label="身份证号" :label-width="formLabelWidth">
-                      <el-input v-model="userForm.idcard" autocomplete="off"></el-input>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span='12'>
-                    <el-form-item label="使用状态" :label-width="formLabelWidth">
-                      <el-radio-group v-model="userForm.enable">
-                        <el-radio :label="1">启用</el-radio>
-                        <el-radio :label="-1">禁用</el-radio>
-                      </el-radio-group>
-                    </el-form-item>
-                  </el-col>
-                </el-row>
+            <el-row class="prompBox">
+              <el-col :span='12'>
+                <el-form-item label="所属组织" :label-width="formLabelWidth">
+                  <!-- <el-input v-model="userForm.partId" autocomplete="off"></el-input> -->
+                  <el-cascader :options="options" :props="props" clearable v-model="userForm.partIds" class="w100" ref="ascader2"></el-cascader>
+                </el-form-item>
+              </el-col>
+              <el-col :span='11'>
+                <el-form-item label="用户角色" :label-width="formLabelWidth">
+                  <el-select v-model="userForm.administrator" placeholder="请选择用户角色" class="w100" @focus="changeLastUnit()">
+                    <el-option label="单位管理员" value="1"></el-option>
+                    <el-option label="部门管理员" value="5" v-show="RoleShow"></el-option>
+                    <el-option label="验收人员" value="10" v-show="RoleShow"></el-option>
+                  </el-select>
+                </el-form-item>
 
-                <el-row  v-show="isService">
-                  <el-col :span='12'>
-                    <el-form-item label="执业资格证" :label-width="formLabelWidth">
-                      <!-- <el-input v-model="userForm.professionalCertificate" autocomplete="off"></el-input> -->
+              </el-col>
+              <el-col :span="1" class="promptIconBox">
+                <i class="el-icon-question promptIcon" @click="showPromptText1 = !showPromptText1"></i>
+              </el-col>
+              <div class="promptText" v-show="showPromptText1">
+                <p>单位管理：具有本级及其下级组织的数据权限</p>
+                <p>部门管理：具有本级组织的数据权限</p>
+                <p>验收人员：仅有本人对应的数据权限</p>
+              </div>
+            </el-row>
+            <el-row>
+              <el-col :span='12'>
+                <el-form-item label="身份证号" :label-width="formLabelWidth">
+                  <el-input v-model="userForm.idcard" autocomplete="off"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span='12'>
+                <el-form-item label="使用状态" :label-width="formLabelWidth">
+                  <el-radio-group v-model="userForm.enable">
+                    <el-radio :label="1">启用</el-radio>
+                    <el-radio :label="-1">禁用</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+            </el-row>
 
-                      <el-select v-model="userForm.professionalCertificate" placeholder="执业资格证书" class="w100">
-                        <el-option label="一级注册消防工程师" value="1"></el-option>
-                        <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
-                        <el-option label="消防设施操作员（四级/中级技能）" value="10"></el-option>
-                        <el-option label="消防设施操作员（五级/初级技能）" value="15"></el-option>
-                      </el-select>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span='12'>
+            <el-row v-show="isService">
+              <el-col :span='12'>
+                <el-form-item label="执业资格证" :label-width="formLabelWidth">
+                  <!-- <el-input v-model="userForm.professionalCertificate" autocomplete="off"></el-input> -->
 
-                    <el-form-item label="技术岗位" :label-width="formLabelWidth">
-                      <!-- <el-input v-model="userForm.technicalPositions" autocomplete="off"></el-input> -->
-                      <el-select v-model="userForm.technicalPositions" placeholder="技术岗位" class="w100">
-                        <el-option label="技术责任人" value="5"></el-option>
-                        <el-option label="项目负责人" value="1"></el-option>
-                        <el-option label="检测人员" value="10"></el-option>
-                      </el-select>
-                    </el-form-item>
+                  <el-select v-model="userForm.professionalCertificate" placeholder="执业资格证书" class="w100">
+                    <el-option label="一级注册消防工程师" value="1"></el-option>
+                    <el-option label="消防设施操作员（三级/高级技能）" value="5"></el-option>
+                    <el-option label="消防设施操作员（四级/中级技能）" value="10"></el-option>
+                    <el-option label="消防设施操作员（五级/初级技能）" value="15"></el-option>
+                    <el-option label="一级建造师" value="20"></el-option>
+                    <el-option label="二级建造师" value="25"></el-option>
+                    <el-option label="其他相关资格证" value="30"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span='12'>
 
-                  </el-col>
-                </el-row>
+                <el-form-item label="技术岗位" :label-width="formLabelWidth">
+                  <!-- <el-input v-model="userForm.technicalPositions" autocomplete="off"></el-input> -->
+                  <el-select v-model="userForm.technicalPositions" placeholder="技术岗位" class="w100">
+                    <el-option label="技术责任人" value="5"></el-option>
+                    <el-option label="项目负责人" value="1"></el-option>
+                    <el-option label="验收人员" value="10"></el-option>
+                  </el-select>
+                </el-form-item>
 
-                <el-row  v-show="isService">
-                  <el-col :span='24'>
-                    <!-- <el-input v-model="userForm.professionalImage2Url" autocomplete="off"></el-input> -->
-                    <el-form-item label="资格证书" :label-width="formLabelWidth" class="flexFormItem">
-                      <div v-for="(item,index) in imgList" :key="index" class="imgList wh80px"><img :src="item" alt="" class="wh80px">
-                        <div class="imgMask">
-                          <i class="el-icon-zoom-in" @click="lookImg(item)"></i>
-                          <i class="el-icon-delete" @click="deleteImage(index)"></i>
-                        </div>
-                      </div>
-                      <!-- <div class="uploadIcon wh80px">
+              </el-col>
+            </el-row>
+
+            <el-row v-show="isService">
+              <el-col :span='24'>
+                <!-- <el-input v-model="userForm.professionalImage2Url" autocomplete="off"></el-input> -->
+                <el-form-item label="资格证书" :label-width="formLabelWidth" class="flexFormItem">
+                  <div v-for="(item,index) in imgList" :key="index" class="imgList wh80px"><img :src="item" alt="" class="wh80px">
+                    <div class="imgMask">
+                      <i class="el-icon-zoom-in" @click="lookImg(item)"></i>
+                      <i class="el-icon-delete" @click="deleteImage(index)"></i>
+                    </div>
+                  </div>
+                  <!-- <div class="uploadIcon wh80px">
                        <i class="el-icon-plus"></i>
                      </div> -->
-                      <!-- <el-upload action="#" list-type="picture-card" :auto-upload="false">
+                  <!-- <el-upload action="#" list-type="picture-card" :auto-upload="false">
                         <i slot="default" class="el-icon-plus"></i>
                         <div slot="file" slot-scope="{file}">
                           <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
@@ -287,26 +308,26 @@
                           </span>
                         </div>
                       </el-upload> -->
-                      <el-upload class="avatar-uploader" :action="uploadIp" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" v-loading="loading">
-                        <!-- <img v-if="imageUrl" :src="imageUrl" class="avatar wh80px"> -->
-                        <i class="el-icon-plus avatar-uploader-icon"></i>
-                      </el-upload>
+                  <el-upload class="avatar-uploader" :action="uploadIp" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" v-loading="loading">
+                    <!-- <img v-if="imageUrl" :src="imageUrl" class="avatar wh80px"> -->
+                    <i class="el-icon-plus avatar-uploader-icon"></i>
+                  </el-upload>
 
-                      <el-dialog :visible.sync="dialogVisible" append-to-body>
-                        <img width="100%" :src="dialogImageUrl" alt="">
-                      </el-dialog>
+                  <el-dialog :visible.sync="dialogVisible" append-to-body>
+                    <img width="100%" :src="dialogImageUrl" alt="">
+                  </el-dialog>
 
-                    </el-form-item>
-                  </el-col>
+                </el-form-item>
+              </el-col>
 
-                </el-row>
+            </el-row>
 
-              </el-form>
-              <div slot="footer" class="dialog-footer">
-                <el-button @click="dialoguserFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="onSubmit()">提交</el-button>
-              </div>
-            </el-dialog>   
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialoguserFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="onSubmit()">提交</el-button>
+          </div>
+        </el-dialog>
 
       </div>
     </div>
@@ -327,7 +348,7 @@ import {
   updateUserAndParts,
   getFactoryByPartsId
 } from "@/apis/userUnit.js";
-import { getTime,changNull } from "@/utils/publictool";
+import { getTime, changNull } from "@/utils/publictool";
 import { uploadIp, ImgIp } from "@/apis/upload.js";
 
 export default {
@@ -361,8 +382,8 @@ export default {
       disabled: false,
       imgList: [],
       loading: false,
-      isService:false, //是否是服务机构
-      showPromptText1:false
+      isService: false, //是否是服务机构
+      showPromptText1: false
     };
   },
   created() {
@@ -370,12 +391,14 @@ export default {
     this.getUserLsit(1);
     this.getLastFactoryMenus();
     // console.log(this.$store.state.factoryType)
-     if(this.$store.state.factoryType==10||this.$store.state.factoryType==1){
-        this.isService = true
-      }else{
-        this.isService = false
-        
-      }
+    if (
+      this.$store.state.factoryType == 10 ||
+      this.$store.state.factoryType == 1
+    ) {
+      this.isService = true;
+    } else {
+      this.isService = false;
+    }
   },
   methods: {
     //用户列表
@@ -386,7 +409,7 @@ export default {
             this.userTotal = res.result.countRows;
             this.userList = res.result.result.map(item => {
               item.createTime = getTime(item.createTime);
-              item.enable1 = item.enable == 1?'启用' :'禁用';
+              item.enable1 = item.enable == 1 ? "启用" : "禁用";
               if (typeof item.administrator == "number") {
                 item.administrator = item.administrator.toString();
                 item.partIds = item.partIds[0];
@@ -458,7 +481,7 @@ export default {
     },
     //提交修改
     onSubmit() {
-      this.userForm.professionalImage2Url = this.imgList.join(',')
+      this.userForm.professionalImage2Url = this.imgList.join(",");
       if (this.updata) {
         updateUserAndParts({
           userId: this.userForm.userId,
@@ -534,11 +557,9 @@ export default {
     },
     //获取所有部门
     getLastFactoryMenus() {
-      getFactoryMenus(
-        {
-        factoryType:this.$store.state.userInfor.factoryType
-        }
-      )
+      getFactoryMenus({
+        factoryType: this.$store.state.userInfor.factoryType
+      })
         .then(res => {
           if (res.httpStatus == 200) {
             this.options = res.result.map(item => {
@@ -549,7 +570,7 @@ export default {
 
               return item;
             });
-            changNull(this.options)
+            changNull(this.options);
           }
         })
         .catch(err => {
@@ -649,11 +670,11 @@ export default {
       this.getUserLsit(1);
     },
     getFactorytype: function(val1, val2) {
-      console.log(val1)
-      if(val1==10||val1==1){
-        this.isService = true
-      }else{
-        this.isService = false
+      console.log(val1);
+      if (val1 == 10 || val1 == 1) {
+        this.isService = true;
+      } else {
+        this.isService = false;
       }
       // this.userList = []
       // this.userTotal = 0
@@ -747,17 +768,25 @@ export default {
     //   border: 1px dotted red;
     // }
   }
-  .prompBox{
+  .prompBox {
     position: relative;
-    .promptIcon{
-      position: absolute;
-      right: 0;
-      top: 0;
+    .promptIconBox {
+      height: 100%;
+      text-indent: 3px;
+      .promptIcon {
+        font-size: 20px;
+        line-height: 40px;
+        cursor: pointer;
+      }
     }
-    .promptText{
+    .promptText {
+      font-size: 12px;
+      color: red;
       position: absolute;
-      bottom: 0;
-      left: 100px;
+      bottom: -48px;
+      right: -20px;
+      z-index: 100;
+      background-color: rgba(0, 0, 0, 0.8);
     }
   }
 }

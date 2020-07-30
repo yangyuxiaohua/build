@@ -29,14 +29,14 @@
               <span>{{projectForm.typeName}}</span>
             </p>
             <p>申请日期 ：
-              <span>{{projectForm.time}}</span>
+              <span>{{projectForm.createTime}}</span>
             </p>
             <p>建设单位 ：
               <span>{{projectForm.factoryName}}</span>
             </p>
             <p>项目负责 ：
-              <span>{{projectForm.constructionProjectLeader}}(
-                <span>{{projectForm.constructionProjectLeaderPhone}}</span>)</span>
+              <span>{{projectForm.constructionProjectLeader}}
+                </span>
             </p>
             <!-- <p>建设单位项目负责人电话 ：
               <span>{{projectForm.constructionProjectLeaderPhone}}</span>
@@ -45,8 +45,8 @@
               <span>{{projectForm.serviceFactoryName}}</span>
             </p>
             <p>项目负责 ：
-              <span>{{projectForm.serviceProjectLeader}}(
-                <span>{{projectForm.serviceProjectLeaderPhone}}</span>)</span>
+              <span>{{projectForm.serviceProjectLeader}}
+                </span>
             </p>
             <!-- <p>服务机构项目负责人电话 ：
              
@@ -117,7 +117,7 @@ export default {
       cIwN: 0,
       pId: "",
       projectForm: {
-        time: "",
+        createTime: "",
         usageName: "",
         dangerousLevelName: "",
         typeName: "",
@@ -154,7 +154,7 @@ export default {
         regionId
       })
         .then(res => {
-          console.log(res)
+          // console.log(res)
           if (res.httpStatus == 200) {
             this.markersSave = res.result.map(item => {
               // console.log(item)
@@ -238,6 +238,7 @@ export default {
           projectId: this.pId
         })
           .then(res => {
+            console.log(res)
             if (res.httpStatus == 200) {
               let usageName = res.result.projectInfoUsages.map(item => {
                 return item.usageName;
@@ -250,16 +251,16 @@ export default {
                     res.result.projectInfo.regionName +
                     res.result.project.detailedAddress,
                   constructionArea: res.result.project.constructionArea + "m²",
-                  time: getlTime(res.result.projectInfo.time),
+                  createTime: getlTime(res.result.project.createTime),
                   factoryName: res.result.projectInfo.factoryName,
                   constructionProjectLeader:
-                    res.result.projectInfo.constructionProjectLeader,
+                    res.result.projectInfo.constructionProjectLeader?`${ res.result.projectInfo.constructionProjectLeader}(${ res.result.projectInfo.constructionProjectLeaderPhone})`:'暂无',
                   constructionProjectLeaderPhone:
                     res.result.projectInfo.constructionProjectLeaderPhone,
 
                   serviceFactoryName: res.result.projectInfo.serviceFactoryName,
                   serviceProjectLeader:
-                    res.result.projectInfo.serviceProjectLeader,
+                    res.result.projectInfo.serviceProjectLeader?`${res.result.projectInfo.serviceProjectLeader}(${ res.result.projectInfo.serviceProjectLeaderPhone})`:'暂无',
                   serviceProjectLeaderPhone:
                     res.result.projectInfo.serviceProjectLeaderPhone,
 
