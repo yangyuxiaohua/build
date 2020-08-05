@@ -319,7 +319,7 @@ import {
   getRecordsByProjectIdGroup1,
   getRecordsByProjectIdGroup2,
   getRecordsBill,
-  downloadEvaiuation
+  // downloadEvaiuation
 } from "@/apis/evaluation";
 import { getTime, changeEdit,splitStr,exportMethod} from "@/utils/publictool";
 
@@ -417,7 +417,7 @@ export default {
         result:this.result
       })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.unitTotal = res.result.countRows;
           this.list = res.result.result.map(i => {
             let children = [];
@@ -598,19 +598,24 @@ export default {
     //点击附件
     lookAttachment(i, item) {
       this.attachment = true;
+      this.fileList=[]
       if (i == "MP3") {
         this.audioWrapper = true;
         this.imgWrapper = false;
         this.videoWrapper = false;
+        this.$refs.audio.src=''
       } else if (i == "MP4") {
         this.audioWrapper = false;
         this.imgWrapper = false;
         this.videoWrapper = true;
+         this.$refs.video.src = ''
       } else {
         this.audioWrapper = false;
         this.imgWrapper = true;
         this.videoWrapper = false;
+        this.imgSrc=''
       }
+      // console.log(item)
       getUploadsByChecklistId({
         checklistId: item.checklistId,
         projectId: item.projectId,

@@ -776,6 +776,7 @@ export default {
                 lng: res.result.project.lon
               });
             }
+            // console.log(res.result)
             this.form = {
               projectName: res.result.project.projectName, //工程名称
               regionId: res.result.project.regionId, //工程地址
@@ -816,6 +817,12 @@ export default {
               return item.usagesTips;
             });
             this.userdListStr = arr.join(" , ");
+            //查询新的验收单位
+            // if()
+            console.log(this.$store.state.userInfor.factoryType)
+            if(this.$store.state.userInfor.factoryType!=1){
+              this.getAcceptUnits(this.form.acceptancePartId,true)
+            }
           }
         })
         .catch(err => {
@@ -829,27 +836,7 @@ export default {
     //查询（验收单位，建设单位，技术服务机构）
     getAcceptanceFactorysOptions() {
       //验收
-      getFactoryMenus({
-        factoryType: 5,
-        onlyFactory: true,
-        queryUser: false
-      })
-        .then(res => {
-          // console.log('验收',res)
-          if (res.httpStatus == 200) {
-            this.AcceptanceFactorysOptions = res.result.map(item => {
-              return item;
-            });
-          changNull(this.AcceptanceFactorysOptions)
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          this.$message({
-            type: "warning",
-            message: err
-          });
-        });
+      this.getAcceptUnits()
       // 建设
       getFactoryMenus({
         factoryType: 1,
@@ -886,6 +873,32 @@ export default {
             });
             changNull(this.serviceOptions)
             // console.log(this.serviceOptions)
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.$message({
+            type: "warning",
+            message: err
+          });
+        });
+    },
+    //查询验收单位
+    getAcceptUnits(organizationPartId=null,onlyQueryOrganizationName=false){
+        getFactoryMenus({
+        factoryType: 5,
+        onlyFactory: true,
+        queryUser: false,
+        organizationPartId,
+        onlyQueryOrganizationName
+      })
+        .then(res => {
+          // console.log('验收',res)
+          if (res.httpStatus == 200) {
+            this.AcceptanceFactorysOptions = res.result.map(item => {
+              return item;
+            });
+          changNull(this.AcceptanceFactorysOptions)
           }
         })
         .catch(err => {

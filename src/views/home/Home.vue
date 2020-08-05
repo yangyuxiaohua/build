@@ -886,7 +886,7 @@ export default {
         }
       } else {
         // console.log("有项目");
-        console.log(this.constructionProcessDto);
+        // console.log(this.constructionProcessDto);
         switch (num) {
           case 1:
             if (this.constructionProcessDto[0].selected) {
@@ -956,8 +956,9 @@ export default {
                 this.constructionProcessDto[5].username
               }）在系统中确认“现场评定”工作完成，评定结论为“合格”。`;
             } else {
+              // console.log(this.constructionProcessDto)
               this.info =
-                "请联系“昆明市建设工程质量安全监督管理总站 杨某某 13577899123”，告知已具备现场评定条件，请安排现场评定。";
+                `请联系“${this.constructionProcessDto[5].username}”，告知已具备现场评定条件，请安排现场评定。`;
             }
         }
       }

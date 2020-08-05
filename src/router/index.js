@@ -87,15 +87,26 @@ const routes = [{
         path: '/index/standard',
         name: 'standard',
         component: () => import('../views/standard/Standard.vue'),
-        children: [{
+        children: [
+          {
             path: '/index/standard/assess',
             name: 'assess',
             component: () => import('../views/standard/Assess.vue')
           },
+          // {
+          //   path: '/index/standard/standardDataReview',
+          //   name: 'standardDataReview',
+          //   component: () => import('../views/standard/StandardDataReview.vue')
+          // },
           {
-            path: '/index/standard/standardDataReview',
-            name: 'standardDataReview',
-            component: () => import('../views/standard/StandardDataReview.vue')
+            path: '/index/standard/detectionJudgement',
+            name: 'detectionJudgement',
+            component: () => import('../views/standard/DetectionJudgement.vue')
+          },
+          {
+            path: '/index/standard/inspectionDecide',
+            name: 'inspectionDecide',
+            component: () => import('../views/standard/InspectionDecide.vue')
           },
         ]
       },

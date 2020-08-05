@@ -10,7 +10,7 @@ export default new Vuex.Store({
     userInfor: {},
     projectInfor: {},
     contentId:'',
-    standardId: '',
+    standardId: {}, // 标准模块
     addProjectSuccessed: '1',
     point:{},
     unitInfo:{}, //用户管理的单位用户信息
@@ -35,8 +35,8 @@ export default new Vuex.Store({
     saveContentId(state, id) { // 新增项目信息存入
       state.contentId = id
     },
-    saveStandardId(state, id) { // 标准菜单切换
-      state.standardId = id
+    saveStandardId(state, obj) { // 标准菜单切换
+      state.standardId = obj
     },
     addProjectSuccess(state, bool) { //增加项目成功
       // if()

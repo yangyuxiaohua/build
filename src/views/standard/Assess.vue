@@ -1,157 +1,153 @@
 <template>
   <div id="assessWrapper">
-    <div class="left">
-      <div class="addBtn">
-        <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="inputSearch">
-        </el-input>
-        <el-button type="primary" plain @click="addBtnClick()">新增</el-button>
-      </div>
-      <el-divider></el-divider>
-      <div class="treeWrapper">
-        <el-tree :data="treeData" :props="defaultProps" @node-click="handleNodeClick" highlight-current :expand-on-click-node='expandOnClickNode' :accordion='accordion' node-key="id" :default-expanded-keys="defaultOnNode" draggable :allow-drop='allowDrop' @node-drop='successDrag'>
-          <span class="custom-tree-node" slot-scope="{node,data}">
-            <span class="nodeText">{{node.label }}</span>
-          </span>
-        </el-tree>
-      </div>
+        <div class="left" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
+          <div class="addBtn">
+            <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="inputSearch">
+            </el-input>
+            <el-button type="primary" plain @click="addBtnClick()">新增</el-button>
+          </div>
+          <el-divider></el-divider>
+          <div class="treeWrapper">
+            <el-tree :data="treeData" :props="defaultProps" @node-click="handleNodeClick" highlight-current :expand-on-click-node='expandOnClickNode' :accordion='accordion' node-key="id" :default-expanded-keys="defaultOnNode" draggable :allow-drop='allowDrop' @node-drop='successDrag'>
+              <span class="custom-tree-node" slot-scope="{node,data}">
+                <span class="nodeText">{{node.label }}</span>
+              </span>
+            </el-tree>
+          </div>
 
-    </div>
-    <div class="right">
-      <div class="parentNode" v-show="parentShow">
-        <el-form label-width="100px">
-          <el-form-item label="名称 :" class="fs18">
-            <el-input v-model="parentNodeValue" disabled></el-input>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div class="firstInfor" v-show="firstShow">
-        <el-form label-width="200px">
-          <el-form-item label="分部工程名称 :" class="fs18">
-            <el-input v-model="firstValue" placeholder="请输入"></el-input>
-          </el-form-item>
-          <el-row class="btns">
-            <el-form-item>
-              <el-button type="primary" @click="onSubmit(1)" plain>提交</el-button>
-              <el-button type="danger" plain @click="deleteCon(1)">删除</el-button>
-            </el-form-item>
-          </el-row>
-        </el-form>
-      </div>
-      <div class="secondInfor" v-show="secondShow">
-        <el-form label-width="200px">
-          <el-form-item label="分项工程名称 :" class="fs18">
-            <el-input v-model="secondValue" placeholder="请输入"></el-input>
-          </el-form-item>
-          <el-row class="btns">
-            <el-form-item>
-              <el-button type="primary" @click="onSubmit(2)" plain>提交</el-button>
-              <el-button type="danger" plain @click="deleteCon(2)">删除</el-button>
-            </el-form-item>
-          </el-row>
-        </el-form>
-      </div>
-      <div class="thirdInfo" v-show="thirdShow">
-        <el-form ref="form" :model="form" label-width="100px">
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="分部工程 :">
-                <el-input v-model="form.subPart" disabled="disabled"></el-input>
+        </div>
+        <div class="right">
+          <div class="parentNode" v-show="parentShow">
+            <el-form label-width="100px">
+              <el-form-item label="名称 :" class="fs18">
+                <el-input v-model="parentNodeValue" disabled></el-input>
               </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="分项工程 :">
-                <el-input v-model="form.subProject" disabled="disabled"></el-input>
+            </el-form>
+          </div>
+          <div class="firstInfor" v-show="firstShow">
+            <el-form label-width="200px">
+              <el-form-item label="分部工程名称 :" class="fs18">
+                <el-input v-model="firstValue" placeholder="请输入"></el-input>
               </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="18">
-              <el-form-item label="验收内容 :">
-                <el-input v-model="form.content"></el-input>
+              <el-row class="btns">
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit(1)" plain>提交</el-button>
+                  <el-button type="danger" plain @click="deleteCon(1)">删除</el-button>
+                </el-form-item>
+              </el-row>
+            </el-form>
+          </div>
+          <div class="secondInfor" v-show="secondShow">
+            <el-form label-width="200px">
+              <el-form-item label="分项工程名称 :" class="fs18">
+                <el-input v-model="secondValue" placeholder="请输入"></el-input>
               </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="重要程度 :">
-                <el-input v-model="form.checkTypeName"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="18">
-              <el-form-item label="验收方法 :">
-                <!-- <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="form.checkContent">
-                </el-input> -->
-                <div class="editWrapper">
-                  <quill-editor v-model="form.checkContent" ref="myQuillEditor" :options="editorOption" class="editContent">
-                  </quill-editor>
-                </div>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="适用标准 :">
-                <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.standardName">
-                </el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="18">
-              <el-form-item label="记录模板 :">
-                <div class="editWrapper">
-                  <quill-editor v-model="form.remark" ref="myQuillEditor" :options="editorOption" class="editContent">
-                  </quill-editor>
-                </div>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="适用项目 :">
-                <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.withProjects">
-                </el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="18">
-              <el-form-item label="评定规则 :">
-                <!-- <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="form.rules">
-                </el-input> -->
-                <div class="editWrapper">
-                  <quill-editor v-model="form.rules" ref="myQuillEditor" :options="editorOption" class="editContent">
-                  </quill-editor>
-                </div>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="抽样要求 :">
-                <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.samplingRequires">
-                </el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="24">
-              <el-form-item label="技术要求 :">
-                <div class="editWrapper">
-                  <quill-editor v-model="form.technologyRequires" ref="myQuillEditor" :options="editorOption" class="editContent">
-                  </quill-editor>
-                </div>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row class="edit">
-          </el-row>
-          <el-row class="btns">
-            <el-form-item>
-              <el-button type="primary" @click="onSubmit(3)" plain>提交</el-button>
-              <el-button type="danger" plain @click="deleteCon(3)">删除</el-button>
-            </el-form-item>
-          </el-row>
+              <el-row class="btns">
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit(2)" plain>提交</el-button>
+                  <el-button type="danger" plain @click="deleteCon(2)">删除</el-button>
+                </el-form-item>
+              </el-row>
+            </el-form>
+          </div>
+          <div class="thirdInfo" v-show="thirdShow">
+            <el-form ref="form" :model="form" label-width="100px">
+              <el-row>
+                <el-col :span="12">
+                  <el-form-item label="分部工程 :">
+                    <el-input v-model="form.subPart" disabled="disabled"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="分项工程 :">
+                    <el-input v-model="form.subProject" disabled="disabled"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="18">
+                  <el-form-item label="验收内容 :">
+                    <el-input v-model="form.content"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="重要程度 :">
+                    <el-input v-model="form.checkTypeName"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="18">
+                  <el-form-item label="验收方法 :">
+                    <div class="editWrapper">
+                      <quill-editor v-model="form.checkContent" ref="myQuillEditor" :options="editorOption" class="editContent">
+                      </quill-editor>
+                    </div>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="适用标准 :">
+                    <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.standardName">
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="18">
+                  <el-form-item label="记录模板 :">
+                    <div class="editWrapper">
+                      <quill-editor v-model="form.remark" ref="myQuillEditor" :options="editorOption" class="editContent">
+                      </quill-editor>
+                    </div>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="适用项目 :">
+                    <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.withProjects">
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="18">
+                  <el-form-item label="评定规则 :">
+                    <div class="editWrapper">
+                      <quill-editor v-model="form.rules" ref="myQuillEditor" :options="editorOption" class="editContent">
+                      </quill-editor>
+                    </div>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="抽样要求 :">
+                    <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.samplingRequires">
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="24">
+                  <el-form-item label="技术要求 :">
+                    <div class="editWrapper">
+                      <quill-editor v-model="form.technologyRequires" ref="myQuillEditor" :options="editorOption" class="editContent">
+                      </quill-editor>
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row class="edit">
+              </el-row>
+              <el-row class="btns">
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit(3)" plain>提交</el-button>
+                  <el-button type="danger" plain @click="deleteCon(3)">删除</el-button>
+                </el-form-item>
+              </el-row>
 
-        </el-form>
+            </el-form>
+          </div>
+          <div class="rightMask" v-show="rightMaskShow"></div>
+        </div>
       </div>
-      <div class="rightMask" v-show="rightMaskShow"></div>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -190,6 +186,7 @@ export default {
   data() {
     return {
       treeData: [],
+      loading: false,
       defaultProps: {
         children: "children",
         label: "label"
@@ -285,14 +282,22 @@ export default {
         }
       },
       accordion: true,
-      defaultOnNode: [] //默认展开
+      defaultOnNode: [], //默认展开,
+      standardName: ""
     };
   },
-  created() {},
+  created() {
+    if(this.$store.state.standardId.standardId){
+      this.loading = true
+      this.standardName = this.$store.state.standardId.standardName
+      this.getTreeData(this.$store.state.standardId.standardId);
+    }
+     
+  },
   mounted() {
-    this.getTreeData(this.$store.state.standardId);
   },
   methods: {
+    //点击树形节点
     handleNodeClick(data, node) {
       this.treeNodeData = data;
       this.rightMaskShow = false;
@@ -495,8 +500,8 @@ export default {
               });
             });
         } else {
-          console.log(this.form)
-          
+          console.log(this.form);
+
           updateChecklist({
             standardChecklistId: this.standardChecklistId,
             ...this.form
@@ -523,9 +528,10 @@ export default {
         standardId: id
       })
         .then(res => {
-          console.log(res)
+          console.log(res);
           this.standardId = res.result.standardId;
           if (res.httpStatus == 200) {
+            this.loading = false;
             this.treeData = res.result.primaryTitles.map(item => {
               return {
                 id: "menuLevel1_" + item.standardPrimaryTitleId,
@@ -566,7 +572,7 @@ export default {
             this.treeData = [
               {
                 id: "01",
-                label: "现场评定",
+                label: this.standardName,
                 children: this.treeData,
                 iconShow: true,
                 editIconShow: false
@@ -695,19 +701,19 @@ export default {
     successDrag(draggingNode, dropNode, type) {
       // console.log(this.treeData)
       // console.log(dropNode.parent.childNodes);
-      let sortsVo = dropNode.parent.childNodes.map((item,index)=>{
-        console.log(item.data.id)
+      let sortsVo = dropNode.parent.childNodes.map((item, index) => {
+        console.log(item.data.id);
         return {
           id: splitStr(item.data.id)[1],
           sort: index
-        }
-      })
+        };
+      });
 
-    //   "sortsVo": 
-    // {
-    //   "id": "string",
-    //   "sort": 0
-    // }
+      //   "sortsVo":
+      // {
+      //   "id": "string",
+      //   "sort": 0
+      // }
       // console.log(dropNode);
       // console.log(type);
       // let num = 0;
@@ -806,110 +812,135 @@ export default {
     //   });
     // }
   },
-  watch: {}
+  computed:{
+     getStandard(){
+       return this.$store.state.standardId
+     }
+  },
+  watch: {
+    getStandard:function(val1,val2){
+      this.loading = true
+      this.standardName = val1.standardName;
+        this.getTreeData(val1.standardId);
+        this.form = {};
+        this.rightMaskShow = true;
+        this.parentShow = false, //父节点
+        this.firstShow = false; //一级显示
+        this.secondShow = false; //二级显示
+        this.thirdShow = true; //三级显示
+        this.nodeClickFlag = false; 
+    }
+  }
 };
 </script>
 
 <style lang="less">
-#assessWrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  background-color: #fff;
-  .left {
-    flex: 0 0 400px;
-    // height: 800px;
-    height: 100%;
-    border-right: 2px solid #f2f2f2;
-    overflow: auto;
-    font-size: 16px;
-    // .leftTit{
-    padding: 0 10px;
-    // }
-    // overflow-y:auto;
-    .el-divider {
-      margin: 10px 0;
-    }
-    .addBtn {
-      margin-top: 10px;
+ #assessWrapper {
+      width: 100%;
+      height: 100%;
       display: flex;
-      justify-content: space-between;
-    }
-    .el-input {
-      width: 300px;
-    }
-    .treeWrapper {
-      height: 1400px;
-      overflow-y: auto;
-      // overflow: hidden;
-      .el-tree {
-        margin-top: 10px;
-        .custom-tree-node {
-          position: relative;
-          padding-right: 150px;
-          // overflow: none;
-          .iconWrapper {
-            position: absolute;
-            right: 0;
-            font-size: 18px;
-            // color: #409eff;
-            cursor: pointer;
-            .el-icon-edit {
-              margin-left: 10px;
-            }
-            .el-input {
-              width: 200px;
-              .el-input__inner {
-                width: 80%;
+      background-color: #fff;
+      .left {
+        flex: 0 0 400px;
+        // height: 800px;
+        height: 100%;
+        border-right: 2px solid #f2f2f2;
+        overflow: auto;
+        font-size: 16px;
+        // .leftTit{
+        padding: 0 10px;
+        // }
+        // overflow-y:auto;
+        .el-divider {
+          margin: 10px 0;
+        }
+        .addBtn {
+          margin-top: 10px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .el-input {
+          width: 300px;
+        }
+        .treeWrapper {
+          // height: 1400px;
+          min-height: 720px;
+          max-height: 1400px;
+          overflow-y: auto;
+          // background-color: red;
+          // overflow: hidden;
+          .el-tree {
+            margin-top: 10px;
+            .custom-tree-node {
+              position: relative;
+              padding-right: 150px;
+              // overflow: none;
+              .iconWrapper {
+                position: absolute;
+                right: 0;
+                font-size: 18px;
+                // color: #409eff;
+                cursor: pointer;
+                .el-icon-edit {
+                  margin-left: 10px;
+                }
+                .el-input {
+                  width: 200px;
+                  .el-input__inner {
+                    width: 80%;
+                  }
+                }
               }
             }
           }
         }
+        .treeWrapper::-webkit-scrollbar {
+          width: 4px;
+          display: none;
+        }
       }
-    }
-  }
-  .right {
-    flex: 1;
-    padding: 20px 20px 20px 30px;
-    position: relative;
-    .thirdInfo,
-    .firstInfor,
-    .firstInfor {
-      width: 100%;
-      height: 100%;
-      // overflow-y: auto;
-      // position: absolute;
-    }
-    .el-form {
-      width: 100%;
-      height: 100%;
-      .el-form-item__label {
-        color: #000;
-        font-weight: 500;
-        font-size: 16px;
-      }
-      .btns {
-        text-align: center;
-        // margin-top: 100px;
-      }
-      .editWrapper {
-        width: 100%;
-        height: 100%;
+      .right {
+        flex: 1;
+        padding: 20px 20px 20px 30px;
         position: relative;
-        margin-bottom: 100px;
-        .editContent {
+        .thirdInfo,
+        .firstInfor,
+        .firstInfor {
           width: 100%;
-          height: 186px;
+          height: 100%;
+          overflow-y: auto;
+          // position: absolute;
+        }
+        .el-form {
+          width: 100%;
+          height: 100%;
+          .el-form-item__label {
+            color: #000;
+            font-weight: 500;
+            font-size: 16px;
+          }
+          .btns {
+            text-align: center;
+            // margin-top: 100px;
+          }
+          .editWrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            margin-bottom: 100px;
+            .editContent {
+              width: 100%;
+              height: 186px;
+            }
+          }
+        }
+        .rightMask {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          left: 0;
+          top: 0;
         }
       }
     }
-    .rightMask {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      left: 0;
-      top: 0;
-    }
-  }
-}
 </style>

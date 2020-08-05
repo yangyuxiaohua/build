@@ -42,6 +42,6 @@ export const toArchive = params => rq.post('/project/toArchive', params)
 export const getRecordsBill = params => rq.post('/getRecordsBill', params)
 
 
-// 1.现场评定导出excel
-export const downloadEvaiuation = params => rq.post('/export/download/records/curr', params)
+// // 1.现场评定导出excel
+// export const downloadEvaiuation = params => rq.post('/export/download/records/curr', params)
 

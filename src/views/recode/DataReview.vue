@@ -365,9 +365,10 @@ export default {
             i.titleSecondaryDtos.forEach(j => {
               // console.log(i)
               j.recordsList.forEach(item => {
-                // console.log(item)
+                console.log(item)
                 // console.log(changeEdit(item.contentRecord))
                 children.push({
+                  checklistId:item.checklistId,
                   listTit: item.primaryTitle,
                   branch: item.secondaryTitle,
                   way: item.checklistContent,
@@ -486,21 +487,26 @@ export default {
     //点击附件
     lookAttachment(i, item) {
       this.attachment = true;
+      this.fileList=[]
       if (i == "MP3") {
         this.audioWrapper = true;
         this.imgWrapper = false;
         this.videoWrapper = false;
+        this.$refs.audio.src=''
       } else if (i == "MP4") {
         this.audioWrapper = false;
         this.imgWrapper = false;
         this.videoWrapper = true;
+        this.$refs.video.src=''
       } else {
         this.audioWrapper = false;
         this.imgWrapper = true;
         this.videoWrapper = false;
+        this.imgSrc=''
       }
+      console.log(item)
       getUploadsByChecklistId({
-        checklistId: i.checklistId,
+        checklistId: item.checklistId,
         projectId: item.projectId,
         type: i,
         standardId:this.$store.state.recodeStandard.standardId

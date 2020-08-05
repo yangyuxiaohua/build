@@ -66,16 +66,16 @@ export function inDexOfStr(str, s) {
 //     }, {})
 // }
 // 切割字符串(-)
-export function splitStr(str){
-     let s = '';
-     s = str.split('_')
-     return s
+export function splitStr(str) {
+    let s = '';
+    s = str.split('_')
+    return s
 }
 // 切割字符串(,)
-export function splitStr2(str){
-     let s = '';
-     s = str.split(',')
-     return s
+export function splitStr2(str) {
+    let s = '';
+    s = str.split(',')
+    return s
 }
 //时间戳格式化
 export function getlTime(time) {
@@ -107,31 +107,31 @@ export function getYNumTime(time) {
 }
 //将富文内容变为普通文本
 export function changeEdit(str) {
-    if(!str){
+    if (!str) {
         return ''
     }
-   str = str.replace()
-   str = str.replace(/<\/?[^>]*>/g,''); //去除HTML tag
-            str = str.replace(/[ | ]*\n/g,'\n'); //去除行尾空白
-            //str = str.replace(/\n[\s| | ]*\r/g,'\n'); //去除多余空行
-            str=str.replace(/ /ig,'');//去掉 
-            return str
+    str = str.replace()
+    str = str.replace(/<\/?[^>]*>/g, ''); //去除HTML tag
+    str = str.replace(/[ | ]*\n/g, '\n'); //去除行尾空白
+    //str = str.replace(/\n[\s| | ]*\r/g,'\n'); //去除多余空行
+    str = str.replace(/ /ig, ''); //去掉 
+    return str
 }
 //递归数组最后一级为空则变为null
-export function changNull(arr){
-    arr.forEach(item=>{
-     if(item.departments.length>0){
-       changNull(item.departments)
-     }else{
-       item.departments=null
-     }
-   })
- }
+export function changNull(arr) {
+    arr.forEach(item => {
+        if (item.departments.length > 0) {
+            changNull(item.departments)
+        } else {
+            item.departments = null
+        }
+    })
+}
 
- // 导出现场评定
- export function exportMethod(params) {
+// 导出现场评定
+export function exportMethod(params) {
     //  console.log()
-   return axios({
+    return axios({
         method: 'post',
         url: 'http://192.168.0.200:2225/export/download/records/curr',
         // url: 'http://39.104.90.111:2225/export/download/records/curr',
@@ -141,17 +141,54 @@ export function changNull(arr){
         // console.log(res)
         // console.log(params)
         const link = document.createElement('a')
-        let blob = new Blob([res.data], {type: 'application/vnd.ms-excel'})
+        let blob = new Blob([res.data], {
+            type: 'application/vnd.ms-excel'
+        })
         link.style.display = 'none'
         link.href = URL.createObjectURL(blob)
- 
+
         // link.download = res.headers['content-disposition'] //下载后文件名
-        link.download = params.projectName+'(现场评定记录)' //下载的文件名
+        link.download = params.projectName + '(现场评定记录)' //下载的文件名
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
         // console.log(111)
-         return Promise.resolve(true)
+        return Promise.resolve(true)
+    }).catch(error => {
+        this.$Notice.error({
+            title: '错误',
+            desc: '网络连接错误'
+        })
+        console.log(error)
+    })
+    // return true
+}
+// 导出消防检测
+export function exportMethod2(params) {
+    console.log(params)
+    return axios({
+        method: 'post',
+        url: 'http://192.168.0.200:2225/export/download/records/service',
+        // url: 'http://39.104.90.111:2225/export/download/records/service',
+        responseType: 'blob',
+        params
+    }).then((res) => {
+        // console.log(res)
+        // console.log(params)
+        const link = document.createElement('a')
+        let blob = new Blob([res.data], {
+            type: 'application/msword'
+        })
+        link.style.display = 'none'
+        link.href = URL.createObjectURL(blob)
+
+        // link.download = res.headers['content-disposition'] //下载后文件名
+        link.download = params.projectName + '(消防检测记录)' //下载的文件名
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        // console.log(111)
+        return Promise.resolve(true)
     }).catch(error => {
         this.$Notice.error({
             title: '错误',

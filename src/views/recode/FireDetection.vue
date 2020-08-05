@@ -186,6 +186,9 @@
         </div>
       </div>
     </div>
+    <div class="exportRecode" v-loading="loading">
+      <el-button type="primary" @click="downloadFireDetectionRecode()">导出</el-button>
+    </div>
   </div>
 </template>
 
@@ -195,9 +198,9 @@ import {
   updateRecode,
   getUploadsByChecklistId,
   IP,
-  getRecordsBill
+  getRecordsBill,
 } from "@/apis/evaluation";
-import { getTime,changeEdit,splitStr } from "@/utils/publictool";
+import { getTime,changeEdit,splitStr,exportMethod2 } from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -320,6 +323,7 @@ export default {
         { label: "不合格", value: "5" }
       ],
       updateRecodeBill:'',
+      loading:false
     };
   },
   created() {
@@ -360,6 +364,7 @@ export default {
               j.recordsList.forEach(item => {
                 // console.log(item)
                 children.push({
+                  checklistId:item.checklistId,
                   listTit: item.primaryTitle,
                   branch: item.secondaryTitle,
                   way: item.checklistContent,
@@ -502,21 +507,25 @@ export default {
     //点击附件
     lookAttachment(i, item) {
       this.attachment = true;
+      this.fileList=[]
       if (i == "MP3") {
         this.audioWrapper = true;
         this.imgWrapper = false;
         this.videoWrapper = false;
+        this.$refs.audio.src=''
       } else if (i == "MP4") {
         this.audioWrapper = false;
         this.imgWrapper = false;
         this.videoWrapper = true;
+        this.$refs.video.src = ''
       } else {
         this.audioWrapper = false;
         this.imgWrapper = true;
         this.videoWrapper = false;
+        this.imgSrc=''
       }
       getUploadsByChecklistId({
-        checklistId: i.checklistId,
+        checklistId: item.checklistId,
         projectId: item.projectId,
         type: i,
         standardId:this.$store.state.recodeStandard.standardId
@@ -553,6 +562,26 @@ export default {
         this.$refs.video.src = url;
       }
     },
+    //导出
+    downloadFireDetectionRecode(){
+       this.loading = true
+       exportMethod2({
+        projectId:this.$store.state.projectInfor.projectId,
+        projectName:this.$store.state.projectInfor.projectName,
+        standardId:this.$store.state.projectInfor.standardId,
+      })
+      .then(res=>{
+            if(res){
+              this.loading = false
+            }
+      }).catch(err=>{
+              this.loading = false
+        this.$message({
+          type:'info',
+          message:'导出失败'
+        })
+      })
+    }
    
   },
   computed: {
@@ -838,6 +867,12 @@ export default {
   }
    .lh30{
     line-height: 30px;
+  }
+  .exportRecode{
+    position: absolute;
+    right:10px;
+    top: -55px; 
+    z-index: 100
   }
 }
 </style>

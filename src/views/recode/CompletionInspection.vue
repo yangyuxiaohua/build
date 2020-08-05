@@ -353,15 +353,16 @@ export default {
         // result: this.result,
       })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.unitTotal = res.result.countRows;
           this.list = res.result.result.map(i => {
             let children = [];
             i.titleSecondaryDtos.forEach(j => {
               // console.log(i)
               j.recordsList.forEach(item => {
-                // console.log(item)
+                console.log(item)
                 children.push({
+                  checklistId:item.checklistId,
                   listTit: item.primaryTitle,
                   branch: item.secondaryTitle,
                   way: item.checklistContent,
@@ -505,27 +506,41 @@ export default {
     },
     //点击附件
     lookAttachment(i, item) {
+      this.fileList=[]
       this.attachment = true;
+      //  if (type == "PNG") {
+      //   this.imgSrc = url;
+      // } else if (type == "MP3") {
+      //   this.$refs.audio.src = url;
+      // } else {
+      //   //  this.videoSrc = url
+      //   this.$refs.video.src = url;
+      // }
       if (i == "MP3") {
         this.audioWrapper = true;
         this.imgWrapper = false;
         this.videoWrapper = false;
+        this.$refs.audio.src=''
       } else if (i == "MP4") {
         this.audioWrapper = false;
         this.imgWrapper = false;
         this.videoWrapper = true;
+        this.$refs.video.src=''
       } else {
         this.audioWrapper = false;
         this.imgWrapper = true;
         this.videoWrapper = false;
+        this.imgSrc=''
       }
+      // console.log(item)
       getUploadsByChecklistId({
-        checklistId: i.checklistId,
+        checklistId: item.checklistId,
         projectId: item.projectId,
         type: i,
         standardId:this.$store.state.recodeStandard.standardId
       })
         .then(res => {
+          console.log(res.result)
           if (res.httpStatus == 200) {
             this.fileList = res.result.map(item => {
               item.uploadUrl = IP + item.uploadUrl;
