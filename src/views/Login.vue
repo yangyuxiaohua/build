@@ -47,6 +47,7 @@ import { login, getCurrentRole, getUserInfor } from "@/apis/login";
 import { Message } from "element-ui";
 // import { setKey } from "@/utils/local";
 export default {
+
   data() {
     return {
       loginFlag: true, //防抖
@@ -77,16 +78,23 @@ export default {
     this.$store.commit("saveUserRole", {});
     this.$store.commit("saveUserInfor", {});
     this.$store.commit("chosedProjectId", {});
-    this.$store.commit("saveStandardId", "");
+    this.$store.commit("saveStandardId", {});
     this.$store.commit("savePoint", {});
     this.$store.commit("saveUnitInfo", {});
-    this.$store.commit("changeUnitStatus", '');
-    this.$store.commit("changeConfiFlag", '');
-    this.$store.commit("filterMarkers", '');
-    this.$store.commit("changeCindex", '');
+    this.$store.commit("changeUnitStatus", "");
+    this.$store.commit("changeConfiFlag", "");
+    this.$store.commit("filterMarkers", "");
+    this.$store.commit("changeCindex", "");
     this.$store.commit("saveRecodeStandard", {});
     this.$store.commit("saveFactoryType", "");
-    this.$store.commit("saveFactoryType", {});
+    this.$store.commit("saveScreeningRecordObj", {});
+   let that = this;
+    document.onkeydown =function(e){
+      e = window.event || e;
+      if(that.$route.path=='/'&&(e.code=='Enter'||e.code=='enter')){//验证在登录界面和按得键是回车键enter
+        that.submitForm('loginForm');//登录函数
+      }
+    }
   },
   methods: {
     //  切换眼睛开和闭
@@ -144,12 +152,12 @@ export default {
       }
     },
     // 注册
-    register(){
+    register() {
       // this.$message({
       //   type:'info',
       //   message:'请扫描页面二维码，下载手机app注册'
       // })
-      this.$router.history.push('/register')
+      this.$router.history.push("/register");
     }
   }
 };
@@ -182,8 +190,8 @@ export default {
       .el-button {
         width: 30%;
       }
-      .btns{
-        .el-form-item__content{
+      .btns {
+        .el-form-item__content {
           display: flex;
           justify-content: space-between;
         }

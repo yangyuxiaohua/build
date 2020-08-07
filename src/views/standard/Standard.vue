@@ -171,35 +171,35 @@
 import { getCategorys } from "@/apis/standard";
 //======================抽过来的
 import {
-  getCurrStandardDocument,
-  getCurrChecklistById,
-  addPrimaryMenu,
-  updatePrimaryMenu,
-  addSecondaryMenu,
-  updateSecondaryMenu,
-  addChecklist,
-  updateChecklist,
-  deletedPrimaryMenu,
-  deletedSecondaryMenu,
-  deletedChecklist
+  // getCurrStandardDocument,
+  // getCurrChecklistById,
+  // addPrimaryMenu,
+  // updatePrimaryMenu,
+  // addSecondaryMenu,
+  // updateSecondaryMenu,
+  // addChecklist,
+  // updateChecklist,
+  // deletedPrimaryMenu,
+  // deletedSecondaryMenu,
+  // deletedChecklist
 } from "@/apis/standard";
 import { uploadIp, ImgIp } from "@/apis/upload";
 import { splitStr } from "@/utils/publictool";
 //富文本
-import { quillEditor, Quill } from "vue-quill-editor";
-import { container, ImageExtend, QuillWatch } from "quill-image-extend-module";
-import { ImageDrop } from "quill-image-drop-module";
-import { ImageResize } from "quill-image-resize-module";
-import { quillRedefine } from "vue-quill-editor-upload"; //引入图片上传
-Quill.register("modules/ImageExtend", ImageExtend);
-Quill.register("modules/ImageResize", ImageResize);
-Quill.register("modules/imageDrop", ImageDrop);
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
+// import { quillEditor, Quill } from "vue-quill-editor";
+// import { container, ImageExtend, QuillWatch } from "quill-image-extend-module";
+// import { ImageDrop } from "quill-image-drop-module";
+// import { ImageResize } from "quill-image-resize-module";
+// import { quillRedefine } from "vue-quill-editor-upload"; //引入图片上传
+// Quill.register("modules/ImageExtend", ImageExtend);
+// Quill.register("modules/ImageResize", ImageResize);
+// Quill.register("modules/imageDrop", ImageDrop);
+// import "quill/dist/quill.core.css";
+// import "quill/dist/quill.snow.css";
+// import "quill/dist/quill.bubble.css";
 export default {
   components: {
-    quillEditor
+    // quillEditor
   },
   data() {
     return {
