@@ -139,11 +139,11 @@ export default {
                 });
               //获取正在登录的角色
             } else {
-              Message.error("账号/密码错误");
+              Message.error(res.msg);
             }
           })
           .catch(err => {
-            Message.error("账号/密码错误");
+            Message.error("请求错误");
           });
         setTimeout(() => {
           this.loginFlag = true;
