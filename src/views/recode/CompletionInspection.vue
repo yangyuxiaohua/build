@@ -121,7 +121,7 @@
             <!-- </el-form-item> -->
           </el-col>
           <el-col :span="6">
-            <div>子项评定 : 
+            <div>子项评定 :
               <el-radio-group v-model="form.conclusion" :disabled='readonly'>
                 <el-radio label="合格"></el-radio>
                 <el-radio label="不合格"></el-radio>
@@ -186,6 +186,9 @@
         </div>
       </div>
     </div>
+    <div class="exportRecode" v-loading="loading">
+      <el-button type="primary" @click="downloadCompletionRecode()">导出</el-button>
+    </div>
   </div>
 </template>
 
@@ -199,7 +202,12 @@ import {
   // getRecordsByProjectIdGroup1,
   // getRecordsByProjectIdGroup2
 } from "@/apis/evaluation";
-import { getTime, changeEdit, splitStr } from "@/utils/publictool";
+import {
+  getTime,
+  changeEdit,
+  splitStr,
+  exportMethod3
+} from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -234,84 +242,11 @@ export default {
       imgWrapper: false,
       audioWrapper: false,
       videoWrapper: false,
-      // imgSrc:require('../../assets/imgs/index/app.png'),
-      // audioSrc: require("../../assets/musics/fireWarning2.mp3"),
-      // videoSrc: require("../../assets/musics/fireWarning2.mp3"),
       imgSrc: "",
       audioSrc: "",
       videoSrc: "",
       fileList: [], //文件数组
       roleShow4: true, //权限
-      // editorOption: {
-      //   modules: {
-      //     ImageExtend: {
-      //       loading: true,
-      //       // 如果不作设置，即{}  则依然开启复制粘贴功能且以base64插入
-      //       name: "file", // 图片参数名
-      //       size: 3, // 可选参数 图片大小，单位为M，1M = 1024kb
-      //       // action: "http://192.168.0.200:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       action: "http://39.104.90.111:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       // response 为一个函数用来获取服务器返回的具体图片地址
-      //       // 例如服务器返回{code: 200; data:{ url: 'baidu.com'}}
-      //       // 则 return res.data.url
-      //       response: res => {
-      //         //  console.log(res)
-      //         const imgUrl = Ip + res.result;
-      //         // console.log(imgUrl)
-      //         return imgUrl;
-      //         // return Ip + res.result;
-      //       },
-      //       // headers: xhr => {
-      //       //   // xhr.setRequestHeader('myHeader','myValue')
-      //       // }, // 可选参数 设置请求头部
-      //       sizeError: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "图片太大"
-      //         });
-      //       }, // 图片超过大小的回调
-      //       start: () => {}, // 可选参数 自定义开始上传触发事件
-      //       end: () => {}, // 可选参数 自定义上传结束触发的事件，无论成功或者失败
-      //       error: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "上传失败"
-      //         });
-      //       }, // 可选参数 上传失败触发的事件
-      //       success: () => {
-      //         //  console.log(res)
-      //       }, // 可选参数  上传成功触发的事件
-      //       change: (xhr, formData) => {
-      //         console.log(xhr);
-      //         console.log(formData);
-      //         return false;
-      //         // xhr.setRequestHeader('myHeader','myValue')
-      //         // formData.append('token', 'myToken')
-      //       } // 可选参数 每次选择图片触发，也可用来设置头部，但比headers多了一个参数，可设置formData
-      //     },
-      //     ImageResize: {
-      //       // ...
-      //       // handleStyles: {
-      //       //   backgroundColor: "black",
-      //       //   border: "none",
-      //       //   color: white
-      //       //   // other camelCase styles for size display
-      //       // }
-      //       displaySize: true
-      //     },
-      //     imageDrop: true, //图片拖拽
-      //     toolbar: {
-      //       // 如果不上传图片到服务器，此处不必配置
-      //       container: container, // container为工具栏，此次引入了全部工具栏，也可自行配置
-      //       handlers: {
-      //         image: function() {
-      //           // 劫持原来的图片点击按钮事件
-      //           QuillWatch.emit(this.quill.id);
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
       primaryTitleId: "",
       secondaryTitleId: "",
       checkTypeName: "",
@@ -320,7 +255,8 @@ export default {
         { label: "合格", value: "1" },
         { label: "不合格", value: "5" }
       ],
-      updateRecodeBill: "" //修改记录
+      updateRecodeBill: "", //修改记录
+      loading: false
     };
   },
   created() {
@@ -360,9 +296,9 @@ export default {
             i.titleSecondaryDtos.forEach(j => {
               // console.log(i)
               j.recordsList.forEach(item => {
-                console.log(item)
+                console.log(item);
                 children.push({
-                  checklistId:item.checklistId,
+                  checklistId: item.checklistId,
                   listTit: item.primaryTitle,
                   branch: item.secondaryTitle,
                   way: item.checklistContent,
@@ -375,7 +311,9 @@ export default {
                   contentRecord: changeEdit(item.contentRecord),
                   standardName: item.standardName,
                   createTime: getTime(item.createTime),
-                  usernames: item.usernames,
+                  usernames: item.otherUsernames
+                    ? item.otherUsernames + "," + item.usernames
+                    : item.usernames,
                   projectId: item.projectId,
                   id: item.id
                 });
@@ -461,42 +399,41 @@ export default {
     },
     //保存
     save() {
-      if(this.form.bill){
-         updateRecode({
-        id: this.form.id,
-        contentRecord: this.form.contentRecord,
-        checkNum: this.form.num,
-        checkPart: this.form.parts,
-        result: this.form.conclusion == "合格" ? 1 : 5,
-        bill: this.form.bill
-      })
-        .then(res => {
-          if (res.httpStatus == 200) {
-            this.$message({
-              type: "success",
-              message: "修改成功"
-            });
-            this.unitCurrentChange(this.unitCurrentPage);
-          } else {
-            this.$message({
-              type: "info",
-              message: res.msg
-            });
-          }
+      if (this.form.bill) {
+        updateRecode({
+          id: this.form.id,
+          contentRecord: this.form.contentRecord,
+          checkNum: this.form.num,
+          checkPart: this.form.parts,
+          result: this.form.conclusion == "合格" ? 1 : 5,
+          bill: this.form.bill
         })
-        .catch(err => {
-          this.$message({
-            type: "warning",
-            message: err.msg
-          });
-        });
-      }else{
-         this.$message({
-            type:'info',
-            message:'请填写修改原由'
+          .then(res => {
+            if (res.httpStatus == 200) {
+              this.$message({
+                type: "success",
+                message: "修改成功"
+              });
+              this.unitCurrentChange(this.unitCurrentPage);
+            } else {
+              this.$message({
+                type: "info",
+                message: res.msg
+              });
+            }
           })
+          .catch(err => {
+            this.$message({
+              type: "warning",
+              message: err.msg
+            });
+          });
+      } else {
+        this.$message({
+          type: "info",
+          message: "请填写修改原由"
+        });
       }
-     
     },
     returnLast() {
       this.showMask = false;
@@ -506,7 +443,7 @@ export default {
     },
     //点击附件
     lookAttachment(i, item) {
-      this.fileList=[]
+      this.fileList = [];
       this.attachment = true;
       //  if (type == "PNG") {
       //   this.imgSrc = url;
@@ -520,27 +457,27 @@ export default {
         this.audioWrapper = true;
         this.imgWrapper = false;
         this.videoWrapper = false;
-        this.$refs.audio.src=''
+        this.$refs.audio.src = "";
       } else if (i == "MP4") {
         this.audioWrapper = false;
         this.imgWrapper = false;
         this.videoWrapper = true;
-        this.$refs.video.src=''
+        this.$refs.video.src = "";
       } else {
         this.audioWrapper = false;
         this.imgWrapper = true;
         this.videoWrapper = false;
-        this.imgSrc=''
+        this.imgSrc = "";
       }
       // console.log(item)
       getUploadsByChecklistId({
         checklistId: item.checklistId,
         projectId: item.projectId,
         type: i,
-        standardId:this.$store.state.recodeStandard.standardId
+        standardId: this.$store.state.recodeStandard.standardId
       })
         .then(res => {
-          console.log(res.result)
+          console.log(res.result);
           if (res.httpStatus == 200) {
             this.fileList = res.result.map(item => {
               item.uploadUrl = IP + item.uploadUrl;
@@ -571,6 +508,27 @@ export default {
         //  this.videoSrc = url
         this.$refs.video.src = url;
       }
+    },
+    //导出
+    downloadCompletionRecode() {
+      this.loading = true;
+      exportMethod3({
+        projectId: this.$store.state.projectInfor.projectId,
+        projectName: this.$store.state.projectInfor.projectName,
+        standardId: this.$store.state.recodeStandard.standardId
+      })
+        .then(res => {
+          if (res) {
+            this.loading = false;
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+          this.$message({
+            type: "info",
+            message: "导出失败"
+          });
+        });
     }
   },
   computed: {
@@ -734,22 +692,29 @@ export default {
     }
   }
   .mask {
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     // background-color: #000;
     left: 0;
     top: 0;
-    display: flex;
-    justify-content: center;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
     background-color: rgba(0, 0, 0, 0.8);
-
+    z-index:200;
     // background-color: #f4f4f4;
     // opacity: 0.8;
     .maskInfor {
       width: 80%;
       min-width: 850px;
       height: 700px;
+      position: fixed;
+      margin: auto;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
       //   padding: 0 10px 60px 0;
       background-color: #fff;
       opacity: 1;
@@ -845,7 +810,7 @@ export default {
   .w50 {
     width: 50%;
   }
-  .lh30{
+  .lh30 {
     line-height: 30px;
   }
   .el-radio-group {
@@ -854,6 +819,12 @@ export default {
       margin-right: 0;
       margin-left: 10px;
     }
+  }
+  .exportRecode {
+    position: absolute;
+    right: 10px;
+    top: -55px;
+    z-index: 100;
   }
 }
 </style>

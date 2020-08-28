@@ -126,6 +126,23 @@ const routes = [{
           }
         ]
       },
+      {
+        path: '/index/messages',
+        name: 'messages',
+        redirect:'/index/messages/news',
+        component: () => import('../views/messages/Messages.vue'),
+        children: [{
+            path: '/index/messages/news',
+            name: 'news',
+            component: () => import('../views/messages/News.vue')
+          },
+          {
+            path: '/index/messages/laws',
+            name: 'laws',
+            component: () => import('../views/messages/Laws.vue')
+          }
+        ]
+      },
     ]
   },
   {

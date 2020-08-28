@@ -365,10 +365,10 @@ export default {
             i.titleSecondaryDtos.forEach(j => {
               // console.log(i)
               j.recordsList.forEach(item => {
-                console.log(item)
+                console.log(item);
                 // console.log(changeEdit(item.contentRecord))
                 children.push({
-                  checklistId:item.checklistId,
+                  checklistId: item.checklistId,
                   listTit: item.primaryTitle,
                   branch: item.secondaryTitle,
                   way: item.checklistContent,
@@ -381,7 +381,9 @@ export default {
                   contentRecord: changeEdit(item.contentRecord),
                   standardName: item.standardName,
                   createTime: getTime(item.createTime),
-                  username: item.username,
+                  username: item.otherUsernames
+                    ? item.otherUsernames + "," + item.username
+                    : item.username,
                   projectId: item.projectId,
                   id: item.id
                 });
@@ -487,29 +489,29 @@ export default {
     //点击附件
     lookAttachment(i, item) {
       this.attachment = true;
-      this.fileList=[]
+      this.fileList = [];
       if (i == "MP3") {
         this.audioWrapper = true;
         this.imgWrapper = false;
         this.videoWrapper = false;
-        this.$refs.audio.src=''
+        this.$refs.audio.src = "";
       } else if (i == "MP4") {
         this.audioWrapper = false;
         this.imgWrapper = false;
         this.videoWrapper = true;
-        this.$refs.video.src=''
+        this.$refs.video.src = "";
       } else {
         this.audioWrapper = false;
         this.imgWrapper = true;
         this.videoWrapper = false;
-        this.imgSrc=''
+        this.imgSrc = "";
       }
-      console.log(item)
+      console.log(item);
       getUploadsByChecklistId({
         checklistId: item.checklistId,
         projectId: item.projectId,
         type: i,
-        standardId:this.$store.state.recodeStandard.standardId
+        standardId: this.$store.state.recodeStandard.standardId
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -705,15 +707,16 @@ export default {
     }
   }
   .mask {
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     // background-color: #000;
     left: 0;
     top: 0;
-    display: flex;
-    justify-content: center;
+    // display: flex;
+    // justify-content: center;
     background-color: rgba(0, 0, 0, 0.8);
+    z-index:200;
 
     // background-color: #f4f4f4;
     // opacity: 0.8;
@@ -721,6 +724,12 @@ export default {
       width: 80%;
       min-width: 850px;
       height: 700px;
+       position: fixed;
+      margin: auto;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
       //   padding: 0 10px 60px 0;
       background-color: #fff;
       opacity: 1;

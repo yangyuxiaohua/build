@@ -130,7 +130,7 @@
           </el-col>
 
         </el-row>
-         <el-row>
+        <el-row>
           <el-col :span="12" v-show="!readonly">
             <!-- bill -->
             <div>
@@ -187,8 +187,22 @@
       </div>
     </div>
     <div class="exportRecode" v-loading="loading">
-      <el-button type="primary" @click="downloadFireDetectionRecode()">导出</el-button>
+      <el-button type="primary" @click="dialogFormVisible = true">导出</el-button>
     </div>
+    <el-dialog title="导出选择" :visible.sync="dialogFormVisible" :modal='true'>
+      <el-form>
+        <el-form-item label="">
+          <el-radio-group v-model="choseLoadFormRecode">
+            <el-radio label="1">消防检测记录</el-radio>
+            <el-radio label="2">检测情况反馈</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="downloadFireDetectionRecode">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -198,9 +212,15 @@ import {
   updateRecode,
   getUploadsByChecklistId,
   IP,
-  getRecordsBill,
+  getRecordsBill
 } from "@/apis/evaluation";
-import { getTime,changeEdit,splitStr,exportMethod2 } from "@/utils/publictool";
+import {
+  getTime,
+  changeEdit,
+  splitStr,
+  exportMethod2,
+  exportMethod4
+} from "@/utils/publictool";
 
 //富文本
 import { uploadIp, Ip } from "@/apis/upload";
@@ -243,87 +263,21 @@ export default {
       videoSrc: "",
       fileList: [], //文件数组
       roleShow4: true, //权限
-      // editorOption: {
-      //   modules: {
-      //     ImageExtend: {
-      //       loading: true,
-      //       // 如果不作设置，即{}  则依然开启复制粘贴功能且以base64插入
-      //       name: "file", // 图片参数名
-      //       size: 3, // 可选参数 图片大小，单位为M，1M = 1024kb
-      //       // action: "http://192.168.0.200:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       action: "http://39.104.90.111:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       // response 为一个函数用来获取服务器返回的具体图片地址
-      //       // 例如服务器返回{code: 200; data:{ url: 'baidu.com'}}
-      //       // 则 return res.data.url
-      //       response: res => {
-      //         //  console.log(res)
-      //         const imgUrl = Ip + res.result;
-      //         // console.log(imgUrl)
-      //         return imgUrl;
-      //         // return Ip + res.result;
-      //       },
-      //       // headers: xhr => {
-      //       //   // xhr.setRequestHeader('myHeader','myValue')
-      //       // }, // 可选参数 设置请求头部
-      //       sizeError: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "图片太大"
-      //         });
-      //       }, // 图片超过大小的回调
-      //       start: () => {}, // 可选参数 自定义开始上传触发事件
-      //       end: () => {}, // 可选参数 自定义上传结束触发的事件，无论成功或者失败
-      //       error: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "上传失败"
-      //         });
-      //       }, // 可选参数 上传失败触发的事件
-      //       success: () => {
-      //         //  console.log(res)
-      //       }, // 可选参数  上传成功触发的事件
-      //       change: (xhr, formData) => {
-      //         console.log(xhr);
-      //         console.log(formData);
-      //         return false;
-      //         // xhr.setRequestHeader('myHeader','myValue')
-      //         // formData.append('token', 'myToken')
-      //       } // 可选参数 每次选择图片触发，也可用来设置头部，但比headers多了一个参数，可设置formData
-      //     },
-      //     ImageResize: {
-      //       // ...
-      //       // handleStyles: {
-      //       //   backgroundColor: "black",
-      //       //   border: "none",
-      //       //   color: white
-      //       //   // other camelCase styles for size display
-      //       // }
-      //       displaySize: true
-      //     },
-      //     imageDrop: true, //图片拖拽
-      //     toolbar: {
-      //       // 如果不上传图片到服务器，此处不必配置
-      //       container: container, // container为工具栏，此次引入了全部工具栏，也可自行配置
-      //       handlers: {
-      //         image: function() {
-      //           // 劫持原来的图片点击按钮事件
-      //           QuillWatch.emit(this.quill.id);
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
-       primaryTitleId:'',//下拉框的筛选
-      secondaryTitleId:'',
-      checkTypeName:'',
-      copyInspectRecordResult:'',
+
+      primaryTitleId: "", //下拉框的筛选
+      secondaryTitleId: "",
+      checkTypeName: "",
+      copyInspectRecordResult: "",
       result: "", //下拉框的筛选
       resultOptions: [
         { label: "合格", value: "1" },
         { label: "不合格", value: "5" }
       ],
-      updateRecodeBill:'',
-      loading:false
+      updateRecodeBill: "",
+      loading: false,
+      dialogFormVisible: false, //导出选择
+      choseLoadFormRecode: ""
+      // choseLoadForm: {} //导出选择的内容
     };
   },
   created() {
@@ -333,11 +287,11 @@ export default {
   mounted() {},
   methods: {
     //角色控制
-   roleShow() {
+    roleShow() {
       let roleCode = this.$store.state.userRole.roleCode;
       if (roleCode == 800 || roleCode == 850 || roleCode == 300) {
         this.roleShow4 = true;
-      }else{
+      } else {
         this.roleShow4 = false;
       }
     },
@@ -345,17 +299,17 @@ export default {
     unitCurrentChange(val) {
       val = val <= 0 ? 1 : val;
       getRecordsByProjectId3({
-        standardId:this.$store.state.projectInfor.inspectStandardId,
+        standardId: this.$store.state.projectInfor.inspectStandardId,
         projectId: this.$store.state.projectInfor.projectId,
         size: this.unitCurrentNum,
         start: val,
         primaryTitleId: this.primaryTitleId,
         secondaryTitleId: this.secondaryTitleId,
-         checkTypeName:this.checkTypeName,
-        result:this.copyInspectRecordResult,
+        checkTypeName: this.checkTypeName,
+        result: this.copyInspectRecordResult
       })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.unitTotal = res.result.countRows;
           this.list = res.result.result.map(i => {
             let children = [];
@@ -364,7 +318,7 @@ export default {
               j.recordsList.forEach(item => {
                 // console.log(item)
                 children.push({
-                  checklistId:item.checklistId,
+                  checklistId: item.checklistId,
                   listTit: item.primaryTitle,
                   branch: item.secondaryTitle,
                   way: item.checklistContent,
@@ -374,10 +328,12 @@ export default {
                   recode: "",
                   importance: item.checkTypeName,
                   conclusion: item.result == 1 ? "合格" : "不合格",
-                  contentRecord:  changeEdit(item.contentRecord),
+                  contentRecord: changeEdit(item.contentRecord),
                   standardName: item.standardName,
                   createTime: getTime(item.createTime),
-                  usernames: item.usernames,
+                  usernames: item.otherUsernames
+                    ? item.otherUsernames + "," + item.usernames
+                    : item.usernames,
                   projectId: item.projectId,
                   id: item.id
                 });
@@ -436,7 +392,7 @@ export default {
       }
       this.showMask = true;
     },
-     //获取修改记录
+    //获取修改记录
     getRecordsBills(recordId) {
       getRecordsBill({ recordId })
         .then(res => {
@@ -461,42 +417,41 @@ export default {
         });
     },
     save() {
-      if(this.form.bill){
-         updateRecode({
-        id: this.form.id,
-        contentRecord: this.form.contentRecord,
-        checkNum: this.form.num,
-        checkPart: this.form.parts,
-         result: this.form.conclusion == "合格" ? 1 : 5,
+      if (this.form.bill) {
+        updateRecode({
+          id: this.form.id,
+          contentRecord: this.form.contentRecord,
+          checkNum: this.form.num,
+          checkPart: this.form.parts,
+          result: this.form.conclusion == "合格" ? 1 : 5,
           bill: this.form.bill
-      })
-        .then(res => {
-          if (res.httpStatus == 200) {
-            this.$message({
-              type: "success",
-              message: "修改成功"
-            });
-            this.unitCurrentChange(this.unitCurrentPage);
-          } else {
-            this.$message({
-              type: "info",
-              message: res.msg
-            });
-          }
         })
-        .catch(err => {
-          this.$message({
-            type: "warning",
-            message: err.msg
-          });
-        });
-      }else{
-        this.$message({
-            type:'info',
-            message:'请填写修改原由'
+          .then(res => {
+            if (res.httpStatus == 200) {
+              this.$message({
+                type: "success",
+                message: "修改成功"
+              });
+              this.unitCurrentChange(this.unitCurrentPage);
+            } else {
+              this.$message({
+                type: "info",
+                message: res.msg
+              });
+            }
           })
+          .catch(err => {
+            this.$message({
+              type: "warning",
+              message: err.msg
+            });
+          });
+      } else {
+        this.$message({
+          type: "info",
+          message: "请填写修改原由"
+        });
       }
-     
     },
     returnLast() {
       this.showMask = false;
@@ -507,28 +462,28 @@ export default {
     //点击附件
     lookAttachment(i, item) {
       this.attachment = true;
-      this.fileList=[]
+      this.fileList = [];
       if (i == "MP3") {
         this.audioWrapper = true;
         this.imgWrapper = false;
         this.videoWrapper = false;
-        this.$refs.audio.src=''
+        this.$refs.audio.src = "";
       } else if (i == "MP4") {
         this.audioWrapper = false;
         this.imgWrapper = false;
         this.videoWrapper = true;
-        this.$refs.video.src = ''
+        this.$refs.video.src = "";
       } else {
         this.audioWrapper = false;
         this.imgWrapper = true;
         this.videoWrapper = false;
-        this.imgSrc=''
+        this.imgSrc = "";
       }
       getUploadsByChecklistId({
         checklistId: item.checklistId,
         projectId: item.projectId,
         type: i,
-        standardId:this.$store.state.recodeStandard.standardId
+        standardId: this.$store.state.recodeStandard.standardId
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -563,70 +518,99 @@ export default {
       }
     },
     //导出
-    downloadFireDetectionRecode(){
-       this.loading = true
-       exportMethod2({
-        projectId:this.$store.state.projectInfor.projectId,
-        projectName:this.$store.state.projectInfor.projectName,
-        standardId:this.$store.state.projectInfor.standardId,
-      })
-      .then(res=>{
-            if(res){
-              this.loading = false
-            }
-      }).catch(err=>{
-              this.loading = false
+    downloadFireDetectionRecode() {
+      console.log(this.choseLoadFormRecode);
+      if (!this.choseLoadFormRecode) {
         this.$message({
-          type:'info',
-          message:'导出失败'
+          type: "info",
+          message: "请选择导出项"
+        });
+      } else if (this.choseLoadFormRecode == 1) {
+        this.dialogFormVisible = false;
+        this.loading = true;
+        exportMethod2({
+          projectId: this.$store.state.projectInfor.projectId,
+          projectName: this.$store.state.projectInfor.projectName,
+          standardId: this.$store.state.recodeStandard.standardId
         })
-      })
+          .then(res => {
+            if (res) {
+              this.loading = false;
+            }
+          })
+          .catch(err => {
+            this.loading = false;
+            this.$message({
+              type: "info",
+              message: "导出失败"
+            });
+          });
+      } else {
+        this.dialogFormVisible = false;
+        this.loading = true;
+        exportMethod4({
+          projectId: this.$store.state.projectInfor.projectId,
+          projectName: this.$store.state.projectInfor.projectName,
+          standardId: this.$store.state.recodeStandard.standardId,
+          code: "v1"
+        })
+          .then(res => {
+            if (res) {
+              this.loading = false;
+            }
+          })
+          .catch(err => {
+            this.loading = false;
+            this.$message({
+              type: "info",
+              message: "导出失败"
+            });
+          });
+      }
     }
-   
   },
   computed: {
     getProjectId() {
       return this.$store.state.projectInfor;
     },
-    getSearchValue(){
-      return this.$store.state.ScreeningRecordObj
+    getSearchValue() {
+      return this.$store.state.ScreeningRecordObj;
     }
   },
   watch: {
     getProjectId: function() {
       this.unitCurrentChange(this.unitCurrentPage);
-    // this.getRecode12();
-      
+      // this.getRecode12();
     },
     getSearchValue: function(val1) {
       // console.log(val1)
       // splitStr
-      let obj; 
-      if(val1.ascaderValue){
-        if(splitStr(val1.ascaderValue)[0]=='menuLevel1'){
+      let obj;
+      if (val1.ascaderValue) {
+        if (splitStr(val1.ascaderValue)[0] == "menuLevel1") {
           obj = {
-            primaryTitleId:splitStr(val1.ascaderValue)[1],
-            secondaryTitleId:'',
-          }
-        }else{
-           obj = {
-            primaryTitleId:'',
-            secondaryTitleId:val1.ascaderValue,
-          }
+            primaryTitleId: splitStr(val1.ascaderValue)[1],
+            secondaryTitleId: ""
+          };
+        } else {
+          obj = {
+            primaryTitleId: "",
+            secondaryTitleId: val1.ascaderValue
+          };
         }
-      }else{
+      } else {
         obj = {
-          primaryTitleId:'',
-          secondaryTitleId:'',
-        }
+          primaryTitleId: "",
+          secondaryTitleId: ""
+        };
       }
-      
-       this.primaryTitleId = obj.primaryTitleId
-       this.secondaryTitleId = obj.secondaryTitleId
-       this.checkTypeName = val1.importantValue
-       this.copyInspectRecordResult = val1.detectionValue
-         this.unitCurrentPage = 1
-         this.unitCurrentChange(this.unitCurrentPage)
+
+      this.primaryTitleId = obj.primaryTitleId;
+      this.secondaryTitleId = obj.secondaryTitleId;
+      this.checkTypeName = val1.importantValue;
+      this.copyInspectRecordResult = val1.detectionValue;
+      this.unitCurrentPage = 1;
+      this.unitCurrentChange(this.unitCurrentPage);
     }
   }
 };
@@ -710,7 +694,6 @@ export default {
     // flex: 0 0 200px;
     flex: 1;
     min-width: 100px;
-    
   }
   .recode {
     flex: 0 0 150px;
@@ -747,22 +730,29 @@ export default {
     }
   }
   .mask {
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     // background-color: #000;
     left: 0;
     top: 0;
-    display: flex;
-    justify-content: center;
+    z-index: 200;
+    // display: flex;
+    // justify-content: center;
     background-color: rgba(0, 0, 0, 0.8);
-    
+
     // background-color: #f4f4f4;
     // opacity: 0.8;
     .maskInfor {
       width: 80%;
       min-width: 850px;
       height: 700px;
+      position: fixed;
+      margin: auto;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
       //   padding: 0 10px 60px 0;
       background-color: #fff;
       opacity: 1;
@@ -858,21 +848,21 @@ export default {
   .w50 {
     width: 50%;
   }
-   .el-radio-group {
+  .el-radio-group {
     text-indent: 0;
     .el-radio {
       margin-right: 0;
       margin-left: 10px;
     }
   }
-   .lh30{
+  .lh30 {
     line-height: 30px;
   }
-  .exportRecode{
+  .exportRecode {
     position: absolute;
-    right:10px;
-    top: -55px; 
-    z-index: 100
+    right: 10px;
+    top: -55px;
+    z-index: 100;
   }
 }
 </style>

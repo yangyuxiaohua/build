@@ -128,7 +128,7 @@
                 <span>查验人员：</span>
               </el-col>
               <el-col :span="18">
-                <span>{{form.completChecklistDtos.usernames}}</span>
+                <span>{{form.completChecklistDtos.usernames}}<span v-show="form.completChecklistDtos.otherUsernames">,</span>{{form.completChecklistDtos.otherUsernames}}</span>
               </el-col>
             </el-row>
             <el-row class="nopadding lh30">
@@ -179,7 +179,7 @@
                 <span>检测人员：</span>
               </el-col>
               <el-col :span="18">
-                <span>{{form.inspectChecklistDtos.usernames}}</span>
+                <span>{{form.inspectChecklistDtos.usernames}}<span v-show="form.inspectChecklistDtos.otherUsernames">,</span>{{form.inspectChecklistDtos.otherUsernames}}</span>
               </el-col>
             </el-row>
             <el-row class="nopadding lh30">
@@ -230,7 +230,7 @@
                 <span>评定人员：</span>
               </el-col>
               <el-col :span="18">
-                <span>{{form.curr2ChecklistDtos.usernames}}</span>
+                <span>{{form.curr2ChecklistDtos.usernames}}<span v-show="form.curr2ChecklistDtos.otherUsernames">,</span>{{form.curr2ChecklistDtos.otherUsernames}}</span>
               </el-col>
             </el-row>
             <el-row class="nopadding lh30">
@@ -864,14 +864,16 @@ export default {
     }
   }
   .mask {
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     // background-color: #000;
     left: 0;
     top: 0;
-    display: flex;
-    justify-content: center;
+    // display: flex;
+    // justify-content: center;
+    z-index:200;
+    
     // background-color: #f4f4f4;
     // opacity: 0.8;
     background-color: rgba(0, 0, 0, 0.8);
@@ -879,6 +881,12 @@ export default {
       width: 80%;
       min-width: 850px;
       height: 700px;
+      position: fixed;
+      margin: auto;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
       //   padding: 0 10px 60px 0;
       background-color: #fff;
       opacity: 1;

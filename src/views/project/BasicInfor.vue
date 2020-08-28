@@ -316,7 +316,7 @@
             <!-- <el-radio-group v-model="form.userd">
             <el-radio :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-radio>
           </el-radio-group> -->
-            <span>（十）生产、储存、装卸易燃易爆危险物品的 ：</span>
+            <span>（十）：</span>
             <el-checkbox-group v-model="userdList" :disabled='roleDisabled'>
               <el-checkbox :label="item.dictionaryId" v-for="item in getUsedList.Used_Gas" :key="item.dictionaryId">{{item.name}}</el-checkbox>
             </el-checkbox-group>

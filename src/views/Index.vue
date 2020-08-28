@@ -295,8 +295,8 @@ export default {
           {
             id: 7,
             img: require("../assets/imgs/index/system.png"),
-            text: "系统管理",
-            path: "",
+            text: "消息管理",
+            path: "/index/messages",
             roleShow4: true
           }
         ];
@@ -334,8 +334,8 @@ export default {
             {
               id: 7,
               img: require("../assets/imgs/index/system.png"),
-              text: "系统管理",
-              path: "",
+              text: "消息管理",
+              path: "/index/messages",
               roleShow4: true
             }
           ];
@@ -379,8 +379,8 @@ export default {
             {
               id: 7,
               img: require("../assets/imgs/index/system.png"),
-              text: "系统管理",
-              path: "",
+              text: "消息管理",
+              path: "/index/messages",
               roleShow4: true
             }
           ];

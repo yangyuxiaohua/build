@@ -2,10 +2,30 @@
   <div id="userManageWrapper">
     <el-form ref="Unitform" :model="form" label-width="120px">
       <el-row>
-        <el-col>
+        <el-col :span="12">
           <el-form-item label="上级机构">
             <el-cascader :options="options" :props="props" clearable v-model="form.authPartsIds" class="w100" ref="ascader1" @change='chosedauthPartsIds()' :disabled='disabledAuthPart'></el-cascader>
           </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-row>
+            <el-col :span='10'>
+              <el-form-item label="注册地址">
+                <el-select placeholder="云南省" disabled v-model="r1">
+                  <el-option v-for="(item,index) in rangeOptions" :key="index" :label="item.name" :value="item.id"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span='6'>
+              <el-select placeholder="昆明市" disabled v-model="r1" class="marL10">
+              </el-select>
+            </el-col>
+            <el-col :span='6'>
+              <el-select placeholder="请选择" v-model="form.regionId" class="marL10">
+                <el-option v-for="(item,index) in rangeOptions" :key="index" :label="item.name" :value="item.id"></el-option>
+              </el-select>
+            </el-col>
+          </el-row>
         </el-col>
       </el-row>
       <el-row>
@@ -135,7 +155,8 @@ import {
   updatedPart
 } from "@/apis/userUnit.js";
 import { uploadIp, ImgIp } from "@/apis/upload.js";
-import { splitStr2,changNull } from "@/utils/publictool";
+import { splitStr2, changNull } from "@/utils/publictool";
+import { getRegions } from "@/apis/project.js";
 
 export default {
   data() {
@@ -162,15 +183,18 @@ export default {
       uploadIp: "", //上传地址
       // businessLicense:'',//营业执照
       loading: false,
-      loading2:false,
+      loading2: false,
       dialogVisible: false, //查看大图
       isACceptShow: false, //验收单位表单隐藏
       isService: false, //服务机构
-      btnText:'提交',
+      btnText: "提交",
+      r1: "",
+      rangeOptions: [] //区域数组
     };
   },
   created() {
     // authPartsIds
+    this.getRegion();
     this.getLastFactoryMenus();
     this.uploadIp = uploadIp;
     if (this.$store.state.factoryType == 5) {
@@ -187,10 +211,32 @@ export default {
   },
 
   methods: {
+    //获取地址regionId
+    getRegion() {
+      //   console.log(1111);
+      getRegions({
+        level: 3,
+        // pid: this.form.cityRegion
+        pid: "530100000000"
+      })
+        .then(res => {
+          console.log(res);
+          if (res.httpStatus == 200) {
+            this.rangeOptions = res.result;
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "warning",
+            message: err
+          });
+        });
+    },
+    // 提交
     onSubmit() {
       if (!this.updata) {
         // if (this.form.authPartsIds && this.form.authPartsIds != "") {
-      this.loading2 = true
+        this.loading2 = true;
         addPart({
           authPartsIds: this.form.authPartsIds,
           partsName: this.form.partsName,
@@ -199,7 +245,7 @@ export default {
           type: this.form.type,
           qualificationLevel: this.form.qualificationLevel,
           legalPerson: this.form.legalPerson,
-          technicalDirectorPerson:this.form.technicalDirectorPerson,
+          technicalDirectorPerson: this.form.technicalDirectorPerson,
           idcard: this.form.idcard,
           technicalDirectorIdcard: this.form.technicalDirectorIdcard,
           contactMasterUser: this.form.contactMasterUser,
@@ -207,7 +253,8 @@ export default {
           enable: this.form.enable,
           businessLicense: this.form.businessLicense,
           isRoot: this.form.isRoot,
-          factoryType: this.$store.state.factoryType
+          factoryType: this.$store.state.factoryType,
+          regionId: this.form.regionId
         })
           .then(res => {
             if (res.httpStatus == 200) {
@@ -223,10 +270,10 @@ export default {
                 message: "网络请求失败"
               });
             }
-              this.loading2 = false
+            this.loading2 = false;
           })
           .catch(err => {
-              this.loading2 = false
+            this.loading2 = false;
             this.$message({
               type: "warning",
               message: err
@@ -313,12 +360,13 @@ export default {
           legalPerson: this.form.legalPerson,
           technicalDirectorPerson: this.form.technicalDirectorPerson,
           idcard: this.form.idcard,
-          idtechnicalDirectorIdcardcard: this.form.technicalDirectorIdcard,
+          technicalDirectorIdcard: this.form.technicalDirectorIdcard,
           contactMasterUser: this.form.contactMasterUser,
           contactMasterPhone: this.form.contactMasterPhone,
           enable: this.form.enable,
           businessLicense: this.form.businessLicense,
-          id: this.$store.state.unitInfo.id
+          id: this.$store.state.unitInfo.id,
+          regionId: this.form.regionId
         })
           .then(res => {
             if (res.httpStatus == 200) {
@@ -363,8 +411,12 @@ export default {
               return item;
             });
             // console.log(this.options);
-            this.options.unshift({ partsName: "无", authPartsIds: "000" ,departments:[]});
-            changNull(this.options)
+            this.options.unshift({
+              partsName: "无",
+              authPartsIds: "000",
+              departments: []
+            });
+            changNull(this.options);
           }
         })
         .catch(err => {
@@ -463,7 +515,7 @@ export default {
     },
     //数据回填
     getFormData(val) {
-      console.log(val);
+      // console.log(val);
       this.form = {
         authPartsIds: val.isRoot == 1 ? "000" : val.authPartsIds,
         partsName: val.partsName,
@@ -478,7 +530,9 @@ export default {
         contactMasterUser: val.contactMasterUser,
         contactMasterPhone: val.contactMasterPhone,
         enable: val.enable,
-        businessLicense: val.businessLicense
+        businessLicense: val.businessLicense,
+        regionId: val.regionId
+
         // departmentPosition: val.unitLocation
         //   ? val.unitLocation
         //   : val.departmentPosition,
@@ -541,7 +595,7 @@ export default {
       if (val1 == "updata" || val1 == "update2") {
         this.updata = true;
         this.deleteBtnShow = true;
-        this.btnText = '确定修改'
+        this.btnText = "确定修改";
         //  this.disabledAuthPart = true
       } else {
         this.form = {};
@@ -549,7 +603,7 @@ export default {
         this.unitTypeShow = true;
         this.deleteBtnShow = false;
         this.updata = false;
-        this.btnText = '提交'
+        this.btnText = "提交";
       }
     },
     getFactorytype: function(val1, val2) {
@@ -558,7 +612,7 @@ export default {
       } else {
         this.isACceptShow = true;
       }
-      if (val1==10) {
+      if (val1 == 10) {
         this.isService = true;
       } else {
         this.isService = false;
@@ -629,6 +683,9 @@ export default {
   }
   .lookImg {
     // margin-left: 15px;
+  }
+  .marL10 {
+    margin-left: 10px;
   }
 }
 </style>

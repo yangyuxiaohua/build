@@ -130,13 +130,13 @@ export default {
       }
       if (roleCode == 600 || roleCode == 650 || roleCode == 700) {
         this.navList = this.navList.filter(item => {
-          if (item.name == "资料审查" || item.name == "竣工查验") {
+          if (item.name == "资料核查" || item.name == "竣工查验") {
             return item;
           }
         });
       } else if (roleCode == 800 || roleCode == 850 || roleCode == 900) {
         this.navList = this.navList.filter(item => {
-          if (item.name == "资料审查" || item.name == "消防检测") {
+          if (item.name == "资料核查" || item.name == "消防检测") {
             return item;
           }
         });
@@ -145,7 +145,7 @@ export default {
       }
       this.cindex = this.navList[0].standardId;
       this.standardName = this.navList[0].name;
-      if (this.standardName == "资料审查") {
+      if (this.standardName == "资料核查") {
         this.isDataReview = false;
       } else {
         this.isDataReview = true;
@@ -312,7 +312,7 @@ export default {
                 case "现场评定":
                   path = "/index/recode/evaluation";
                   break;
-                case "资料审查":
+                case "资料核查":
                   path = "/index/recode/dataReview";
                   break;
                 case "竣工查验":
@@ -410,7 +410,7 @@ export default {
     changeNav(i) {
       this.cindex = i.standardId;
       this.standardName = i.name;
-      if (this.standardName == "资料审查") {
+      if (this.standardName == "资料核查") {
         this.isDataReview = false;
       } else if (
         this.standardName == "竣工查验" ||
@@ -439,7 +439,7 @@ export default {
     getPrimaryTitleIdOptopns() {
       if (this.standardName == "现场评定") {
         this.getEvaluationRecode12();
-      } else if (this.standardName == "资料审查") {
+      } else if (this.standardName == "资料核查") {
         this.getDataReviewRecode12();
       } else {
         this.getFireRecode12();
@@ -454,7 +454,7 @@ export default {
             (this.evaluationShow = true);
           this.importantShow = true;
           break;
-        case "资料审查":
+        case "资料核查":
           (this.importantShow = false),
             (this.completionInspectionShow = false),
             (this.fireDetectionShow = false),

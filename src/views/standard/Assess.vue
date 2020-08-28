@@ -147,6 +147,17 @@
       </div>
       <div class="rightMask" v-show="rightMaskShow"></div>
     </div>
+    <div class="cloneBtn ">
+      <el-button type="primary" size="small" @click="dialogFormVisible = true" v-show="showCopyBtn">复制</el-button>
+      <el-dialog title="" :visible.sync="dialogFormVisible">
+        <el-radio v-model="copyRadio" label="standard_001">复制到现场评定</el-radio>
+        <el-radio v-model="copyRadio" label="standard_003">复制到竣工查验</el-radio>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="cloneCheckList">确 定</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -163,7 +174,8 @@ import {
   updateChecklist,
   deletedPrimaryMenu,
   deletedSecondaryMenu,
-  deletedChecklist
+  deletedChecklist,
+  copyChecklist
 } from "@/apis/standard";
 import { uploadIp, ImgIp } from "@/apis/upload";
 import { splitStr } from "@/utils/publictool";
@@ -179,6 +191,10 @@ Quill.register("modules/imageDrop", ImageDrop);
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
+//======================================================
+var Align = Quill.import("attributors/style/align");
+Align.whitelist = ["right", "center", "justify"];
+Quill.register(Align, true);
 export default {
   components: {
     quillEditor
@@ -287,7 +303,21 @@ export default {
             [{ script: "sub" }, { script: "super" }],
             [{ indent: "-1" }, { indent: "+1" }],
             [{ direction: "rtl" }],
-            [{ size: ["small", false, "large", "huge"] }],
+            [
+              {
+                size: [
+                  "12px",
+                  "14px",
+                  false,
+                  "18px",
+                  "22px",
+                  "26px",
+                  "30px",
+                  "36px",
+                  "42px"
+                ]
+              }
+            ],
             [{ header: [1, 2, 3, 4, 5, 6, false] }],
             [{ color: [] }, { background: [] }],
             [{ font: [] }],
@@ -295,13 +325,15 @@ export default {
             ["clean"],
             // ["link", "image", "video"]
             ["image"]
-
           ]
         }
       },
       accordion: true,
       defaultOnNode: [], //默认展开,
-      standardName: ""
+      standardName: "",
+      showCopyBtn: false,
+      dialogFormVisible: false,
+      copyRadio: ""
     };
   },
   created() {
@@ -315,6 +347,9 @@ export default {
   methods: {
     //点击树形节点
     handleNodeClick(data, node) {
+      // console.log(this.$store.state.standardId.standardId)
+
+      this.showCopyBtn = false;
       this.treeNodeData = data;
       this.rightMaskShow = false;
       this.nodeClickFlag = true;
@@ -338,6 +373,10 @@ export default {
         this.secondShow = false;
         this.thirdShow = true;
         this.parentShow = false;
+        // 判断是否显示复制按钮
+        if (this.$store.state.standardId.standardName == "消防检测") {
+          this.showCopyBtn = true;
+        }
       } else {
         this.firstShow = false;
         this.secondShow = false;
@@ -516,7 +555,7 @@ export default {
               });
             });
         } else {
-          console.log(this.form);
+          // console.log(this.form);
 
           updateChecklist({
             standardChecklistId: this.standardChecklistId,
@@ -819,6 +858,36 @@ export default {
             });
           });
       }
+    },
+    //复制标准
+    cloneCheckList() {
+      copyChecklist({
+        checklistId: this.standardChecklistId,
+        targetStandardId: this.copyRadio
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            // console.log(res)
+            this.dialogFormVisible = false;
+            this.$message({
+              type: "success",
+              message: "复制成功"
+            });
+          } else {
+            this.$message({
+              type: "info",
+              message: res.msg
+            });
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: err.msg
+          });
+        });
+      // console.log(111)
+      // this.dialogFormVisible = false
     }
     // //拖拽失败
     // failDrag() {
@@ -856,6 +925,7 @@ export default {
   height: 100%;
   display: flex;
   background-color: #fff;
+  position: relative;
   .left {
     flex: 0 0 400px;
     // height: 800px;
@@ -958,7 +1028,11 @@ export default {
       top: 0;
     }
   }
-
+  .cloneBtn {
+    position: absolute;
+    right: 10px;
+    top: -46px;
+  }
   .ql-editor {
     white-space: normal !important;
   }

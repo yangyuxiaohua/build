@@ -172,12 +172,12 @@
               <span class="releaseTime">发布时间</span>
             </div>
             <div class="lawsCon">
-              <div class="laws">
-                <span class="titText">建设工程消防设计审查验收管理暂行规定</span>
-                <span class="releaseUnit">住房和城乡建设部</span>
-                <span class="releaseTime">2020-02-03 11：26</span>
+              <div class="laws" v-for="(item,index) in lawsList" :key='index'>
+                <span class="titText">{{item.title}}</span>
+                <span class="releaseUnit">{{item.factoryName}}</span>
+                <span class="releaseTime">{{item.createTime}}</span>
               </div>
-              <div class="laws">
+              <!-- <div class="laws">
                 <span class="titText">建设工程消防设计审查验收工作细则</span>
                 <span class="releaseUnit">住房和城乡建设部</span>
                 <span class="releaseTime">2020-02-03 11：26</span>
@@ -186,7 +186,7 @@
                 <span class="titText">昆明市房屋建筑和市政基础设施工程竣工联合验收工作细则（试行）</span>
                 <span class="releaseUnit">昆明市住房和城乡建设局</span>
                 <span class="releaseTime">2020-02-03 11：26</span>
-              </div>
+              </div> -->
             </div>
             <div class="paging">
               <el-pagination background layout="prev, pager, next" :total="userTotal" :pager-count="pageCount" :page-size='userCurrentNum' :current-page.sync='userCurrentPage' @current-change='userCurrentChange'>
@@ -247,7 +247,8 @@ import {
   get6ConstructionProcess
 } from "@/apis/home";
 import { getYMTime, getTime, getYNumTime } from "@/utils/publictool";
-import { defaults } from "lodash-es";
+// import { defaults } from "lodash-es";
+import { pageByCondition } from "@/apis/laws";
 
 export default {
   components: {
@@ -262,7 +263,7 @@ export default {
       text2: "", //表二显示的百分比
       projectSearch: "", //项目名称
       projectOptions: [],
-      dataValue:[],
+      dataValue: [],
       loading: false,
       rangeValue: "", //辖区范围
       rangeOptions: [],
@@ -274,10 +275,10 @@ export default {
         { id: 4, text: "验收记录", path: "/index/recode" },
         { id: 5, text: "验收标准", path: "/index/standard" },
         { id: 6, text: "用户管理", path: "/index/user/userManage" },
-        { id: 7, text: "系统管理", path: "" }
+        { id: 7, text: "消息管理", path: "/index/messages" }
       ],
       userCurrentPage: 1, //当前页
-      userCurrentNum: 10, //每页显示条数
+      userCurrentNum: 5, //每页显示条数
       pageCount: 5, // 按钮数
       userTotal: 0, //总条数
       infoCurrentPage: 1, //当前页
@@ -301,7 +302,8 @@ export default {
       stepChangeColor5: false,
       stepChangeColor6: false,
       //时间选择器
-      dataFlag: true
+      dataFlag: true,
+      lawsList:[],//法规
     };
   },
   created() {},
@@ -335,7 +337,7 @@ export default {
           { id: 4, text: "验收记录", path: "/index/recode" },
           // { id:5, text: "验收标准", path: "/index/standard" },
           { id: 6, text: "用户管理", path: "/index/user/userManage" },
-          { id: 7, text: "系统管理", path: "" }
+          { id: 7, text: "消息管理", path: "/index/messages" }
         ];
       } else if (
         this.$store.state.userRole.roleCode == 500 ||
@@ -354,7 +356,7 @@ export default {
           { id: 4, text: "验收记录", path: "/index/recode" },
           // { id:5, text: "验收标准", path: "/index/standard" },
           // { id: 6, text: "用户管理", path: "/index/user/userManage" },
-          { id: 7, text: "系统管理", path: "" }
+          { id: 7, text: "消息管理", path: "/index/messages" }
         ];
       } else {
         this.navList = [
@@ -369,7 +371,7 @@ export default {
           { id: 4, text: "验收记录", path: "/index/recode" },
           { id: 5, text: "验收标准", path: "/index/standard" },
           { id: 6, text: "用户管理", path: "/index/user/userManage" },
-          { id: 7, text: "系统管理", path: "" }
+          { id: 7, text: "消息管理", path: "/index/messages" }
         ];
       }
 
@@ -381,11 +383,12 @@ export default {
         this.construContentShow = true;
         this.contentShow = false;
         this.getCharts2();
+         this.lawsCurrentChange(this.userCurrentPage)
       } else {
         this.getFourData();
         this.getCharts();
         this.$store.commit("filterMarkers", {
-           projectSearch: this.projectSearch,
+          projectSearch: this.projectSearch,
           rangeValue: this.rangeValue.toString(),
           time: this.dataValue
         });
@@ -776,9 +779,9 @@ export default {
           });
         });
     },
-  //选中区域清空项目
-    changeRange(){
-      this.projectSearch = ''
+    //选中区域清空项目
+    changeRange() {
+      this.projectSearch = "";
     },
     // 时间选择器
     chosedDataValue() {
@@ -957,14 +960,16 @@ export default {
               }）在系统中确认“现场评定”工作完成，评定结论为“合格”。`;
             } else {
               // console.log(this.constructionProcessDto)
-              this.info =
-                `请联系“${this.constructionProcessDto[5].username}”，告知已具备现场评定条件，请安排现场评定。`;
+              this.info = `请联系“${
+                this.constructionProcessDto[5].username
+              }”，告知已具备现场评定条件，请安排现场评定。`;
             }
         }
       }
     },
     // 切换页码
     userCurrentChange(val) {
+      this.lawsCurrentChange(val)
       // this.getUserLsit(val);
     },
     // 切换信息页码
@@ -1067,7 +1072,30 @@ export default {
             message: "网络请求失败"
           });
         });
-    }
+    },
+    //法规分页
+    lawsCurrentChange(val) {
+      pageByCondition({
+        size: this.userCurrentNum,
+        start: val
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            // console.log(res);
+            this.userTotal = res.result.countRows;
+            this.lawsList = res.result.result.map(item => {
+              item.createTime = getTime(item.createTime);
+              return item;
+            });
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: "65网络请求失败"
+          });
+        });
+    },
   }
 };
 </script>
@@ -1337,6 +1365,7 @@ export default {
             }
           }
           .lawsCon {
+            min-height: 250px;
             & > .laws:nth-child(2n) {
               background-color: #fcfcfc;
             }

@@ -48,3 +48,6 @@ export const getStandardRules = params => rq.post('/standard/rules/getStandardRu
 
 // 替换规则
 export const replaceStandardRules = params => rq.post('/standard/rules/replace', params)
+
+// 复制验收项到指定标准(从消防检测进行验收项复制)
+export const copyChecklist = params => rq.post('/standard/checklist/copyChecklist', params)

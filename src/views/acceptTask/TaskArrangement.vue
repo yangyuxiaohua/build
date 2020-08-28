@@ -101,14 +101,14 @@ export default {
   data() {
     return {
       rightNav: [
-        // { id: 1, text: "资料审查", roleShow4: true },
+        // { id: 1, text: "资料核查", roleShow4: true },
         // { id: 2, text: "竣工查验", roleShow4: true },
         // { id: 3, text: "消防检测", roleShow4: true },
         // { id: 4, text: "现场评定", roleShow4: true }
         // { id: 3, path: "/index/project/taskArrangement", text: "任务安排",roleShow4:true }
       ],
       cindex: 1,
-      cText: "资料审查",
+      cText: "资料核查",
       loading: false, //加载
       acceptanceData1: [],
       defaultProps: {
@@ -170,7 +170,7 @@ export default {
         this.rightNav = [
           {
             id: this.projectInfor.reviewStandardId,
-            text: "资料审查",
+            text: "资料核查",
             roleShow4: true
           },
           {
@@ -183,7 +183,7 @@ export default {
         this.rightNav = [
           {
             id: this.projectInfor.reviewStandardId,
-            text: "资料审查",
+            text: "资料核查",
             roleShow4: true
           },
           {
@@ -196,7 +196,7 @@ export default {
         this.rightNav = [
           {
             id: this.projectInfor.reviewStandardId,
-            text: "资料审查",
+            text: "资料核查",
             roleShow4: true
           },
           {
@@ -209,7 +209,7 @@ export default {
         this.rightNav = [
           {
             id: this.projectInfor.reviewStandardId,
-            text: "资料审查",
+            text: "资料核查",
             roleShow4: true
           },
           {
@@ -864,17 +864,17 @@ export default {
         projectId: this.$store.state.projectInfor.projectId
       })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           if (res.httpStatus == 200) {
-            if (this.cText == "资料审查") {
+            if (this.cText == "资料核查") {
               this.useRecodeRadioList = [
                 {
-                  text: "使用建设单位已有的资料审查记录",
+                  text: "使用建设单位已有的资料核查记录",
                   copyType: 15,
                   disabled: res.result.reviewComplete
                 },
                 {
-                  text: "使用服务机构已有的资料审查记录",
+                  text: "使用服务机构已有的资料核查记录",
                   copyType: 20,
                   disabled: res.result.reviewInspect
                 },

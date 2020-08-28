@@ -133,8 +133,8 @@ export function exportMethod(params) {
     //  console.log()
     return axios({
         method: 'post',
-        url: 'http://192.168.0.200:2225/export/download/records/curr',
-        // url: 'http://39.104.90.111:2225/export/download/records/curr',
+        // url: 'http://192.168.0.200:2225/export/download/records/curr',
+        url: 'http://39.104.90.111:2225/export/download/records/curr',
         responseType: 'blob',
         params
     }).then((res) => {
@@ -168,8 +168,8 @@ export function exportMethod2(params) {
     console.log(params)
     return axios({
         method: 'post',
-        url: 'http://192.168.0.200:2225/export/download/records/service',
-        // url: 'http://39.104.90.111:2225/export/download/records/service',
+        // url: 'http://192.168.0.200:2225/export/download/records/service',
+        url: 'http://39.104.90.111:2225/export/download/records/service',
         responseType: 'blob',
         params
     }).then((res) => {
@@ -184,6 +184,77 @@ export function exportMethod2(params) {
 
         // link.download = res.headers['content-disposition'] //下载后文件名
         link.download = params.projectName + '(消防检测记录)' //下载的文件名
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        // console.log(111)
+        return Promise.resolve(true)
+    }).catch(error => {
+        this.$Notice.error({
+            title: '错误',
+            desc: '网络连接错误'
+        })
+        console.log(error)
+    })
+    // return true
+}
+
+// 4.消防检测反馈-导出excel
+export function exportMethod4(params) {
+    console.log(params)
+    return axios({
+        method: 'post',
+        // url: 'http://192.168.0.200:2225/export/download/records/service-feedback',
+        url: 'http://39.104.90.111:2225/export/download/records/service-feedback',
+        responseType: 'blob',
+        params
+    }).then((res) => {
+        // console.log(res)
+        // console.log(params)
+        const link = document.createElement('a')
+        let blob = new Blob([res.data], {
+            type: 'application/msword'
+        })
+        link.style.display = 'none'
+        link.href = URL.createObjectURL(blob)
+
+        // link.download = res.headers['content-disposition'] //下载后文件名
+        link.download = params.projectName + '(检测情况反馈)' //下载的文件名
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        // console.log(111)
+        return Promise.resolve(true)
+    }).catch(error => {
+        this.$Notice.error({
+            title: '错误',
+            desc: '网络连接错误'
+        })
+        console.log(error)
+    })
+    // return true
+}
+// 导出竣工查验
+export function exportMethod3(params) {
+    console.log(params)
+    return axios({
+        method: 'post',
+        // url: 'http://192.168.0.200:2225//export/download/records/cons',
+        url: 'http://39.104.90.111:2225/export/download/records/cons',
+        responseType: 'blob',
+        params
+    }).then((res) => {
+        // console.log(res)
+        // console.log(params)
+        const link = document.createElement('a')
+        let blob = new Blob([res.data], {
+            type: 'application/msword'
+        })
+        link.style.display = 'none'
+        link.href = URL.createObjectURL(blob)
+
+        // link.download = res.headers['content-disposition'] //下载后文件名
+        link.download = params.projectName + '(竣工查验记录)' //下载的文件名
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
