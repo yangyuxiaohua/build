@@ -494,17 +494,12 @@ export default {
               type: "success",
               message: "保存成功"
             });
-          } else {
-            this.$message({
-              type: "warning",
-              message: "网络请求失败"
-            });
-          }
+          } 
         })
         .catch(err => {
           this.$message({
             type: "warning",
-            message: err.msg
+            message: err
           });
         });
     },
@@ -595,7 +590,7 @@ export default {
         .catch(err => {
           this.$message({
             type: "warning",
-            message: err.Msg
+            message: err
           });
         });
     },
@@ -646,7 +641,7 @@ export default {
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         } else {
@@ -677,7 +672,7 @@ export default {
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         }
@@ -704,7 +699,7 @@ export default {
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         } else {
@@ -729,7 +724,7 @@ export default {
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         }
@@ -753,7 +748,7 @@ export default {
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         } else {
@@ -775,7 +770,7 @@ export default {
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         }

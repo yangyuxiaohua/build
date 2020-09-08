@@ -239,7 +239,7 @@ export function exportMethod3(params) {
     console.log(params)
     return axios({
         method: 'post',
-        // url: 'http://192.168.0.200:2225//export/download/records/cons',
+        // url: 'http://192.168.0.200:2225/export/download/records/cons',
         url: 'http://39.104.90.111:2225/export/download/records/cons',
         responseType: 'blob',
         params

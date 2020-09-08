@@ -385,7 +385,9 @@ export default {
     };
   },
   created() {
-    this.unitCurrentChange(this.unitCurrentPage);
+    if(this.$store.state.projectInfor.projectId){
+      this.unitCurrentChange(this.unitCurrentPage);
+    }
     this.roleShow();
     // console.log(this.$store.state.recodeStandard)
   },

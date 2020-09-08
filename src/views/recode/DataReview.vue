@@ -330,7 +330,9 @@ export default {
     };
   },
   created() {
+    if(this.$store.state.projectInfor.projectId){
     this.unitCurrentChange(this.unitCurrentPage);
+    }
     this.roleShow();
     // console.log(this.$store.state)
   },
@@ -365,7 +367,7 @@ export default {
             i.titleSecondaryDtos.forEach(j => {
               // console.log(i)
               j.recordsList.forEach(item => {
-                console.log(item);
+                // console.log(item);
                 // console.log(changeEdit(item.contentRecord))
                 children.push({
                   checklistId: item.checklistId,

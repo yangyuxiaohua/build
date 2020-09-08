@@ -109,15 +109,46 @@
         </div>
       </div>
     </div>
+    <div class="searchNoticeBox">
+      <el-row>
+        <el-col :span="4">
+          <el-input v-model="titKeyword" placeholder="标题关键字" clearable></el-input>
+        </el-col>
+        <el-col :span="3">
+          <el-select v-model="noticeType" clearable placeholder="消息类型">
+            <el-option v-for="item in noticeTypeOptions" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="3">
+          <el-select v-model="noticeStatus" clearable placeholder="消息状态">
+            <el-option v-for="item in noticeStatusOptions" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+            
+        </el-col>
+        <el-col :span="8">
+         <el-date-picker v-model="dataValue" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp" class="w100" @change='chosedDataValue'>
+            </el-date-picker>
+        </el-col>
+        <el-col :span="4" class='poright'>
+          <el-button type="primary" @click="onSearch">查询</el-button>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <script>
-import { pageByCondition, deletedNews, getNews, sendNews } from "@/apis/news";
-import { splitStr } from "@/utils/publictool";
+import {
+  pageByConditionNews,
+  deletedNews,
+  getNews,
+  sendNews
+} from "@/apis/news";
+import { splitStr,getTime } from "@/utils/publictool";
 // import { getRegions } from "@/apis/project.js";
 import { getFactoryMenus } from "@/apis/userUnit.js";
-import { getTime } from "@/utils/publictool";
 // import { uploadIp, ImgIp } from "@/apis/upload";
 // //富文本
 // import { quillEditor, Quill } from "vue-quill-editor";
@@ -146,110 +177,6 @@ export default {
       lawsContent: "", // 法律法规的内容
       lawsFormMaskShow: false, // 发布蒙版
       form: {}, // 发布修改的表单
-      // editorOption: {
-      //   modules: {
-      //     ImageExtend: {
-      //       loading: true,
-      //       // 如果不作设置，即{}  则依然开启复制粘贴功能且以base64插入
-      //       name: "file", // 图片参数名
-      //       size: 3, // 可选参数 图片大小，单位为M，1M = 1024kb
-      //       // action: "http://192.168.0.200:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       action: "http://39.104.90.111:2225/upload", // 服务器地址, 如果action为空，则采用base64插入图片
-      //       // response 为一个函数用来获取服务器返回的具体图片地址
-      //       // 例如服务器返回{code: 200; data:{ url: 'baidu.com'}}
-      //       // 则 return res.data.url
-      //       response: res => {
-      //         //  console.log(res)
-      //         const imgUrl = ImgIp + res.result;
-      //         // console.log(imgUrl)
-      //         return imgUrl;
-      //         // return Ip + res.result;
-      //       },
-      //       // headers: xhr => {
-      //       //   // xhr.setRequestHeader('myHeader','myValue')
-      //       // }, // 可选参数 设置请求头部
-      //       sizeError: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "图片太大"
-      //         });
-      //       }, // 图片超过大小的回调
-      //       start: () => {}, // 可选参数 自定义开始上传触发事件
-      //       end: () => {}, // 可选参数 自定义上传结束触发的事件，无论成功或者失败
-      //       error: () => {
-      //         this.$message({
-      //           type: "warning",
-      //           message: "上传失败"
-      //         });
-      //       }, // 可选参数 上传失败触发的事件
-      //       success: () => {
-      //         //  console.log(res)
-      //       }, // 可选参数  上传成功触发的事件
-      //       change: (xhr, formData) => {
-      //         console.log(xhr);
-      //         console.log(formData);
-      //         return false;
-      //         // xhr.setRequestHeader('myHeader','myValue')
-      //         // formData.append('token', 'myToken')
-      //       } // 可选参数 每次选择图片触发，也可用来设置头部，但比headers多了一个参数，可设置formData
-      //     },
-      //     ImageResize: {
-      //       // ...
-      //       // handleStyles: {
-      //       //   backgroundColor: "black",
-      //       //   border: "none",
-      //       //   color: white
-      //       //   // other camelCase styles for size display
-      //       // }
-      //       displaySize: true
-      //     },
-      //     imageDrop: true, //图片拖拽
-      //     // toolbar: {
-      //     //   // 如果不上传图片到服务器，此处不必配置
-      //     //   container: container, // container为工具栏，此次引入了全部工具栏，也可自行配置
-      //     //   handlers: {
-      //     //     image: function() {
-      //     //       // 劫持原来的图片点击按钮事件
-      //     //       QuillWatch.emit(this.quill.id);
-      //     //     }
-      //     //   }
-      //     // }
-      //     toolbar: [
-      //       ["bold", "italic", "underline", "strike"],
-      //       ["blockquote", "code-block"],
-      //       [{ header: 1 }, { header: 2 }],
-      //       [{ list: "ordered" }, { list: "bullet" }],
-      //       [{ script: "sub" }, { script: "super" }],
-      //       [{ indent: "-1" }, { indent: "+1" }],
-      //       [{ direction: "rtl" }],
-      //       [
-      //         {
-      //           size: [
-      //             "12px",
-      //             "14px",
-      //             false,
-      //             "18px",
-      //             "22px",
-      //             "26px",
-      //             "30px",
-      //             "36px",
-      //             "42px"
-      //           ]
-      //         }
-      //       ],
-      //       [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      //       [{ color: [] }, { background: [] }],
-      //       [{ font: [] }],
-      //       [{ align: [] }],
-      //       ["clean"],
-      //       // ["link", "image", "video"]
-      //       ["image"]
-      //     ]
-      //   }
-      // },
-      // addFlag: false, // 增加还是修改
-      // countyOptions: [], //区域
-      // btnShow: false ,//权限控制
       defaultOnNode: [], //人员默认展开
       checkStrictly: false, //父子之间不关联
       expandOnClickNode: false, //只有点击三角展开
@@ -262,7 +189,23 @@ export default {
       },
       checkedPersonList: [], // 默认选中人员
       typeOptions: [{ name: "公告", id: 1 }, { name: "通知", id: 5 }],
-      roleShow: false
+      roleShow: false,
+      titKeyword: "", // 标题关键字
+      noticeType: "", //消息类型
+      noticeTypeOptions: [
+        //消息类型数组
+        { label: "全部", value: null },
+        { label: "公告", value: 1 },
+        { label: "通知", value: 5 },
+        { label: "提醒", value: 10 }
+      ],
+      noticeStatus: "", //消息状态
+      noticeStatusOptions: [
+        //消息状态数组
+        { label: "已读", value: 5 },
+        { label: "未读", value: 1 }
+      ],
+      dataValue:[], // 起始时间和结束时间
     };
   },
   created() {
@@ -278,18 +221,23 @@ export default {
       } else {
         this.roleShow = false;
       }
-      
     },
     //分页
     lawsCurrentChange(val) {
       val = val < 1 ? 1 : val;
-      pageByCondition({
+      this.dataValue = this.dataValue?this.dataValue:[]
+      pageByConditionNews({
         size: this.lawsCurrentNum,
-        start: val
+        start: val,
+        title:this.titKeyword,
+        type:this.noticeType,
+        status:this.noticeStatus,
+        startTime:this.dataValue[0],
+        endTime:this.dataValue[1]
       })
         .then(res => {
           if (res.httpStatus == 200) {
-            console.log(res);
+            // console.log(res);
             this.lawsTotal = res.result.countRows;
             this.lawsList = res.result.result.notices.map(item => {
               item.createTime = getTime(item.createTime);
@@ -354,17 +302,12 @@ export default {
                   this.lawsCurrentChange(this.lawsCurrentPage);
                 }
                 // this.getLastFactoryMenus();
-              } else {
-                this.$message({
-                  type: "info",
-                  message: res.msg
-                });
               }
             })
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         })
@@ -392,7 +335,7 @@ export default {
         userIds: []
       };
       let arr3 = this.$refs.personTree.getCheckedKeys();
-      console.log(arr3);
+      // console.log(arr3);
       arr3.forEach(item => {
         if (item.indexOf("_") == -1) {
           obj.partIds.push(item);
@@ -409,11 +352,6 @@ export default {
               message: "发布成功"
             });
             this.lawsCurrentChange(this.lawsCurrentPage);
-          } else {
-            this.$message({
-              type: "info",
-              message: res.msg
-            });
           }
         })
         .catch(err => {
@@ -422,35 +360,6 @@ export default {
             message: "404网络请求失败"
           });
         });
-
-      // } else {
-      //   updateLaws({
-      //     id: this.form.id,
-      //     regionId: this.form.regionId,
-      //     title: this.form.title,
-      //     content: this.form.content
-      //   })
-      //     .then(res => {
-      //       if (res.httpStatus == 200) {
-      //         this.$message({
-      //           type: "success",
-      //           message: "修改成功"
-      //         });
-      //         this.lawsCurrentChange(this.lawsCurrentPage);
-      //       } else {
-      //         this.$message({
-      //           type: "info",
-      //           message: res.msg
-      //         });
-      //       }
-      //     })
-      //     .catch(err => {
-      //       this.$message({
-      //         type: "info",
-      //         message: "324网络请求失败"
-      //       });
-      //     });
-      // }
     },
     // 返回
     returnList() {
@@ -460,12 +369,10 @@ export default {
     //发布
     addLaws() {
       // this.addFlag = true;
-      if(this.$store.state.userRole.roleCode==300){
-      this.typeOptions = [{ name: "公告", id: 1 }, { name: "通知", id: 5 }]
-
-      }else{
-      this.typeOptions = [{ name: "通知", id: 5 }]
-
+      if (this.$store.state.userRole.roleCode == 300) {
+        this.typeOptions = [{ name: "公告", id: 1 }, { name: "通知", id: 5 }];
+      } else {
+        this.typeOptions = [{ name: "通知", id: 5 }];
       }
       this.lawsFormMaskShow = true;
       this.form = {};
@@ -494,11 +401,6 @@ export default {
               return item;
             });
             this.ruleValidate(this.acceptancePersonData);
-          } else {
-            this.$message({
-              type: "info",
-              message: "获取人员失败"
-            });
           }
         })
         .catch(err => {
@@ -567,6 +469,26 @@ export default {
             message: "网络请求失败"
           });
         });
+    },
+    // 时间选择器
+    chosedDataValue() {
+      if (this.dataValue) {
+        let date = new Date().getTime();
+        this.dataValue.forEach(item => {
+          if (item > date) {
+            this.$message({
+              type: "info",
+              message: "请选择有效时间"
+            });
+            this.dataValue=[]
+          }
+        });
+      }
+    },
+    //搜索
+    onSearch(){
+      this.lawsCurrentPage = 1
+      this.lawsCurrentChange(this.lawsCurrentPage)
     }
   }
 };
@@ -759,6 +681,19 @@ export default {
     .editContent {
       width: 100%;
       height: 400px;
+    }
+  }
+  .searchNoticeBox {
+    width: 900px;
+    position: absolute;
+    left: 300px;
+    top: -56px;
+    .el-col {
+      margin-left: 5px;
+    }
+    .poright{
+      display: flex;
+      justify-content: flex-end;
     }
   }
   // .ql-editor {

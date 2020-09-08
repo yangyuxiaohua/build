@@ -97,7 +97,7 @@
           <div class="statisticsLitleBoxLeft"><img src="../../assets/imgs/index/5.png" alt=""></div>
           <div class="statisticsLitleBoxRight">
             <p>
-              <span>{{num5}}</span>个</p>
+              <span>{{newsWait}}</span>个</p>
             <p>待查收消息</p>
           </div>
         </div>
@@ -205,23 +205,23 @@
             <span class="infoTitText">消息通知</span>
             <div>
               <span class="infoTotal">共计
-                <span> 1 </span>条</span>
+                <span> {{newsTotal}} </span>条</span>
               <span class="waitInfoNum">待验收
-                <span class="c00a"> 0 </span>条</span>
+                <span class="c00a"> {{newsWait}} </span>条</span>
             </div>
 
           </div>
           <div class="systemInfo">
             <div class="systemInfoTit">
-              <div class="systemInfoText">系统通告</div>
-              <div class="infoTime">2020-02-03 12：30</div>
+              <div class="systemInfoText">{{nwsObj.type}}</div>
+              <div class="infoTime">{{nwsObj.createTime}}</div>
             </div>
             <div class="info">
               <p class="infoText">
-                自2020年3月9日起正式启用升级后的建设工程消防设计审查验收备案申报系统，实现建设工程消防业务全网办。系统升级后，建设单位登录市住房城乡建设局企业网上申报系统（网址：http：//kmzj.zjz01.gov.cn）填写申报信息，并上传申报材料扫描文件及具有电子签章的电子图纸，即可办理相关业务，住建部门不在收取纸质材料与图纸。建设单位在收到审批结果短信通知后，自行在申报系统打印结果文书。
+               {{nwsObj.content}}
               </p>
               <div class="infoPaging">
-                <el-pagination background layout="prev, pager, next" :total="infoTotal" :pager-count="pageCount" :page-size='infoCurrentNum' :current-page.sync='infoCurrentPage' @current-change='infoCurrentChange'>
+                <el-pagination background layout="prev, pager, next" :total="newsTotal" :pager-count="pageCount" :page-size='newsCurrentNum' :current-page.sync='newsCurrentPage' @current-change='newsCurrentChange2'>
                 </el-pagination>
               </div>
             </div>
@@ -249,6 +249,7 @@ import {
 import { getYMTime, getTime, getYNumTime } from "@/utils/publictool";
 // import { defaults } from "lodash-es";
 import { pageByCondition } from "@/apis/laws";
+import { pageByConditionNews } from "@/apis/news";
 
 export default {
   components: {
@@ -304,6 +305,13 @@ export default {
       //时间选择器
       dataFlag: true,
       lawsList:[],//法规
+      newsCurrentPage:1,
+      newsTotal:0,
+      newsCurrentNum:1,
+      newsList:[],
+      newsWait:0,
+      nwsObj:{}
+
     };
   },
   created() {},
@@ -393,6 +401,9 @@ export default {
           time: this.dataValue
         });
       }
+      //消息
+         this.newsCurrentChange(this.newsCurrentPage)
+      
     },
     // 模糊查询
     remoteMethod(query) {
@@ -516,7 +527,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
+          // console.log(err);
           this.$message({
             type: "warning",
             message: "报表暂无数据"
@@ -972,10 +983,6 @@ export default {
       this.lawsCurrentChange(val)
       // this.getUserLsit(val);
     },
-    // 切换信息页码
-    infoCurrentChange(val) {
-      // this.getUserLsit(val);
-    },
     //获取4项
     getFourData(
       projectId = "",
@@ -1095,6 +1102,52 @@ export default {
             message: "65网络请求失败"
           });
         });
+    },
+    //==================================消息
+     //分页
+    newsCurrentChange(val) {
+      val = val < 1 ? 1 : val;
+      pageByConditionNews({
+        size: this.newsCurrentNum,
+        start: val
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            console.log(res);
+            
+            this.newsTotal = res.result.countRows;
+            this.newsWait = res.result.result.noticeNums + res.result.result.publicNums + res.result.result.remindNums;
+            this.newsList = res.result.result.notices.map(item => {
+              item.createTime = getTime(item.createTime);
+              let type = "";
+              switch (item.type) {
+                case 1:
+                  type = "公告";
+                  break;
+                case 5:
+                  type = "通知";
+                  break;
+                default:
+                  type = "提醒";
+              }
+              item.type = type;
+              return item;
+            });
+            // this.news = this.newsList
+            // console.log(this.newsList);
+            this.nwsObj = this.newsList[0]
+            
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: "287网络请求失败"
+          });
+        });
+    },
+    newsCurrentChange2(val) {
+      this.newsCurrentChange(val);
     },
   }
 };
@@ -1447,10 +1500,10 @@ export default {
               line-height: 26px;
             }
             .infoPaging {
-              position: absolute;
-              bottom: -40px;
-              // width: 100%;
-              left: 140px;
+              // position: absolute;
+              // bottom: -40px;
+              // // width: 100%;
+              // left: 140px;
               text-align: center;
             }
           }

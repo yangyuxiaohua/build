@@ -35,3 +35,6 @@ export const getCurrCopyStatus = params => rq.post('/record/personnel/getCurrCop
 
 // (新)获取标准名称
 export const getChecklistStandards2 = params => rq.post('/record/personnel/getChecklistStandardsRules', params,'json')
+
+// 查询标准冲突
+export const getStandardConflict = params => rq.post('/record/personnel/getStandardConflict', params)

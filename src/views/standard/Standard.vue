@@ -4,12 +4,7 @@
       <div class="headerNav">
         <span class="navList" v-for="(item,index) in navList" :key='index' :class="{chosedNav:cindex==item.standardId}" @click="changeNav(item)">{{item.name}}</span>
       </div>
-      <div class="standardSelect">
-        <el-select v-model="standardValue" placeholder="请选择标准" @change="chosedStandar()">
-          <el-option v-for="item in StandarOptions" :key="item.value" :label="item.label" :value="item">
-          </el-option>
-        </el-select>
-      </div>
+      
     </div>
     <div class="containner">
       <router-view></router-view>
@@ -205,8 +200,7 @@ export default {
     return {
       navList: [],
       cindex: 0,
-      StandarOptions: [],
-      standardValue: "",
+      
       //==============抽过来
       // treeData: [],
       // loading: false,
@@ -952,17 +946,7 @@ export default {
       }
     }
 
-    .standardSelect {
-      position: absolute;
-      width: 250px;
-      height: 40px;
-      left: 1100px;
-      top: -70px;
-      border-radius: 10px;
-      .el-input__inner {
-        background-color: #000;
-      }
-    }
+   
   }
   .containner {
     margin-top: 10px;

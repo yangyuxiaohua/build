@@ -131,7 +131,7 @@
 <script>
 import { uploadIp, ImgIp } from "@/apis/upload.js";
 import { getRegions } from "@/apis/project.js";
-import { register } from "@/apis/login.js";
+import { register, registerRepeat } from "@/apis/login.js";
 export default {
   data() {
     return {
@@ -177,7 +177,7 @@ export default {
     // 上传
     handleAvatarSuccess(res, file) {
       // this.imageUrl = URL.createObjectURL(file.raw);
-      console.log(res, file);
+      //   console.log(res, file);
       if (res.httpStatus == 200) {
         this.unitForm.businessLicense = res.result;
         this.imageUrl = ImgIp + res.result;
@@ -197,59 +197,63 @@ export default {
       // return isJPG && isLt2M;
     },
     agreeRegister() {
-        if(this.accountForm.password==this.accountForm.password2){
-             register(
-          {
-              factoryName:this.unitForm.factoryName,
-              regionId:this.unitForm.regionId,
-              unitLocation:this.unitForm.unitLocation,
-              maleSignal:this.unitForm.maleSignal,
-              type:this.unitForm.type,
-              businessLicense:this.unitForm.businessLicense,
-              contactMasterUser:this.accountForm.contactMasterUser,
-              username:this.accountForm.contactMasterUser,
-              contactMasterPhone:this.accountForm.contactMasterPhone,
-              account:this.accountForm.account,
-              password:this.accountForm.password,
-          }
-      )
-        .then(res => {
-          if (res.httpStatus == 200) {
+      if (this.unitForm.maleSignal) {
+        registerRepeat({ maleSignal: this.unitForm.maleSignal }).then(res => {
+          if (!res.result) {
+            if (this.accountForm.password == this.accountForm.password2) {
+              register({
+                factoryName: this.unitForm.factoryName,
+                regionId: this.unitForm.regionId,
+                unitLocation: this.unitForm.unitLocation,
+                maleSignal: this.unitForm.maleSignal,
+                type: this.unitForm.type,
+                businessLicense: this.unitForm.businessLicense,
+                contactMasterUser: this.accountForm.contactMasterUser,
+                username: this.accountForm.contactMasterUser,
+                contactMasterPhone: this.accountForm.contactMasterPhone,
+                account: this.accountForm.account,
+                password: this.accountForm.password
+              })
+                .then(res => {
+                  if (res.httpStatus == 200) {
+                    this.$alert(
+                      "请妥善保管注册账号信息！您需要登录系统pc端进一步完善单位信息，分配本单位的其他用户账号",
+                      "注册成功",
+                      {
+                        confirmButtonText: "确定"
+                      }
+                    );
+                  }
+                })
+                .catch(err => {
+                  this.$message({
+                    type: "info",
+                    message: "请求失败"
+                  });
+                });
+            } else {
+              this.$message({
+                type: "info",
+                message: "两次输入密码不一致，请确认！！！"
+              });
+            }
+          } else {
             this.$alert(
-              "请妥善保管注册账号信息！您需要登录系统pc端进一步完善单位信息，分配本单位的其他用户账号",
-              "注册成功",
-              {
-                confirmButtonText: "确定"
-              }
-            );
-          }else if(res.httpStatus == 417){
-              this.$alert(
               "您注册的单位已经存在系统中，请联系系统管理员复核。联系电话0871-65710577",
               "注册失败",
               {
                 confirmButtonText: "确定"
               }
             );
-          }else{
-              this.$message({
-                  type:'info',
-                  message:'注册失败'
-              })
           }
-        })
-        .catch(err => {
-             this.$message({
-                 type:'info',
-                 message:'请求失败'
-             })
         });
-        }else{
-            this.$message({
-                type:'info',
-                message:'两次输入密码不一致，请确认！！！'
-            })
-        }
-     
+      } else {
+        this.$message({
+          type: "info",
+          message: "请填写统一社会信用代码!"
+        });
+      }
+      //    registerRepeat({})
     },
     returnLogin() {
       this.$router.history.push("/");

@@ -185,7 +185,7 @@ export default {
         .catch(err => {
           this.$message({
             type: "warning",
-            message: err.msg
+            message: err
           });
         });
     },

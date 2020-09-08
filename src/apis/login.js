@@ -17,3 +17,6 @@ export const getLoginAccountInfo = params => req.post('/getLoginAccountInfo', pa
 
 // 2.单位注册
 export const register = params => req.post('/register', params)
+
+// 2.单位注册验重
+export const registerRepeat = params => req.post('/register/search', params)

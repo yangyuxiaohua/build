@@ -4,6 +4,7 @@
       <div class="lawsTabTit">
         <span class="titText">标题</span>
         <span class="releaseUnit">发布单位</span>
+        <span class="releasePerson">发布人</span>
         <span class="releaseTime">发布时间</span>
         <span class="handle">操作</span>
       </div>
@@ -11,6 +12,8 @@
         <div class="laws" v-for="(item,index) in lawsList" :key='index'>
           <span class="titText">{{item.title}}</span>
           <span class="releaseUnit">{{item.factoryName}}</span>
+          <span class="releasePerson">{{item.createUsername}}</span>
+
           <span class="releaseTime">{{item.createTime}}</span>
           <span class="handle">
             <span @click="lookLaw(item)">详情</span>
@@ -30,7 +33,9 @@
           <i class="el-icon-close closeIcon" @click="closeMask"></i>
         </div>
         <div class="titBox">
-           <div class="h2Box"><h3>{{form.title}}</h3></div>
+          <div class="h2Box">
+            <h3>{{form.title}}</h3>
+          </div>
           <div class="factoryNameTime">
             <span>{{form.factoryName}}</span>
             <span>{{form.createTime}}</span>
@@ -314,17 +319,12 @@ export default {
                   this.lawsCurrentChange(this.lawsCurrentPage);
                 }
                 // this.getLastFactoryMenus();
-              } else {
-                this.$message({
-                  type: "info",
-                  message: res.msg
-                });
-              }
+              } 
             })
             .catch(err => {
               this.$message({
                 type: "warning",
-                message: err.msg
+                message: err
               });
             });
         })
@@ -353,12 +353,7 @@ export default {
                 message: "发布成功"
               });
               this.lawsCurrentChange(this.lawsCurrentPage);
-            } else {
-              this.$message({
-                type: "info",
-                message: res.msg
-              });
-            }
+            } 
           })
           .catch(err => {
             this.$message({
@@ -380,12 +375,7 @@ export default {
                 message: "修改成功"
               });
               this.lawsCurrentChange(this.lawsCurrentPage);
-            } else {
-              this.$message({
-                type: "info",
-                message: res.msg
-              });
-            }
+            } 
           })
           .catch(err => {
             this.$message({
@@ -466,6 +456,11 @@ export default {
       .releaseUnit {
         flex: 0 0 300px;
       }
+      .releasePerson {
+        flex: 0 0 160px;
+        text-align: center;
+        text-indent: 0;
+      }
       .releaseTime {
         flex: 0 0 180px;
         // padding-right: 20px;
@@ -515,7 +510,7 @@ export default {
     background: rgba(0, 0, 0, 0.5);
     z-index: 10;
     box-sizing: border-box;
-    padding-bottom:60px ;
+    padding-bottom: 60px;
     .maskContainer {
       background-color: #fff;
       width: 100%;
@@ -544,7 +539,7 @@ export default {
       }
       .titBox {
         flex: 0 0 80px;
-        .h2Box{
+        .h2Box {
           padding: 10px;
           display: flex;
           justify-content: center;
@@ -553,8 +548,8 @@ export default {
         .factoryNameTime {
           color: #c0c4cc;
           line-height: 20px;
-        text-align: center;
-          
+          text-align: center;
+
           span:last-child {
             margin-left: 20px;
           }
@@ -565,7 +560,7 @@ export default {
         padding: 10px;
         line-height: 1.5em;
       }
-      .lawsForm{
+      .lawsForm {
         flex: 1;
       }
       .maskBtns {

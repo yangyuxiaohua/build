@@ -260,7 +260,9 @@ export default {
     };
   },
   created() {
+    if(this.$store.state.projectInfor.projectId){
     this.unitCurrentChange(this.unitCurrentPage);
+    }
     this.roleShow();
   },
   mounted() {},
@@ -296,7 +298,7 @@ export default {
             i.titleSecondaryDtos.forEach(j => {
               // console.log(i)
               j.recordsList.forEach(item => {
-                console.log(item);
+                // console.log(item);
                 children.push({
                   checklistId: item.checklistId,
                   listTit: item.primaryTitle,
@@ -523,6 +525,7 @@ export default {
           }
         })
         .catch(err => {
+          // console.log(err)
           this.loading = false;
           this.$message({
             type: "info",

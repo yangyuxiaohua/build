@@ -281,7 +281,9 @@ export default {
     };
   },
   created() {
+    if(this.$store.state.projectInfor.projectId){
     this.unitCurrentChange(this.unitCurrentPage);
+    }
     this.roleShow();
   },
   mounted() {},

@@ -31,16 +31,22 @@
             <el-divider></el-divider>
           </el-form> -->
           <div class="chickListWrapper">
+            <p class="stanardTitName">现行标准</p>
             <el-checkbox-group v-model="checkList">
               <el-row v-for="(item,index) in StandardNames" :key='index'>
-                <el-checkbox :label="item.value">{{item.name}}</el-checkbox>
+                <el-checkbox :label="item.value" @change="changeStandard(1,item.value)">{{item.name}}</el-checkbox>
               </el-row>
 
             </el-checkbox-group>
-            <div class="strandBtn">
-
-              <!-- <el-button type="primary" plain>确定</el-button> -->
-            </div>
+          <el-divider></el-divider>
+            
+            <p class="stanardTitName ">原有标准</p>
+            <el-checkbox-group v-model="checkList2">
+              <el-row v-for="(item,index) in StandardNames2" :key='index'>
+                <el-checkbox :label="item.value" @change="changeStandard(-1,item.value)">{{item.name}}</el-checkbox>
+              </el-row>
+            
+            </el-checkbox-group>
           </div>
         </div>
       </div>
@@ -92,11 +98,13 @@ import {
   // getAcceptanceFactoryPartsMenuDto,
   submitData,
   getCurrCopyStatus,
-  getChecklistStandards2
+  getChecklistStandards2,
+  getStandardConflict
 } from "@/apis/acceptMethods.js";
 import { getFactoryMenus } from "@/apis/userUnit.js";
 import { getChecklistStandards } from "@/apis/standard";
 import { splitStr } from "@/utils/publictool";
+import { indexOf } from 'lodash-es';
 export default {
   data() {
     return {
@@ -142,8 +150,10 @@ export default {
       checkedPersonList: [], // 默认选中人员
       checkedPersonList2: [], //默认选中项目负责人
       departments: [],
-      StandardNames: [], //所有使用标准
-      checkList: [], //筛选标准
+      StandardNames: [], //现行标准
+      StandardNames2: [], //原有标准
+      checkList: [], //筛选现行标准
+      checkList2: [], //筛选原有标准
       projectInfor: {}, //项目信息
       factoryType: 1, //单位类型
       dialogFormVisible: false,
@@ -157,7 +167,7 @@ export default {
     // this.projectInfor = this.$store.state.projectInfor;
     // this.factoryType = this.$store.state.userInfor.factoryType;
     // this.roleControl();
-    if(this.$store.state.projectInfor.projectId){
+    if (this.$store.state.projectInfor.projectId) {
       this.init();
     }
   },
@@ -286,7 +296,6 @@ export default {
     SubmitTask(copyType = null) {
       this.loading = true;
 
-      // console.log(this.checkList)
       let obj = {
         copyType,
         primaryChecklistIds: [],
@@ -454,16 +463,21 @@ export default {
           partId: splitStr(item)[0]
         };
       });
-      obj.checklistStandardIds = this.checkList;
+      obj.checklistStandardIds = this.checkList.concat(this.checkList2);
       // obj.primaryChecklistIds = obj.primaryChecklistIds.concat(level1NoChecked);
       // obj.secondaryChecklistIds = obj.secondaryChecklistIds.concat(
       //   level2NoChecked
       // );
       // console.log(this.StandardNames)
-      // console.log(this.checkList)
       this.checkList.forEach(item => {
         this.StandardNames.forEach(i => {
-          //  console.log(i)
+          if (i.value == item) {
+            obj.standardNames.push(i.name);
+          }
+        });
+      });
+      this.checkList2.forEach(item => {
+        this.StandardNames2.forEach(i => {
           if (i.value == item) {
             obj.standardNames.push(i.name);
           }
@@ -623,7 +637,7 @@ export default {
       })
         .then(res => {
           if (res.httpStatus == 200) {
-            console.log(res);
+            // console.log(res);
             this.acceptancePersonData = res.result.map(item => {
               // return {
               //   id: item.factoryId,
@@ -779,12 +793,19 @@ export default {
     },
 
     //切换标准
-    changeStandard() {},
+    changeStandard(num,val) {
+      if(num===1){
+          this.StandardConflict(val,this.checkList,this.checkList2)
+      }else{
+          this.StandardConflict(val,this.checkList2,this.checkList)
+      }
+    },
     //获取标准名称
     getStandardNames() {
       getChecklistStandards({
         projectId: this.$store.state.projectInfor.projectId,
-        standardId: this.cindex
+        standardId: this.cindex,
+        version: "v1"
       })
         .then(res => {
           if (res.httpStatus == 200) {
@@ -805,6 +826,35 @@ export default {
             this.StandardNames.forEach(item => {
               if (item.selected) {
                 this.checkList.push(item.value);
+              }
+            });
+          }
+        })
+        .catch(err => {
+          this.$message({
+            type: "info",
+            message: "请求数据失败"
+          });
+        });
+      getChecklistStandards({
+        projectId: this.$store.state.projectInfor.projectId,
+        standardId: this.cindex,
+        version: "v0"
+      })
+        .then(res => {
+          if (res.httpStatus == 200) {
+            // console.log(res);
+            this.checkList2 = []
+            this.StandardNames2 = res.result.map(item => {
+              return {
+                name: item.standardName,
+                value: item.standardChecklistId,
+                selected: item.selected
+              };
+            });
+             this.StandardNames2.forEach(item => {
+              if (item.selected) {
+                this.checkList2.push(item.value);
               }
             });
           }
@@ -909,6 +959,37 @@ export default {
     sureUsedRecode() {
       // console.log()
       this.SubmitTask(this.radio);
+    },
+    //标准冲突
+    StandardConflict(str='',arr1=[],arr2=[]){
+      if(arr1.indexOf(str) !==-1 ){
+        getStandardConflict({
+                dictId:str
+              }).then(res=>{
+                if(res.httpStatus==200){
+                  // console.log(res)
+                  if(res.result.length>0){
+                  let DictArr = res.result.map(item=>{
+                      let s = '';
+                     return s = str===item.originalDictId?item.purposeDictId:item.originalDictId
+                    })
+                    // console.log(DictArr)
+                    for (let i=0;i<DictArr.length;i++){
+                      let num1 = arr2.indexOf(DictArr[i])
+                        if(num1!==-1){
+                            arr2.splice(num1,1)
+                        }
+                    }
+                  }
+                }
+              }).catch(err=>{
+                this.$message({
+                  type:'info',
+                  message:'网络请求失败'
+                })
+              })
+      }
+     
     }
   },
   computed: {
@@ -995,9 +1076,15 @@ export default {
         .chickListWrapper {
           padding: 0 10px;
           line-height: 20px;
-          .strandBtn {
-            text-align: center;
-            margin-top: 40px;
+          // .strandBtn {
+          //   text-align: center;
+          //   margin-top: 40px;
+          // }
+          .stanardTitName {
+            line-height: 30px;
+          }
+          .el-divider{
+            margin: 12px 0;
           }
         }
       }
@@ -1049,5 +1136,7 @@ export default {
   .lh48 {
     line-height: 48px;
   }
+ 
+ 
 }
 </style>

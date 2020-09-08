@@ -51,7 +51,16 @@
         </el-form>
       </div>
       <div class="thirdInfo" v-show="thirdShow">
-        <el-form ref="form" :model="form" label-width="100px">
+        <el-form ref="form" :model="form" label-width="120px">
+          <el-row v-show="showData">
+            <el-col :span="24">
+              <el-form-item label="现场评定标识 :">
+                <el-input v-model="form.copyStandardChecklistId"></el-input>
+              </el-form-item>
+            </el-col>
+
+          </el-row>
+
           <el-row>
             <el-col :span="12">
               <el-form-item label="分部工程 :">
@@ -87,7 +96,18 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="适用标准 :">
-                <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.standardName">
+                <!-- <el-input type="textarea" :rows="13" placeholder="请输入内容" v-model="form.checkTypeId">
+
+                </el-input> -->
+
+                <el-radio-group v-model="form.checkTypeId">
+                  <el-radio :label="item.value" v-for="item in StandarOptions" :key='item.value'>{{item.name}}</el-radio>
+                  <!-- <el-radio label="v1">现行标准</el-radio> -->
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="标准名称 :">
+                <el-input type="textarea" :rows="10" placeholder="请输入内容" v-model="form.standardName">
+
                 </el-input>
               </el-form-item>
             </el-col>
@@ -158,6 +178,12 @@
         </div>
       </el-dialog>
     </div>
+    <div class="standardSelect">
+        <el-select v-model="version" placeholder="请选择标准" @change="chosedStandard()">
+          <el-option v-for="item in StandarOptions" :key="item.value" :label="item.name" :value="item.value">
+          </el-option>
+        </el-select>
+      </div>
   </div>
 </template>
 
@@ -226,6 +252,7 @@ export default {
       treeNodeData: {}, //点击树形节点传递的数据
       addBtnClickFlag: false,
       inputSearch: "",
+      showData: false, // 现场评定标识在资料审查不用显示
       // content: null,
       editorOption: {
         modules: {
@@ -333,13 +360,23 @@ export default {
       standardName: "",
       showCopyBtn: false,
       dialogFormVisible: false,
-      copyRadio: ""
+      copyRadio: "",
+      StandarOptions: [
+        {name:'原有标准',value:'v0'},
+        {name:'现行标准',value:'v1'}
+      ],//标准
+      version: 'v1',
     };
   },
   created() {
     if (this.$store.state.standardId.standardId) {
       this.loading = true;
       this.standardName = this.$store.state.standardId.standardName;
+      if (this.standardName == "资料核查") {
+        this.showData = false;
+      } else {
+        this.showData = true;
+      }
       this.getTreeData(this.$store.state.standardId.standardId);
     }
   },
@@ -373,6 +410,7 @@ export default {
         this.secondShow = false;
         this.thirdShow = true;
         this.parentShow = false;
+
         // 判断是否显示复制按钮
         if (this.$store.state.standardId.standardName == "消防检测") {
           this.showCopyBtn = true;
@@ -390,14 +428,33 @@ export default {
       if (data.confi) {
         getCurrChecklistById({ checklistId: splitStr(data.id)[1] })
           .then(res => {
+            // console.log(res);
             if (res.httpStatus == 200) {
               this.form = res.result;
+              let copyStandardChecklistId = "";
+              switch (this.standardName) {
+                case "竣工查验":
+                  this.form.copyStandardChecklistId = res.result
+                    .copyStandardChecklistId
+                    ? res.result.copyStandardChecklistId
+                    : "";
+                  break;
+                case "消防检测":
+                  this.form.copyStandardChecklistId = res.result
+                    .copyStandardChecklistId
+                    ? res.result.copyStandardChecklistId
+                    : "";
+                  break;
+                default:
+                  this.form.copyStandardChecklistId =
+                    res.result.standardChecklistId;
+              }
             }
           })
           .catch(err => {
             this.$message({
               type: "warning",
-              message: err.msg
+              message: err
             });
           });
       }
@@ -531,9 +588,16 @@ export default {
             });
         }
       } else {
+        // 复制标准
+        if (
+          this.standardName == "现场评定" ||
+          this.standardName == "资料核查"
+        ) {
+          this.form.copyStandardChecklistId = null;
+        }
         if (this.addBtnClickFlag) {
           addChecklist({
-            checkTypeId: this.standardId,
+            // checkTypeId: this.standardId,
             standardId: this.standardId,
             standardPrimaryId: this.treeNodeData.standardPrimaryId,
             standardSecondaryId: this.treeNodeData.standardSecondaryId,
@@ -580,10 +644,11 @@ export default {
     },
     getTreeData(id) {
       getCurrStandardDocument({
-        standardId: id
+        standardId: id,
+        version:this.version
       })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.standardId = res.result.standardId;
           if (res.httpStatus == 200) {
             this.loading = false;
@@ -609,6 +674,8 @@ export default {
                       if (j.selected) {
                         this.checkedList.push(j.standardChecklistId);
                       }
+                      // console.log(j)
+
                       return {
                         id: "menuLevel3_" + j.standardChecklistId,
                         label: j.content,
@@ -624,6 +691,7 @@ export default {
                 })
               };
             });
+            // console.log(this.treeData);
             this.treeData = [
               {
                 id: "01",
@@ -639,9 +707,21 @@ export default {
         .catch(err => {
           this.$message({
             type: "warning",
-            message: err.msg
+            message: err
           });
         });
+    },
+    //筛选标准
+    chosedStandard(){
+        this.loading = true;
+      this.getTreeData(this.standardId);
+      this.form = {};
+      this.rightMaskShow = true;
+      this.parentShow = false; //父节点
+        this.firstShow = false; //一级显示
+      this.secondShow = false; //二级显示
+      this.thirdShow = true; //三级显示
+      this.nodeClickFlag = false;
     },
     //删除
     deleteCon(index) {
@@ -906,6 +986,11 @@ export default {
     getStandard: function(val1, val2) {
       this.loading = true;
       this.standardName = val1.standardName;
+      if (this.standardName == "资料核查") {
+        this.showData = false;
+      } else {
+        this.showData = true;
+      }
       this.getTreeData(val1.standardId);
       this.form = {};
       this.rightMaskShow = true;
@@ -923,6 +1008,7 @@ export default {
 #assessWrapper {
   width: 100%;
   height: 100%;
+  // overflow: hidden;
   display: flex;
   background-color: #fff;
   position: relative;
@@ -1040,5 +1126,16 @@ export default {
   .ql-container {
     white-space: pre-wrap !important;
   }
+   .standardSelect {
+      position: absolute;
+      width: 250px;
+      height: 40px;
+      left: 1100px;
+      top: -120px;
+      border-radius: 10px;
+      .el-input__inner {
+        background-color: #000;
+      }
+    }
 }
 </style>

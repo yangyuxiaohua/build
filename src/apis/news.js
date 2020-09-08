@@ -1,7 +1,7 @@
 import rq from '../utils/request.js';
 
 // 查询一批消息
-export const pageByCondition = params => rq.post('/notice/pageByCondition', params)
+export const pageByConditionNews = params => rq.post('/notice/pageByCondition', params)
 
 // 删除通知
 export const deletedNews = params => rq.post('/notice/deleted', params)

@@ -40,18 +40,10 @@ axios.interceptors.request.use(config => {
 
 // 响应拦截器
 axios.interceptors.response.use(response => {
-    // console.log('返回的错误',response.data)
-    // if (response.data.httpStatus == 417) {
-    //     console.log('重复')
-    //     // this.$message({
-    //     //     type: 'warning',
-    //     //     Message: response.data.msg
-    //     // })
-    // } else if (response.data.httpStatus == 403) {
-    //     this.$router.history.push('*')
-    // } else if (response.data.httpStatus == 500) {
-    //     Message.error("网络请求发生错误，请稍后再试")
-    // }
+   
+    if (response.data.httpStatus && response.data.httpStatus != 200) {
+        Message.error(response.data.msg)
+    }
     return response;
 
 }, error => {
