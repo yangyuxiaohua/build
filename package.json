@@ -14,7 +14,7 @@
     "element-ui": "2.13.1",
     "less": "3.11.1",
     "less-loader": "5.0.0",
-    "qs": "6.9.4",
+    "qs": "6.9.7",
     "quill-image-drop-module": "1.0.3",
     "quill-image-extend-module": "1.1.2",
     "quill-image-resize-module": "1.0.0",
